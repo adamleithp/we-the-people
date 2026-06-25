@@ -1,0 +1,149 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="We The People — The Walk">
+  <canvas id="walk"></canvas>
+  <p id="caption" class="caption"></p>
+  <p id="hint" class="hint">Arrow keys / WASD — or tap — to walk down</p>
+
+  <div id="join" class="join">
+    <p class="join-tag">Be part of hope.</p>
+    <a class="join-cta" href="#">Join Us</a>
+  </div>
+</Layout>
+
+<script>
+  import { startWalk } from '../scripts/walk';
+  startWalk();
+</script>
+
+<style>
+  #walk {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100vw;
+    height: 100dvh;
+    touch-action: none;
+    cursor: pointer;
+  }
+
+  .caption {
+    position: fixed;
+    top: 12vh;
+    left: 0;
+    right: 0;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--wtp-green, #004225);
+    opacity: 0;
+    pointer-events: none;
+    transition: top 0.6s ease, font-size 0.6s ease;
+    z-index: 3; /* stays crisp above the arrival dim */
+
+    /* pure-CSS shimmer: a lighter band swept across the glyphs */
+    background: linear-gradient(
+      100deg,
+      var(--wtp-green, #004225) 35%,
+      #3f9268 50%,
+      var(--wtp-green, #004225) 65%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: caption-shimmer 4s linear infinite;
+  }
+
+  @keyframes caption-shimmer {
+    from {
+      background-position: 220% 0;
+    }
+    to {
+      background-position: -220% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .caption {
+      animation: none;
+    }
+  }
+
+  /* title-card register for the opening & closing bookend beats */
+  .caption.title {
+    top: 40vh;
+    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    font-size: clamp(2.6rem, 9vw, 6rem);
+    line-height: 0.95;
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 6vh;
+    left: 0;
+    right: 0;
+    margin: 0;
+    text-align: center;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(7, 41, 27, 0.5);
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    z-index: 2;
+  }
+  .hint.gone {
+    opacity: 0;
+  }
+
+  /* arrival: dim the scene and bring the CTA in below the on-screen wordmark */
+  .join {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    padding-bottom: 16vh;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.66);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    z-index: 1;
+  }
+  .join.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  .join-tag {
+    margin: 0.4rem 0 1.4rem;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    color: rgba(7, 41, 27, 0.8);
+  }
+  .join-cta {
+    justify-self: center;
+    padding: 0.8rem 2.4rem;
+    border-radius: 999px;
+    background: var(--wtp-green, #004225);
+    color: var(--wtp-paper, #f6f4ee);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+  .join-cta:hover {
+    transform: translateY(-2px);
+  }
+</style>

@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+/* Brand tokens — exposed as Tailwind utilities (bg-wtp-green, text-wtp-paper, font-wordmark, …) */
+@theme {
+  --color-wtp-green: #004225; /* British Racing Green */
+  --color-wtp-paper: #f6f4ee;
+
+  /* maps to the Astro Fonts API variable injected by <Font /> */
+  --font-wordmark: var(--font-anton), 'Arial Narrow', sans-serif;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-wtp-green);
+    color: var(--color-wtp-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}

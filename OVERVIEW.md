@@ -48,6 +48,26 @@ Members pledge to hold personal political loyalties **secondary** to WTP's objec
 - **Tone:** effortlessly cool but simple; bold action, journey toward unity; works seamlessly on mobile + desktop.
 - **Likely partner:** ISWE Foundation (runs assemblies).
 
+## Design references
+
+From the website brief. **Guiding insight (their words):** the best sites *"worked out what's at their core and then made THAT their means of navigation"* — which stops them being gimmicky. So **how the site unfolds should reflect what WTP *is*** — millions of distinct dots / voices / **splinters of glass** pulling together into the shape of the country (a Magna Carta–style constitution, or the round UN / O2 / Stonehenge gathering place) — possibly passing through a spiky, uncomfortable phase that resolves into harmony.
+
+**Aim for** giveahand's "dots forming a whole" concept and no-fishing's sense of scale, **shipped at** blueheart's simplicity. Don't out-jazz the stage we're at.
+
+Peers (the citizens'-assembly space):
+- [Assemble](https://timetoassemble.org/)
+- [Sortition / 858 — House of Citizens](https://www.858.org.uk/house-of-citizens)
+- [Our House](https://ourhouseuk.org/)
+- [ISWE Foundation](https://www.iswe.org/) — likely partner (may run the assemblies). Rated best in class: *"the faces especially, and the impact of that on you."*
+
+Style references they love ([awwwards nonprofit collection](https://www.awwwards.com/awwwards/collections/nonprofit-websites/)):
+- [giveahand.ai](https://www.giveahand.ai/) — scroll-driven; people across a map forming a logo. Loved the idea, but *"too jazzy"* for now.
+- [theothersideoftruth.com](https://theothersideoftruth.com/) — *"amazing"*; busy, complex, groundbreaking.
+- [blueheart.patagonia.com](https://blueheart.patagonia.com/) — *"really LOVE the simplicity."* Model for the steps 1·2·3 layout.
+- [no-fishing.net](https://www.no-fishing.net/) — *"badass"*; the cause at the scale of the world.
+
+See [`DESIGN.md`](./DESIGN.md) for concrete concepts being explored.
+
 ## Source documents (`docs/`)
 
 | Doc | Role |

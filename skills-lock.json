@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "cinematography": {
+      "source": "fal-ai-community/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cinematography/SKILL.md",
+      "computedHash": "c0c5ee6d1b570d61d622f4dfbd8ca55158101cfffcc9bf0819777476927b9dce"
+    }
+  }
+}

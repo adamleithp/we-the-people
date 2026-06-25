@@ -1,0 +1,26 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/base.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'We The People' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="We The People — Reunite the Country, Transform the System." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Self-hosted, subset & preloaded by the Astro Fonts API -->
+    <Font cssVariable="--font-anton" preload />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
