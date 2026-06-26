@@ -25,6 +25,7 @@ type Figure = {
   oy: number;
   slump?: number; // 0..1 despair posture (hunched, bowed, still)
   joined?: number; // 0..1 turned green on entering the circle / the cause
+  ring?: boolean; // belongs to the final gathering, packs to the centre
   walking?: boolean; // drives the walk cycle in render
   gathering?: boolean; // converging on the centre at the climax
   ga?: number; // gather angle
@@ -59,9 +60,9 @@ export function startWalk() {
   const WORLD_END = 5200; // arrival
   // Beats cut to the action, with leads + breathing gaps between them.
   const beats: Beat[] = [
-    { text: 'We start alone.', in: 60, out: 900, big: true },
-    { text: 'The world wears us down.', in: 1000, out: 1750, big: true },
-    { text: 'Something stirs us to anger.', in: 1850, out: 2650, big: true },
+    { text: 'We’ve drifted apart.', in: 60, out: 900, big: true },
+    { text: 'We’ve lost heart.', in: 1000, out: 1750, big: true },
+    { text: 'We’re turned against each other.', in: 1850, out: 2650, big: true },
     { text: 'We split into sides.', in: 2450, out: 3450, big: true },
     { text: 'But there is another way…', in: 3550, out: 3950, big: true },
     { text: 'We the People', in: 4050, out: WORLD_END, big: true },
@@ -123,21 +124,42 @@ export function startWalk() {
     f.tx = left ? range(150, WORLD_W * 0.32) : range(WORLD_W * 0.68, WORLD_W - 150);
     npcs.push(f);
   }
-  // Zone 5/6 — the gathering: rings around the centre at the journey's end
+  // Zone 5/6 — the gathering. Figures start scattered far out and pack to the
+  // centre. Each gets a unique sunflower slot (phyllotaxis): fills a disc from
+  // the centre outward, evenly spaced — no centre gap, no overlapping bodies.
   const ringCx = WORLD_W / 2;
   const ringCy = 4700;
+  const SPACING = 20; // world units between packed neighbours
+  const RESERVE = 2; // tiny inner core left for the player at the very centre
+  const GOLD = 2.399963229728653; // golden angle
+  let slot = 0;
+  const aimCentre = (f: Figure) => {
+    const i = slot++;
+    const rr = SPACING * Math.sqrt(i + RESERVE);
+    const th = i * GOLD;
+    f.ring = true;
+    f.tx = ringCx + Math.cos(th) * rr;
+    f.ty = ringCy + Math.sin(th) * rr * 0.7; // 0.7 = oblique squash
+  };
+
   const RING = 78 * DENSITY;
   for (let i = 0; i < RING; i++) {
-    const a = rnd() * Math.PI * 2; // random angle — scattered, not in rings
+    const a = rnd() * Math.PI * 2; // scattered start — random angle
     const r = range(380, 1150); // random distance, well out from the centre
-    npcs.push(mk(ringCx + Math.cos(a) * r, ringCy + Math.sin(a) * r * 0.7));
+    const f = mk(ringCx + Math.cos(a) * r, ringCy + Math.sin(a) * r * 0.7);
+    aimCentre(f);
+    npcs.push(f);
   }
-  // still-angry but supported figures inside the fold (scene 8 spirit)
-  for (let i = 0; i < 12 * DENSITY; i++)
-    npcs.push(mk(ringCx + range(-120, 120), ringCy + range(-80, 80), 0.6));
+  // still-angry but supported figures, also drawn into the fold (scene 8 spirit)
+  for (let i = 0; i < 12 * DENSITY; i++) {
+    const f = mk(ringCx + range(-120, 120), ringCy + range(-80, 80), 0.6);
+    aimCentre(f);
+    npcs.push(f);
+  }
 
   // --- player -------------------------------------------------------------
-  const player: Figure = mk(WORLD_W / 2, 120);
+  // start well north of the first beat (in:60) so no text is visible at spawn
+  const player: Figure = mk(WORLD_W / 2, -320);
   player.scale = 1.15;
   player.angry = 0;
   player.targetAngry = 0;
@@ -235,12 +257,17 @@ export function startWalk() {
     ctx.lineTo(sx - swing, sy);
     ctx.stroke();
 
-    // anger: a raised arm thrown up from the shoulder
+    // anger: both arms thrown up, with a little agitated jitter
     if (f.angry > 0.15) {
-      const dir = f.wanderSeed % 2 < 1 ? 1 : -1;
+      const a = f.angry;
+      const shY = shoulderY + 3 * s - bob;
+      const upY = shoulderY - 11 * s * a - bob;
+      const jit = Math.sin(f.phase * 1.4) * 1.6 * s * a;
       ctx.beginPath();
-      ctx.moveTo(sx, shoulderY + 3 * s - bob);
-      ctx.lineTo(sx + dir * 7 * s, shoulderY - 13 * s * f.angry - bob);
+      ctx.moveTo(sx, shY);
+      ctx.lineTo(sx - 7 * s, upY + jit);
+      ctx.moveTo(sx, shY);
+      ctx.lineTo(sx + 7 * s, upY - jit);
       ctx.stroke();
     }
 
@@ -294,7 +321,7 @@ export function startWalk() {
       player.x += vx * SPEED * dt;
       player.y += vy * SPEED * dt;
       player.x = clamp(player.x, 60, WORLD_W - 60);
-      player.y = clamp(player.y, 60, WORLD_END);
+      player.y = clamp(player.y, -360, WORLD_END);
       player.phase += dt * 10 * player.speed;
     }
 
@@ -307,7 +334,10 @@ export function startWalk() {
 
     // distance to the gathering centre drives the climax
     const distC = Math.hypot(player.x - ringCx, player.y - ringCy);
-    const gatherOn = distC < 1300; // begin converging early — off-screen, before you see them
+    // convergence throttle: ~still before the scene, slow as you enter, fast as
+    // you reach the centre (eased so far-away figures barely creep).
+    const closeC = clamp(1 - distC / 1000, 0, 1);
+    const gatherSpeed = closeC * closeC;
     const SPLIT_SPEED = 130; // top march speed (everyone shares it)
 
     // you turn green as you step into the circle / join the cause
@@ -376,30 +406,20 @@ export function startWalk() {
         }
       }
 
-      // climax: triggers from far out so figures are already converging long
-      // before they scroll into view (no synchronised pop). Each collapses
-      // inward along its OWN radius — no cross-scramble.
-      if (f.baseY > 3600 && gatherOn && !f.gathering) {
-        f.gathering = true;
-        f.ga = Math.atan2(f.y - ringCy, f.x - ringCx);
-        // walk inward to a fraction of the current distance (keeps a clear core)
-        const curR = Math.hypot(f.x - ringCx, (f.y - ringCy) / 0.7);
-        f.gr = Math.max(150, curR * range(0.32, 0.55));
-      }
-
-      if (f.gathering) {
-        const tx = ringCx + Math.cos(f.ga!) * f.gr!;
-        const ty = ringCy + Math.sin(f.ga!) * f.gr! * 0.7;
-        const dx = tx - f.x;
-        const dy = ty - f.y;
+      // climax: everyone packs to the centre, into their own sunflower slot.
+      // Movement is throttled by the player's nearness — barely moving before
+      // the scene, slow as you enter, fast as you reach the centre.
+      if (f.ring) {
+        const dx = f.tx! - f.x;
+        const dy = f.ty! - f.y;
         const dd = Math.hypot(dx, dy);
-        const mv = Math.min(1, dt * 1.7);
+        const mv = Math.min(1, dt * 3.6 * gatherSpeed);
         f.x += dx * mv;
         f.y += dy * mv;
-        // joining the cause: turn green as they settle into the circle
-        f.joined = (f.joined ?? 0) + (1 - (f.joined ?? 0)) * Math.min(1, dt * 0.9);
-        f.walking = dd > 5;
-        if (!reduceMotion && f.walking) f.phase += dt * 9 * f.speed;
+        f.walking = dd > 4 && gatherSpeed > 0.03;
+        if (!reduceMotion && f.walking) f.phase += dt * (2 + 8 * gatherSpeed) * f.speed;
+        // joining the cause: turn green as the crowd comes together
+        f.joined = (f.joined ?? 0) + (closeC - (f.joined ?? 0)) * Math.min(1, dt * 1.2);
         continue;
       }
 
