@@ -1,3 +1,7 @@
+> **Idea 3 — The Movie (current direction, v2)** is specced in [`MOVIE.md`](./MOVIE.md):
+> scroll-scrubbed 9-beat film, behind-figure pseudo-3D camera, sunrise finale
+> spelling WE THE PEOPLE from above. Ideas 1 & 2 below are kept for reference.
+
 # Design idea 1 
 
 explained a sequence of scenes, as we scroll, we pass through the scenes.
