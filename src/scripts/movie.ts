@@ -93,8 +93,13 @@ export function startMovie() {
   const range = (a: number, b: number) => a + (b - a) * rnd();
 
   // --- terrain ------------------------------------------------------------
-  // A broad slope rising to the summit plateau; the path winds up it.
-  const elev = (z: number) => HILL_H * smooth(clamp((z - HILL_FOOT) / (HILL_TOP - HILL_FOOT), 0, 1));
+  // Gently rolling valleys flattening into the broad slope up to the summit.
+  const elev = (z: number) => {
+    const hill = HILL_H * smooth(clamp((z - HILL_FOOT) / (HILL_TOP - HILL_FOOT), 0, 1));
+    const rollOff = 1 - smooth(clamp((z - HILL_FOOT) / 500, 0, 1));
+    const roll = (Math.sin(z * 0.0035) * 0.6 + Math.sin(z * 0.0011 + 3) * 0.4) * 7 * rollOff;
+    return hill + roll;
+  };
   const pathX = (z: number) => 26 * Math.sin(z * 0.0021) + 14 * Math.sin(z * 0.00057 + 2);
 
   // --- letters ------------------------------------------------------------
@@ -272,14 +277,12 @@ export function startMovie() {
     const N_SLICE = lowPower ? 72 : 96;
     const ratio = Math.pow(FAR_VIEW / NEAR, 1 / (N_SLICE - 1));
     let d = NEAR;
-    let skylineY = cssH;
     for (let i = 0; i < N_SLICE; i++, d *= ratio) {
       const z = camZ + d;
       const y = horizonY + ((camElev - elev(z)) * FOCAL) / d;
       // cap below full white-out so the hill stays a shadowy outline in the mist
       const fog = Math.min(0.93, g.fog * clamp(d / FOG_FAR, 0, 1));
       slices.push({ z, y, fog });
-      if (y < skylineY) skylineY = y;
     }
 
     // --- sky ------------------------------------------------------------------
@@ -289,23 +292,28 @@ export function startMovie() {
     ctx!.fillStyle = sky;
     ctx!.fillRect(0, 0, cssW, cssH);
 
-    // --- sun: glow, then disc + rays (drawn pre-ground so the hill occludes) --
+    // --- mountains + sun: far ridges, then the sun nestled between ranges ----
     const sunX = cx + (pathX(camZ + FAR_VIEW) - camX) * proj(camZ + FAR_VIEW);
-    const sunY = skylineY - g.sunAlt * cssH * 0.2;
+    const sunY = horizonY + cssH * 0.02 - g.sunAlt * cssH * 0.52;
     if (g.glow > 0.01) {
       const r = cssH * (0.25 + 0.45 * g.glow);
+      const gy = Math.max(sunY, horizonY - cssH * 0.1);
       ctx!.save();
       ctx!.globalAlpha = 0.55 * g.glow;
-      const gl = ctx!.createRadialGradient(sunX, Math.max(sunY, skylineY), 0, sunX, Math.max(sunY, skylineY), r);
+      const gl = ctx!.createRadialGradient(sunX, gy, 0, sunX, gy, r);
       gl.addColorStop(0, 'rgba(242,193,78,0.9)');
       gl.addColorStop(1, 'rgba(242,193,78,0)');
       ctx!.fillStyle = gl;
-      ctx!.fillRect(sunX - r, Math.max(sunY, skylineY) - r, r * 2, r * 2);
+      ctx!.fillRect(sunX - r, gy - r, r * 2, r * 2);
       ctx!.restore();
     }
-    if (g.sunAlt > -0.15) {
-      const sr = cssH * 0.075;
-      if (g.sunAlt > 0.05) {
+    ridgeLayer(ctx!, cssW, horizonY, camX * 0.1 + playerZ * 0.012 + 60, cssH * 0.21, cssH * 0.015, mix(g.ground, g.hor, 0.82), 1.1);
+    ridgeLayer(ctx!, cssW, horizonY, camX * 0.18 + playerZ * 0.022 + 900, cssH * 0.165, cssH * 0.008, mix(g.ground, g.hor, 0.68), 1.7);
+    if (g.sunAlt > -0.35) {
+      // the sun — large, low, orange; whitening as it climbs
+      const sr = cssH * 0.105;
+      const warmupT = clamp(g.sunAlt / 0.5, 0, 1);
+      if (g.sunAlt > 0.02) {
         // rays — slow wheel of translucent wedges
         ctx!.save();
         ctx!.translate(sunX, sunY);
@@ -322,14 +330,19 @@ export function startMovie() {
         }
         ctx!.restore();
       }
-      ctx!.fillStyle = 'rgba(252,232,170,0.95)';
+      ctx!.fillStyle = rgb(mix([238, 152, 74], [252, 238, 190], warmupT));
       ctx!.beginPath();
       ctx!.arc(sunX, sunY, sr, 0, Math.PI * 2);
       ctx!.fill();
     }
-
-    // --- distant decor hills (parallax silhouettes at the horizon) -----------
-    decorHills(ctx!, cssW, horizonY, camX, mix(g.ground, g.hor, 0.55), mix(g.ground, g.hor, 0.38));
+    // mid + near ridges pass in front of the sun
+    ridgeLayer(ctx!, cssW, horizonY, camX * 0.3 + playerZ * 0.045 + 2400, cssH * 0.11, cssH * 0.003, mix(g.ground, g.hor, 0.52), 2.6);
+    // the hill ahead — dark mound with the pale path winding to its summit.
+    // A cinematic cheat: it looms through beats 1–5, then dissolves as the
+    // real terrain climb takes over.
+    const hillFade = 1 - smooth(clamp((p - 0.4) / 0.18, 0, 1));
+    if (hillFade > 0.01) storyHill(ctx!, cssW, cssH, horizonY, p, hillFade, g);
+    ridgeLayer(ctx!, cssW, horizonY, camX * 0.45 + playerZ * 0.07 + 5100, cssH * 0.06, 0, mix(g.ground, g.hor, 0.38), 3.9);
 
     // --- ground: fill each screen row once, nearest slice wins ----------------
     let bottom = cssH;
@@ -434,6 +447,12 @@ export function startMovie() {
           ctx!.restore();
         }
       }
+    }
+
+    // --- beat 4: accusing hands lean in from the edges of the frame -----------
+    const handsBand = smooth(clamp((p - 0.3) / 0.035, 0, 1)) * smooth(clamp((0.43 - p) / 0.035, 0, 1));
+    if (handsBand > 0.01) {
+      pointingHands(ctx!, cssW, cssH, handsBand, reduceMotion ? 0 : clock, FIG_INK, mix(g.hor, PAPER, 0.4));
     }
 
     // --- finale: the camera soars — crossfade to the aerial shot --------------
@@ -619,21 +638,145 @@ function drawFigure(
 }
 
 // --- scenery helpers --------------------------------------------------------
-function decorHills(ctx: CanvasRenderingContext2D, w: number, horizonY: number, camX: number, far: RGB, near: RGB) {
-  const layer = (col: RGB, amp: number, wl: number, off: number, lift: number) => {
+// One mountain range: a deterministic ridge of layered sines rising above the
+// horizon. `off` carries the parallax; `sd` de-correlates the layers.
+function ridgeLayer(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  horizonY: number,
+  off: number,
+  amp: number,
+  lift: number,
+  col: RGB,
+  sd: number
+) {
+  ctx.fillStyle = rgb(col);
+  ctx.beginPath();
+  ctx.moveTo(0, horizonY + 4);
+  for (let x = 0; x <= w; x += 12) {
+    const t = x + off;
+    const r =
+      (Math.sin(t * 0.0016 + sd) * 0.55 + Math.sin(t * 0.0043 + sd * 2.3) * 0.3 + Math.sin(t * 0.011 + sd * 4.1) * 0.15 + 1) / 2;
+    ctx.lineTo(x, horizonY - lift - r * amp);
+  }
+  ctx.lineTo(w, horizonY + 4);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// The hill of the storyboard's beat 2: a dark central mound with a pale path
+// winding to its summit, growing as the walker approaches.
+function storyHill(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  horizonY: number,
+  p: number,
+  fade: number,
+  g: { ground: RGB; hor: RGB }
+) {
+  const grow = 1 + p * 1.3;
+  const hw = w * 0.34 * grow; // half-width
+  const hh = h * 0.17 * grow; // height above its base
+  const cx = w * 0.5;
+  const baseY = horizonY + h * 0.012;
+  ctx.save();
+  ctx.globalAlpha = fade;
+  // mound
+  ctx.fillStyle = rgb(mix(g.ground, g.hor, 0.58));
+  ctx.beginPath();
+  ctx.moveTo(cx - hw, baseY);
+  ctx.bezierCurveTo(cx - hw * 0.55, baseY - hh * 0.25, cx - hw * 0.38, baseY - hh, cx, baseY - hh);
+  ctx.bezierCurveTo(cx + hw * 0.42, baseY - hh, cx + hw * 0.6, baseY - hh * 0.2, cx + hw, baseY);
+  ctx.closePath();
+  ctx.fill();
+  // the pale path, S-curving up the face to the summit
+  ctx.strokeStyle = rgb(mix(PATH_PALE, g.hor, 0.45));
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  const N = 26;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const px = cx + Math.sin(t * 4.4 + 0.9) * (1 - t) * hw * 0.34;
+    const py = baseY - t * hh * 0.97;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.lineWidth = Math.max(1.2, hw * 0.012);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Beat 4's accusing hands: giant silhouette arms jab in from both edges of the
+// frame, pointing at the walker — dark shapes with a harsh backlit rim so they
+// read against the dark ground. `band` fades the shot in and out.
+function pointingHands(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  band: number,
+  clock: number,
+  col: RGB,
+  rimCol: RGB
+) {
+  const arms: { side: number; y: number; len: number; tilt: number }[] = [
+    { side: -1, y: 0.52, len: 0.26, tilt: -0.02 },
+    { side: -1, y: 0.68, len: 0.34, tilt: -0.06 },
+    { side: -1, y: 0.84, len: 0.24, tilt: -0.1 },
+    { side: 1, y: 0.58, len: 0.3, tilt: -0.04 },
+    { side: 1, y: 0.74, len: 0.24, tilt: -0.08 },
+    { side: 1, y: 0.88, len: 0.34, tilt: -0.12 },
+  ];
+  ctx.save();
+  ctx.globalAlpha = band;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  arms.forEach((a, i) => {
+    const dir = -a.side; // arms reach inward from their edge
+    const slide = -(1 - band) * w * 0.12 * dir; // slide in with the fade
+    const jab = Math.sin(clock * 6 + i * 1.7) * h * 0.005 * band;
+    const x0 = (a.side < 0 ? 0 : w) + slide;
+    const y0 = a.y * h;
+    const x1 = x0 + dir * (a.len * w + jab);
+    const y1 = y0 + a.tilt * h;
+    const sw = h * 0.062; // shoulder half-width
+    const ww = h * 0.021; // wrist half-width
+    const fr = ww * 2.1; // fist radius
+    const finX = x1 + dir * (w * 0.045 + fr);
+    const finY = y1 + a.tilt * h * 0.2;
+
     ctx.fillStyle = rgb(col);
     ctx.beginPath();
-    ctx.moveTo(0, horizonY + 2);
-    for (let x = 0; x <= w; x += 16) {
-      const t = (x + off - camX * 0.15) / wl;
-      ctx.lineTo(x, horizonY - lift - (Math.sin(t) * 0.6 + Math.sin(t * 2.7) * 0.4) * amp);
-    }
-    ctx.lineTo(w, horizonY + 2);
+    ctx.moveTo(x0, y0 - sw);
+    ctx.lineTo(x1, y1 - ww);
+    ctx.lineTo(x1, y1 + ww);
+    ctx.lineTo(x0, y0 + sw);
     ctx.closePath();
     ctx.fill();
-  };
-  layer(far, 14, 320, 40, 8);
-  layer(near, 22, 210, 480, 2);
+    // fist + pointing finger
+    ctx.beginPath();
+    ctx.arc(x1, y1, fr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = rgb(col);
+    ctx.lineWidth = ww * 1.3;
+    ctx.beginPath();
+    ctx.moveTo(x1 + dir * fr * 0.6, y1);
+    ctx.lineTo(finX, finY);
+    ctx.stroke();
+    // harsh backlight catches the upper edge only
+    ctx.strokeStyle = rgb(rimCol);
+    ctx.globalAlpha = band * 0.55;
+    ctx.lineWidth = h * 0.0045;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0 - sw);
+    ctx.lineTo(x1, y1 - ww);
+    ctx.arc(x1, y1, fr, -Math.PI * 0.6, dir > 0 ? -Math.PI * 0.1 : -Math.PI * 0.9, dir < 0);
+    ctx.moveTo(x1 + dir * fr * 0.6, y1 - ww * 0.6);
+    ctx.lineTo(finX, finY - ww * 0.5);
+    ctx.stroke();
+    ctx.globalAlpha = band;
+  });
+  ctx.restore();
 }
 
 function mistBand(

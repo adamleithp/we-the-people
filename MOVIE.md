@@ -125,6 +125,15 @@ Mist: 3–4 horizontal translucent gradient bands at fixed depths, drifting
 laterally on the clock, alpha × `fogDensity(p)`. Cheap, layered, and its
 disappearance at sunrise is the emotional turn.
 
+**Scenery** (matches the artboard): four parallax mountain ridges behind the
+playable ground, grade-tinted, with the large low sun drawn *between* the far
+and mid ranges so it rises out of the landscape. The storyboard's beat-2 hill —
+a dark central mound with a pale S-curve path to its summit — is a cinematic
+cheat drawn among the ridges; it looms through beats 1–5 and dissolves as the
+real terrain climb takes over. The ground itself rolls gently (valleys) until
+the hill slope begins. Beat 4 gets its own foreground shot: giant silhouette
+arms with backlit edges jab in from both frame edges, pointing at the walker.
+
 ### 4. Figures & crowds
 
 One `Figure` type (port of `walk.ts`): world `x/z`, walk phase, scale jitter,
