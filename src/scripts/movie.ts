@@ -106,7 +106,13 @@ export function startMovie() {
   // Raster the wordmark offscreen, sample filled pixels → world points on the
   // summit plateau. From above, the crowd *is* the wordmark.
   let letterPts: { x: number; z: number }[] = [];
+  // the Fonts API hashes the family name — pull the real stack off :root
+  let fontStack =
+    getComputedStyle(document.documentElement).getPropertyValue('--font-anton').trim() ||
+    'Anton, "Arial Narrow", sans-serif';
   const sampleLetters = () => {
+    fontStack =
+      getComputedStyle(document.documentElement).getPropertyValue('--font-anton').trim() || fontStack;
     const off = document.createElement('canvas');
     off.width = 560;
     off.height = 260;
@@ -115,9 +121,7 @@ export function startMovie() {
     c.fillStyle = '#000';
     c.textAlign = 'center';
     c.textBaseline = 'middle';
-    // the Fonts API hashes the family name — pull the real stack off :root
-    const stack = getComputedStyle(document.documentElement).getPropertyValue('--font-anton').trim();
-    c.font = `92px ${stack || 'Anton, "Arial Narrow", sans-serif'}`;
+    c.font = `92px ${fontStack}`;
     c.fillText('WE THE', 280, 78);
     c.fillText('PEOPLE', 280, 188);
     const img = c.getImageData(0, 0, 560, 260).data;
@@ -234,6 +238,7 @@ export function startMovie() {
   // scratch buffers, reused every frame
   type Slice = { z: number; y: number; fog: number };
   const slices: Slice[] = [];
+  const vis: Slice[] = []; // visible skyline slices — the path rides only these
   const drawlist: { z: number; fig?: Fig; mist?: number }[] = [];
   const MIST_Z = [500, 1000, 1600, 2300, 3000];
 
@@ -345,32 +350,44 @@ export function startMovie() {
     ridgeLayer(ctx!, cssW, horizonY, camX * 0.45 + playerZ * 0.07 + 5100, cssH * 0.06, 0, mix(g.ground, g.hor, 0.38), 3.9);
 
     // --- ground: fill each screen row once, nearest slice wins ----------------
+    // Collect the visible skyline slices (a farther slice sitting lower than a
+    // nearer one is behind a hill — occluded, skipped). The path then rides
+    // only these, so it can never show through terrain that should hide it.
     let bottom = cssH;
+    vis.length = 0;
     for (let i = 0; i < slices.length && bottom > 0; i++) {
       const sl = slices[i];
       if (sl.y >= bottom) continue;
       ctx!.fillStyle = rgb(mix(g.ground, g.hor, sl.fog));
       ctx!.fillRect(0, sl.y, cssW, bottom - sl.y + 1);
       bottom = sl.y;
+      vis.push(sl);
     }
 
-    // --- the path: pale ribbon, projected quad per slice, far → near ---------
-    for (let i = slices.length - 1; i > 0; i--) {
-      const a = slices[i];
-      const b = slices[i - 1];
-      if (b.y > cssH && a.y > cssH) continue;
-      const pa = toScreen(pathX(a.z), a.z);
-      const pb = toScreen(pathX(b.z), b.z);
-      const wa = PATH_W * pa.s;
-      const wb = PATH_W * pb.s;
-      // the path keeps cutting a pale line all the way up the hill face
-      ctx!.fillStyle = rgb(mix(mix(PATH_PALE, g.ground, 0.45), g.hor, Math.min(a.fog, 0.8)));
+    // --- the path: one continuous pale ribbon over the visible ground only ----
+    if (vis.length > 1) {
+      const pathCol = (fog: number) => rgb(mix(mix(PATH_PALE, g.ground, 0.45), g.hor, Math.min(fog, 0.8)));
       ctx!.beginPath();
-      ctx!.moveTo(pa.sx - wa, pa.sy);
-      ctx!.lineTo(pa.sx + wa, pa.sy);
-      ctx!.lineTo(pb.sx + wb, pb.sy + 1); // +1: overlap the next quad, no seams
-      ctx!.lineTo(pb.sx - wb, pb.sy + 1);
+      for (let i = 0; i < vis.length; i++) {
+        // left edge, near → far
+        const sl = vis[i];
+        const ps = toScreen(pathX(sl.z), sl.z);
+        const w = PATH_W * ps.s;
+        if (i === 0) ctx!.moveTo(ps.sx - w, sl.y);
+        else ctx!.lineTo(ps.sx - w, sl.y);
+      }
+      for (let i = vis.length - 1; i >= 0; i--) {
+        // right edge, far → near
+        const sl = vis[i];
+        const ps = toScreen(pathX(sl.z), sl.z);
+        const w = PATH_W * ps.s;
+        ctx!.lineTo(ps.sx + w, sl.y);
+      }
       ctx!.closePath();
+      const grad = ctx!.createLinearGradient(0, vis[0].y, 0, vis[vis.length - 1].y);
+      grad.addColorStop(0, pathCol(vis[0].fog));
+      grad.addColorStop(1, pathCol(vis[vis.length - 1].fog));
+      ctx!.fillStyle = grad;
       ctx!.fill();
     }
 
@@ -466,17 +483,17 @@ export function startMovie() {
       const K = Math.min((cssW * 0.82) / LETTER_W, (cssH * 0.62) / LETTER_D) * (1 / (1 + (1 - ae) * 2.4));
       const acx = cssW / 2;
       const acy = cssH * 0.47;
-      const lcx = pathX(SUMMIT_Z);
-      ctx!.fillStyle = rgb(PAPER);
-      const dotR = clamp(K * 0.85, 1.4, 4.5);
       // hold the letters back until we're well off the ground — the crowd is
       // still a formless mass at eye level; only from above does it resolve
+      // into the solid wordmark.
       ctx!.globalAlpha = ae * smooth(clamp((ae - 0.45) / 0.55, 0, 1));
-      for (const pt of letterPts) {
-        ctx!.beginPath();
-        ctx!.arc(acx + (pt.x - lcx) * K, acy + (pt.z - SUMMIT_Z) * K, dotR, 0, Math.PI * 2);
-        ctx!.fill();
-      }
+      ctx!.fillStyle = rgb(PAPER);
+      ctx!.textAlign = 'center';
+      ctx!.textBaseline = 'middle';
+      const sf = (LETTER_W * K) / 560; // raster px → screen px (matches sampler)
+      ctx!.font = `${92 * sf}px ${fontStack}`;
+      ctx!.fillText('WE THE', acx, acy + (78 - 130) * sf);
+      ctx!.fillText('PEOPLE', acx, acy + (188 - 130) * sf);
       ctx!.globalAlpha = ae;
       // the summit as a sunlit island in a sea of dissipating mist
       const vig = ctx!.createRadialGradient(acx, acy, cssH * 0.28, acx, acy, cssH * 0.85);
