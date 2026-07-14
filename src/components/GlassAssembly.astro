@@ -1,0 +1,156 @@
+---
+import { tessellate } from '../lib/shards';
+
+interface Props {
+  /** the single image the fragments assemble into */
+  photo: string;
+  caption?: string;
+}
+const { photo, caption = 'We are many, we are one.' } = Astro.props;
+
+// gap-free by construction: jittered grid, each fragment shows its portion
+const fragments = tessellate(4, 4, 20260714);
+---
+
+<div class="assembly" data-assembly>
+  <div class="assembly__stage" data-stage>
+    <div class="assembly__sheet">
+      {
+        fragments.map((f) => (
+          <div
+            class="fragment"
+            style={`--tx:${f.tx.toFixed(1)}vw; --ty:${f.ty.toFixed(1)}vh; --rz:${f.rz.toFixed(1)}deg; --ry:${f.ry.toFixed(1)}deg; clip-path:${f.clip}; transform-origin:${f.origin}; background-image:url('${photo}');`}
+          />
+        ))
+      }
+      <div class="assembly__shinewrap" aria-hidden="true">
+        <div class="assembly__shine"></div>
+      </div>
+      <div class="assembly__frame" aria-hidden="true"></div>
+    </div>
+    <p class="assembly__caption">{caption}</p>
+  </div>
+</div>
+
+<style>
+  .assembly {
+    position: relative;
+    height: 250vh;
+  }
+  .assembly__stage {
+    --q: 1; /* 1 = scattered, 0 = assembled; JS scrubs it, fragments inherit */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    align-content: center;
+  }
+  .assembly__sheet {
+    position: relative;
+    width: min(78vw, 920px);
+    aspect-ratio: 3 / 2;
+    perspective: 1400px; /* fragments are direct children → shared camera */
+  }
+
+  .fragment {
+    position: absolute;
+    inset: 0; /* full-sheet boxes: identical cover math, portions via clip-path */
+    background-size: cover;
+    background-position: center;
+    transform: translate3d(
+        calc(var(--tx) * var(--q)),
+        calc(var(--ty) * var(--q)),
+        0
+      )
+      rotate(calc(var(--rz) * var(--q))) rotateY(calc(var(--ry) * var(--q)));
+  }
+  /* glass tint that clears as the sheet seals */
+  .fragment::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.14),
+      rgba(0, 66, 37, 0.4) 55%,
+      rgba(0, 0, 0, 0.55)
+    );
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+    opacity: calc(0.18 + 0.82 * var(--q));
+  }
+
+  /* specular sweep once the sheet seals (clipped to the sheet, above fragments) */
+  .assembly__shinewrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .assembly__shine {
+    position: absolute;
+    inset: -10% -30%;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.32) 50%,
+      transparent 60%
+    );
+    transform: translateX(-130%);
+    transition: transform 1.2s cubic-bezier(0.25, 0.6, 0.3, 1);
+  }
+  .assembly__frame {
+    position: absolute;
+    inset: 0;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+      0 30px 90px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    pointer-events: none;
+  }
+  .assembly__stage.is-sealed .assembly__shinewrap {
+    opacity: 1;
+  }
+  .assembly__stage.is-sealed .assembly__shine {
+    transform: translateX(130%);
+  }
+  .assembly__stage.is-sealed .assembly__frame {
+    opacity: 1;
+  }
+
+  .assembly__caption {
+    margin: 2.2rem 0 0;
+    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: clamp(1.1rem, 3vw, 1.7rem);
+    color: var(--color-wtp-paper, #f6f4ee);
+    text-align: center;
+    opacity: 0;
+    translate: 0 12px;
+    transition:
+      opacity 0.9s ease,
+      translate 0.9s ease;
+  }
+  .assembly__stage.is-sealed .assembly__caption {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Reduced motion: rest assembled — a complete, still scene */
+  @media (prefers-reduced-motion: reduce) {
+    .assembly__stage {
+      --q: 0;
+    }
+    .assembly__caption {
+      opacity: 1;
+      translate: 0 0;
+    }
+    .assembly__frame {
+      opacity: 1;
+    }
+  }
+</style>

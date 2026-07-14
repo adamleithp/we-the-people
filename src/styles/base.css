@@ -4,21 +4,51 @@
 @theme {
   --color-wtp-green: #004225; /* British Racing Green */
   --color-wtp-paper: #f6f4ee;
+  --color-wtp-dawn: #f2c14e; /* dawn yellow — secondary accent */
+  --color-wtp-ink: #00160c; /* dark dark green */
+  --color-wtp-night: #050505; /* site ground — near-black */
+
+  /* mountain ramp: far (pale, most fog) → near (deep) for atmospheric depth */
+  --color-wtp-green-100: #a9c4b3;
+  --color-wtp-green-300: #5f9377;
+  --color-wtp-green-500: #2e6b4b;
+  --color-wtp-green-700: #004225; /* = brand green */
+  --color-wtp-green-900: #00160c; /* = ink */
 
   /* maps to the Astro Fonts API variable injected by <Font /> */
   --font-wordmark: var(--font-anton), 'Arial Narrow', sans-serif;
+  --font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
 }
 
 @layer base {
   html,
   body {
     height: 100%;
+    /* Shards scatter past the viewport edge; `clip` (never `hidden`, which would
+       create a scroll container and kill every position:sticky) contains them. */
+    overflow-x: clip;
   }
 
   body {
-    background-color: var(--color-wtp-green);
+    background-color: var(--color-wtp-night);
     color: var(--color-wtp-paper);
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* Decorative shards thinned out on small screens (authored, not JS) */
+  @media (max-width: 640px) {
+    [data-mobile-hide] {
+      display: none;
+    }
+  }
+
+  /* Compositor layers only while a region is actually animating (IO toggles is-live) */
+  [data-hero-act].is-live .shard--fg,
+  [data-cluster].is-live,
+  [data-assembly].is-live .fragment {
+    will-change: transform;
   }
 }

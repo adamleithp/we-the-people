@@ -1,0 +1,136 @@
+---
+import type { FieldShard } from '../lib/shards';
+
+interface Props {
+  shards: FieldShard[];
+  /** 'hero' fields hold the interactive reveal shards; 'story' fields are calmer set dressing */
+  variant?: 'hero' | 'story';
+}
+const { shards, variant = 'hero' } = Astro.props;
+---
+
+<div class={`field field--${variant}`} aria-hidden="true">
+  {
+    shards.map((s) =>
+      s.depth === 'fg' && variant === 'hero' ? (
+        <div
+          class="shard shard--fg"
+          data-shard
+          data-mobile-hide={s.mobileHide ? '' : undefined}
+          data-base-rx={s.baseRx.toFixed(1)}
+          data-base-ry={s.baseRy.toFixed(1)}
+          data-amp-x={s.ampX.toFixed(1)}
+          data-amp-y={s.ampY.toFixed(1)}
+          data-reveal-rx={s.revealRx.toFixed(1)}
+          data-reveal-ry={s.revealRy.toFixed(1)}
+          data-win={s.win.toFixed(1)}
+          data-w1={s.w1.toFixed(2)}
+          data-w2={s.w2.toFixed(2)}
+          data-p1={s.p1.toFixed(2)}
+          data-p2={s.p2.toFixed(2)}
+          style={`left:${s.x}%; top:${s.y}%; width:${s.w}px; height:${s.h}px; rotate:${s.rz.toFixed(1)}deg; clip-path:${s.clip};`}
+        >
+          <img class="shard__face" src={s.img} alt="" loading="lazy" decoding="async" />
+          <div class="shard__tint" />
+          <div class="shard__glare" />
+        </div>
+      ) : (
+        <div
+          class={`shard shard--bg${s.depth === 'fg' ? ' shard--sharp' : ''}`}
+          data-mobile-hide={s.mobileHide ? '' : undefined}
+          style={`left:${s.x}%; top:${s.y}%; width:${s.w}px; height:${s.h}px; rotate:${s.rz.toFixed(1)}deg; clip-path:${s.clip}; animation-duration:${s.driftDur.toFixed(1)}s; animation-delay:${s.driftDelay.toFixed(1)}s;`}
+        >
+          <img class="shard__face" src={s.img} alt="" loading="lazy" decoding="async" />
+          <div class="shard__tint" />
+        </div>
+      ),
+    )
+  }
+</div>
+
+<style>
+  .field {
+    position: absolute;
+    inset: 0;
+    perspective: 1100px; /* shards are direct children → shared camera */
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shard {
+    position: absolute;
+    /* base translateZ(0) is set by JS on fg shards; bg shards stay 2D */
+  }
+  .shard__face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* fg faces hide until the tilt catches them (JS drives opacity) */
+  .shard--fg .shard__face {
+    opacity: 0.08;
+  }
+  .shard__tint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(0, 66, 37, 0.34) 48%,
+      rgba(0, 0, 0, 0.5)
+    );
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  }
+  .shard__glare {
+    position: absolute;
+    inset: -50%; /* oversized; moved by transform only (compositor) */
+    background: linear-gradient(
+      115deg,
+      transparent 42%,
+      rgba(255, 255, 255, 0.34) 50%,
+      transparent 58%
+    );
+    opacity: 0.75;
+  }
+
+  /* background depth: pre-blurred imagery + opacity — never CSS filters */
+  .shard--bg {
+    opacity: 0.5;
+    animation-name: shard-drift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+  .shard--bg.shard--sharp {
+    opacity: 0.8;
+  }
+  .field--story .shard--bg {
+    opacity: 0.65;
+  }
+  .field--story .shard--bg.shard--sharp {
+    opacity: 0.9;
+  }
+  @keyframes shard-drift {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shard--bg {
+      animation: none;
+    }
+    /* rest complete: faces softly present without any motion */
+    .shard--fg .shard__face {
+      opacity: 0.45;
+    }
+    .shard__glare {
+      opacity: 0.3;
+    }
+  }
+</style>
