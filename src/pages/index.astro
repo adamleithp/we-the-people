@@ -1,319 +1,209 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import ShardField from '../components/ShardField.astro';
-import StoryBlock from '../components/StoryBlock.astro';
-import GlassAssembly from '../components/GlassAssembly.astro';
-import { makeShards, type ShardSlot } from '../lib/shards';
+import PageHero from '../components/PageHero.astro';
 
-// Placeholder imagery (final assets TBD). Background-depth shards use
-// pre-blurred variants — depth without runtime CSS filters.
-const face = (id: string, w: number, blur = 0) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&crop=faces&w=${w}&q=60${blur ? `&blur=${blur}` : ''}`;
-
-const FACES = [
-  'photo-1507003211169-0a1dd7228f2d',
-  'photo-1494790108377-be9c29b29330',
-  'photo-1500648767791-00dcc994a43e',
-  'photo-1544005313-94ddf0286df2',
-  'photo-1438761681033-6461ffad8d80',
-  'photo-1472099645785-5658abf4ff4e',
-  'photo-1526976668912-1a811878dd37',
-  'photo-1508214751196-bcfd4ca60f91',
+const SECTIONS = [
+  {
+    n: '01',
+    title: 'The Idea',
+    blurb:
+      'Trust in politics is the lowest it has ever been. There is another way we have overlooked — a Citizens’ Assembly.',
+    cta: 'Read the idea',
+    href: '/idea',
+  },
+  {
+    n: '02',
+    title: 'In Practice',
+    blurb:
+      'A National Council of the People on immigration: ten days, every perspective heard, one policy written by us.',
+    cta: 'See the plan',
+    href: '/practice',
+  },
+  {
+    n: '03',
+    title: 'Join Us',
+    blurb:
+      'Movements are made of people. Add your name and be part of the first step.',
+    cta: 'Sign up',
+    href: '/join',
+  },
 ];
-const GROUP_PHOTO =
-  'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=60';
-
-// --- hero field: 7 interactive reveal shards + 8 blurred depth shards --------
-const heroSlots: ShardSlot[] = [
-  // foreground (mouse-tilt + face reveal) — framing the headline, never over it
-  { x: 5, y: 10, size: 170, depth: 'fg' },
-  { x: 76, y: 7, size: 190, depth: 'fg' },
-  { x: 84, y: 55, size: 170, depth: 'fg' },
-  { x: 8, y: 58, size: 200, depth: 'fg' },
-  { x: 26, y: 76, size: 140, depth: 'fg', mobileHide: true },
-  { x: 63, y: 72, size: 160, depth: 'fg' },
-  { x: 42, y: 4, size: 130, depth: 'fg', mobileHide: true },
-  // background depth (pre-blurred, slow CSS drift)
-  { x: 16, y: 26, size: 110, depth: 'bg', mobileHide: true },
-  { x: 70, y: 28, size: 100, depth: 'bg' },
-  { x: 91, y: 18, size: 95, depth: 'bg', mobileHide: true },
-  { x: 1, y: 38, size: 120, depth: 'bg' },
-  { x: 48, y: 86, size: 110, depth: 'bg', mobileHide: true },
-  { x: 22, y: 2, size: 100, depth: 'bg' },
-  { x: 68, y: 48, size: 90, depth: 'bg', mobileHide: true },
-  { x: 34, y: 34, size: 80, depth: 'bg', mobileHide: true },
-];
-const heroImages = [
-  ...FACES.slice(0, 7).map((id) => face(id, 480)),
-  ...FACES.map((id) => face(id, 320, 60)),
-];
-const heroShards = makeShards(heroSlots, heroImages, 11);
-
-// --- story clusters: calmer set dressing beside the pinned copy --------------
-const storySlots = (mirror: boolean): ShardSlot[] =>
-  [
-    { x: 30, y: 8, size: 150, depth: 'bg' as const },
-    { x: 62, y: 22, size: 120, depth: 'bg' as const, mobileHide: true },
-    { x: 44, y: 42, size: 180, depth: 'bg' as const },
-    { x: 70, y: 58, size: 130, depth: 'bg' as const, mobileHide: true },
-    { x: 34, y: 72, size: 150, depth: 'bg' as const },
-    { x: 58, y: 86, size: 110, depth: 'bg' as const, mobileHide: true },
-  ].map((s) => (mirror ? { ...s, x: 100 - s.x - 12 } : s));
-
-const storyImages = (offset: number) =>
-  Array.from({ length: 6 }, (_, i) =>
-    i % 2 === 0
-      ? face(FACES[(offset + i) % FACES.length], 480)
-      : face(FACES[(offset + i) % FACES.length], 320, 60),
-  );
-
-const story1Shards = makeShards(storySlots(false), storyImages(0), 23);
-const story2Shards = makeShards(storySlots(true), storyImages(4), 41);
 ---
 
-<Layout title="We The People — Reunite the Country, Transform the System">
-  <Header />
-
+<Layout
+  title="We The People — Reunite the Country, Transform the System"
+  introLines={['We The', 'People']}
+  introVariant="hero"
+>
   <main>
-    <!-- Act 1 — headline in a field of floating glass -->
-    <section class="act act--hero" data-hero-act>
-      <ShardField shards={heroShards} variant="hero" />
-      <div class="hero__inner">
-        <h1 class="hero__title">Reunite the Country<br />Transform the System</h1>
-        <p class="hero__tag">
-          A movement to heal our divisions and hand power back to the people.
-        </p>
-      </div>
-      <div class="scroll-hint" aria-hidden="true">
+    <!-- the intro's pane matches this one, so the assembled wordmark lands here -->
+    <PageHero lines={['We The', 'People']} variant="hero">
+      <!-- the tagline leads: it starts as the glass lifts, the cue follows -->
+      <p class="hero__tagline fade-up">Reunite the Country · Transform the System</p>
+      <a class="hero__cue fade-up" style="--fade-delay:0.12s" href="#sections">
         <span>Scroll</span>
-        <span class="chev">⌄</span>
-      </div>
+        <span class="hero__arrow" aria-hidden="true"></span>
+      </a>
+    </PageHero>
+
+    <section class="panels" id="sections">
+      {
+        SECTIONS.map((s) => (
+          <a class="panel" href={s.href}>
+            <span class="panel__n">{s.n}</span>
+            <h2 class="panel__title">{s.title}</h2>
+            <p class="panel__blurb">{s.blurb}</p>
+            <span class="panel__cta">
+              {s.cta} <span aria-hidden="true">→</span>
+            </span>
+          </a>
+        ))
+      }
     </section>
 
-    <!-- Act 2 — copy pins left, glass drifts on the right -->
-    <section class="act act--story">
-      <div class="cluster cluster--right" data-cluster data-drift="0.07" aria-hidden="true">
-        <ShardField shards={story1Shards} variant="story" />
-      </div>
-      <StoryBlock eyebrow="01" heading="Heal Our Divisions" align="left" pin="210vh">
-        We feel more divided than ever — sorted into sides, talking past each other. It
-        doesn't have to be this way. It begins with listening, empathy, and the will to
-        find common ground.
-      </StoryBlock>
-    </section>
-
-    <!-- Act 3 — copy pins right, glass drifts on the left -->
-    <section class="act act--story">
-      <div class="cluster cluster--left" data-cluster data-drift="0.09" aria-hidden="true">
-        <ShardField shards={story2Shards} variant="story" />
-      </div>
-      <StoryBlock eyebrow="02" heading="Councils of the People" align="right" pin="210vh">
-        Ordinary people, chosen at random to reflect the whole country, come together to
-        hear every side and forge policy we can share — jury service, applied to
-        politics.
-      </StoryBlock>
-    </section>
-
-    <!-- Act 4 — the shattered pieces come together into one sheet -->
-    <GlassAssembly photo={GROUP_PHOTO} caption="We are many, we are one." />
-
-    <!-- Act 5 — the ask -->
-    <section class="act act--cta">
-      <div class="cta">
-        <span class="cta__bar" aria-hidden="true"></span>
-        <p class="cta__eyebrow">03</p>
-        <h2 class="cta__heading">Join the Movement</h2>
-        <p class="cta__body">Add your name and be part of hope.</p>
-        <a class="cta__button" href="/join">Join Us</a>
-      </div>
-    </section>
+    <footer class="foot">
+      <p class="foot__mark">Be part of hope</p>
+      <a class="foot__link" href="/join">Join Us</a>
+    </footer>
   </main>
-
-  <footer class="site-footer">
-    <p class="site-footer__mark">We the People</p>
-    <p class="site-footer__tag">Be Part of Hope</p>
-  </footer>
 </Layout>
 
-<script>
-  import { initGlass } from '../scripts/glass';
-  initGlass();
-</script>
-
 <style>
-  .act {
-    position: relative;
-  }
-
-  /* --- hero ------------------------------------------------------------- */
-  .act--hero {
-    min-height: 115vh;
-  }
-  .hero__inner {
-    position: relative;
-    z-index: 10;
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 6rem 1.5rem 4rem;
-  }
-  .hero__title {
+  .hero__tagline {
     margin: 0;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
+    font-size: clamp(0.85rem, 2.2vw, 1.05rem);
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--color-wtp-paper, #f6f4ee);
-    font-size: clamp(2.7rem, 9.5vw, 7.5rem);
-    line-height: 0.92;
-    letter-spacing: 0.01em;
-    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.6);
+    color: rgba(246, 244, 238, 0.62);
   }
-  .hero__tag {
-    margin: 1.6rem auto 0;
-    max-width: 32rem;
-    font-family: var(--font-body);
-    font-size: clamp(1rem, 2.4vw, 1.2rem);
-    line-height: 1.55;
-    color: rgba(246, 244, 238, 0.75);
-  }
-
-  .scroll-hint {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 4vh;
-    z-index: 10;
-    display: flex;
+  .hero__cue {
+    display: inline-flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.15rem;
-    color: rgba(246, 244, 238, 0.55);
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    text-decoration: none;
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.28em;
-    pointer-events: none;
+    color: rgba(246, 244, 238, 0.45);
+    transition:
+      color 150ms ease,
+      transform 160ms var(--ease-out);
   }
-  .scroll-hint .chev {
-    font-size: 1.4rem;
-    line-height: 1;
-    animation: hint-bob 1.8s ease-in-out infinite;
+  .hero__cue:active {
+    transform: scale(0.97); /* it's pressable — say so */
   }
-  @keyframes hint-bob {
+  @media (hover: hover) and (pointer: fine) {
+    .hero__cue:hover {
+      color: var(--color-wtp-paper);
+    }
+  }
+  .hero__arrow {
+    width: 1px;
+    height: 2.6rem;
+    background: linear-gradient(to bottom, rgba(246, 244, 238, 0.55), transparent);
+    animation: cue 2.4s ease-in-out infinite;
+  }
+  @keyframes cue {
     0%,
     100% {
       transform: translateY(0);
       opacity: 0.5;
     }
     50% {
-      transform: translateY(5px);
+      transform: translateY(6px);
       opacity: 1;
     }
   }
 
-  /* --- story clusters ----------------------------------------------------- */
-  .cluster {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 52%;
-    z-index: 0;
+  /* --- three flexed sections ---------------------------------------------- */
+  .panels {
+    display: flex;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(246, 244, 238, 0.14);
   }
-  .cluster--right {
-    right: 0;
-  }
-  .cluster--left {
-    left: 0;
-  }
-
-  /* --- CTA ------------------------------------------------------------------ */
-  .act--cta {
-    min-height: 90vh;
-    display: grid;
-    place-items: center;
-    padding: 6rem 1.5rem;
-    text-align: center;
-  }
-  .cta__bar {
-    display: block;
-    width: 2.5rem;
-    height: 2px;
-    margin: 0 auto 1.3rem;
-    background: var(--color-wtp-dawn, #f2c14e);
-  }
-  .cta__eyebrow {
-    margin: 0 0 0.8rem;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.32em;
-    font-size: 0.78rem;
-    color: var(--color-wtp-dawn, #f2c14e);
-  }
-  .cta__heading {
-    margin: 0 0 1rem;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
-    text-transform: uppercase;
-    line-height: 0.96;
-    font-size: clamp(2.4rem, 7vw, 4.5rem);
-    color: var(--color-wtp-paper, #f6f4ee);
-  }
-  .cta__body {
-    margin: 0 0 2.2rem;
-    font-family: var(--font-body);
-    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
-    color: rgba(246, 244, 238, 0.78);
-  }
-  .cta__button {
-    display: inline-block;
-    padding: 1rem 3rem;
-    background: var(--color-wtp-dawn, #f2c14e);
-    color: var(--color-wtp-night, #050505);
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 1.05rem;
+  .panel {
+    flex: 1 1 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    min-height: 62vh;
+    padding: clamp(2rem, 5vw, 3.4rem);
     text-decoration: none;
-    transition:
-      transform 0.15s ease,
-      box-shadow 0.15s ease;
-    box-shadow: 0 14px 40px rgba(242, 193, 78, 0.18);
+    color: inherit;
+    border-right: 1px solid rgba(246, 244, 238, 0.14);
+    transition: background-color 0.35s ease;
   }
-  .cta__button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 50px rgba(242, 193, 78, 0.26);
+  .panel:last-child {
+    border-right: 0;
   }
-  .cta__button:focus-visible {
-    outline: 2px solid var(--color-wtp-paper, #f6f4ee);
-    outline-offset: 3px;
+  .panel:hover,
+  .panel:focus-visible {
+    background-color: var(--color-wtp-green);
+    outline: none;
+  }
+  .panel__n {
+    font-family: var(--font-wordmark);
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    color: var(--color-wtp-dawn);
+  }
+  .panel__title {
+    margin: 0;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(2rem, 5vw, 3.1rem);
+    line-height: 0.95;
+    color: #fff;
+  }
+  .panel__blurb {
+    margin: 0;
+    max-width: 34ch;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(246, 244, 238, 0.72);
+  }
+  .panel__cta {
+    margin-top: auto;
+    padding-top: 1.6rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-wtp-paper);
   }
 
-  /* --- footer -------------------------------------------------------------- */
-  .site-footer {
-    padding: 3rem 1.5rem 4rem;
-    text-align: center;
+  /* --- foot ---------------------------------------------------------------- */
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 5vw, 3.4rem);
+    border-top: 1px solid rgba(246, 244, 238, 0.14);
   }
-  .site-footer__mark {
+  .foot__mark {
     margin: 0;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: rgba(246, 244, 238, 0.85);
-  }
-  .site-footer__tag {
-    margin: 0.4rem 0 0;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
+    font-family: var(--font-wordmark);
     text-transform: uppercase;
     letter-spacing: 0.24em;
-    font-size: 0.85rem;
-    color: var(--color-wtp-dawn, #f2c14e);
+    font-size: 0.95rem;
+    color: rgba(246, 244, 238, 0.6);
+  }
+  .foot__link {
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    text-decoration: none;
+    color: var(--color-wtp-dawn);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-hint .chev {
-      animation: none;
+  @media (max-width: 640px) {
+    .panel {
+      min-height: auto;
+      border-right: 0;
+      border-bottom: 1px solid rgba(246, 244, 238, 0.14);
     }
   }
 </style>

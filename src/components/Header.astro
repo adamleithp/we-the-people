@@ -1,11 +1,14 @@
 ---
-// Fixed, transparent header overlaid on the hero: wordmark left, "Take action" right.
+// Fixed, transparent header: small wordmark left, the three sections right.
+// Eases in behind the glass intro (`.fade-up` waits on html.intro-done).
 ---
 
-<header class="site-header">
+<header class="site-header fade-up" style="--fade-delay:0.24s">
   <a class="wordmark" href="/">We the People</a>
   <nav>
-    <a class="action" href="/join">Take action</a>
+    <a class="action" href="/idea">The Idea</a>
+    <a class="action" href="/practice">In Practice</a>
+    <a class="action action--key" href="/join">Join Us</a>
   </nav>
 </header>
 
@@ -33,12 +36,19 @@
     letter-spacing: 0.06em;
     line-height: 1;
   }
+  nav {
+    display: flex;
+    gap: clamp(0.9rem, 3vw, 2rem);
+  }
   .action {
-    font-size: clamp(0.78rem, 1.6vw, 0.98rem);
+    font-size: clamp(0.72rem, 1.6vw, 0.92rem);
     letter-spacing: 0.14em;
     padding: 0.4rem 0.15rem;
     border-bottom: 2px solid transparent;
     transition: border-color 0.2s ease;
+  }
+  .action--key {
+    color: var(--color-wtp-dawn, #f2c14e);
   }
   .action:hover,
   .action:focus-visible {

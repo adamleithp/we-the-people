@@ -1,0 +1,170 @@
+---
+/**
+ * Glass intro — the loading animation, one per page, carrying that page's title.
+ *
+ * The title is shattered at build time into triangular shards (each shard is a
+ * full copy of the title, clipped to its own polygon). The overlay opens
+ * hard-broken — pieces thrown out and spun — then every piece converges to
+ * transform:none, so the title reassembles perfectly uniform by construction.
+ *
+ * The overlay uses the SAME `.pane` modifier as the page's <PageHero />, so when
+ * it fades the assembled title hands off to the real heading in place.
+ *
+ * Timing follows frequency: the homepage intro is a first-impression piece and
+ * can be cinematic; the section pages are seen again and again, so theirs is
+ * roughly twice as fast. Both ease-out — the shards are entering.
+ *
+ * Performance: only `transform` and `opacity` animate, so every shard stays on
+ * the compositor and rasterises once. No animated `filter` (a moving blur
+ * re-rasterises each layer every frame), and shard boxes are stage-sized, not
+ * viewport-sized, to keep layer memory sane.
+ */
+import { shatter } from '../lib/shards';
+
+interface Props {
+  /** the title, one entry per line */
+  lines: string[];
+  variant?: 'hero' | 'page';
+}
+const { lines, variant = 'page' } = Astro.props;
+
+const hero = variant === 'hero';
+// fewer, larger pieces for the smaller/faster page titles
+const shards = hero ? shatter(7, 3, 20260728) : shatter(5, 2, 20260728);
+
+// duration of one shard's flight + the longest stagger = when the title lands
+const flight = hero ? 2.4 : 1.1;
+const staggerScale = hero ? 1 : 0.5; // baked delays run 0 → 0.55s
+const land = (flight + 0.55 * staggerScale) * 1000;
+const sealAt = Math.round(land + (hero ? 400 : 200));
+const doneAt = sealAt + (hero ? 950 : 550);
+---
+
+<div
+  class="intro"
+  data-intro
+  data-seal={sealAt}
+  data-done={doneAt}
+  style={`--flight:${flight}s;--sk:${staggerScale};--fade:${hero ? 0.9 : 0.5}s`}
+>
+  <div class="intro__backdrop" aria-hidden="true"></div>
+  <div class={`pane pane--${variant} intro__pane`} style={`--lines:${lines.length}`}>
+    <div class="intro__stage">
+      <!-- invisible copy sets the stage box; every shard centres on the same box -->
+      <p class="wtp-wordmark intro__ghost" aria-hidden="true" set:html={lines.join('<br />')} />
+      {
+        shards.map((s) => (
+          <div
+            class="shard"
+            aria-hidden="true"
+            style={`clip-path:${s.clip};transform-origin:${s.origin};--tx:${s.tx.toFixed(1)}vw;--ty:${s.ty.toFixed(1)}vh;--rz:${s.rz.toFixed(1)}deg;--rx:${s.rx.toFixed(1)}deg;--ry:${s.ry.toFixed(1)}deg;--sc:${s.sc.toFixed(2)};--d:${s.delay.toFixed(2)}s;`}
+          >
+            <p class="wtp-wordmark" set:html={lines.join('<br />')} />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<script>
+  const intro = document.querySelector<HTMLElement>('[data-intro]');
+  const root = document.documentElement;
+
+  const done = () => {
+    root.classList.remove('intro-running');
+    root.classList.add('intro-done');
+    intro?.remove();
+  };
+
+  if (!intro) {
+    root.classList.add('intro-done');
+  } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Motion is unwelcome: straight to the page.
+    done();
+  } else {
+    // Plays on every load — a refresh always shows it.
+    root.classList.add('intro-running');
+    const seal = Number(intro.dataset.seal) || 2000;
+    const off = Number(intro.dataset.done) || seal + 900;
+    // `intro-sealing` releases the page's fade-ups, so the tagline is already
+    // arriving while the glass lifts rather than after it's gone.
+    setTimeout(() => {
+      intro.classList.add('is-sealed');
+      root.classList.add('intro-sealing');
+    }, seal);
+    setTimeout(done, off);
+  }
+</script>
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+  }
+  .intro.is-sealed {
+    pointer-events: none;
+  }
+  /* Only the backdrop fades. Fading the whole overlay would composite the shards
+     as a group, and adjacent antialiased shard edges then show as hairline
+     cracks across the letters. The assembled shards are pixel-identical to the
+     real heading beneath, so they can simply be removed at the end — no seams,
+     no crossfade of two copies. */
+  .intro__backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--color-wtp-night, #0b0b0b);
+    transition: opacity var(--fade) ease;
+  }
+  .intro.is-sealed .intro__backdrop {
+    opacity: 0;
+  }
+  .intro__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    perspective: 1200px;
+  }
+  .intro__ghost {
+    visibility: hidden;
+  }
+
+  .shard {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    /* compositor-only properties: rasterise once, then just move */
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    animation: shard-assemble var(--flight) cubic-bezier(0.16, 1, 0.3, 1)
+      calc(var(--d) * var(--sk)) both;
+  }
+
+  @keyframes shard-assemble {
+    0% {
+      opacity: 0;
+      transform: translate3d(var(--tx), var(--ty), 0) rotate3d(1, 0, 0, var(--rx))
+        rotate3d(0, 1, 0, var(--ry)) rotate(var(--rz)) scale(var(--sc));
+    }
+    10% {
+      opacity: 1;
+      transform: translate3d(var(--tx), var(--ty), 0) rotate3d(1, 0, 0, var(--rx))
+        rotate3d(0, 1, 0, var(--ry)) rotate(var(--rz)) scale(var(--sc));
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shard {
+      animation: none;
+    }
+    .intro {
+      display: none;
+    }
+  }
+</style>

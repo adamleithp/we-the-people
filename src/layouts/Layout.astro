@@ -1,12 +1,21 @@
 ---
 import { Font } from 'astro:assets';
 import '../styles/base.css';
+import Header from '../components/Header.astro';
+import GlassIntro from '../components/GlassIntro.astro';
 
 interface Props {
   title?: string;
+  /** the page's own title for the glass intro, one entry per line */
+  introLines?: string[];
+  introVariant?: 'hero' | 'page';
 }
 
-const { title = 'We The People' } = Astro.props;
+const {
+  title = 'We The People',
+  introLines = ['We The', 'People'],
+  introVariant = 'page',
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -21,6 +30,9 @@ const { title = 'We The People' } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
+    <!-- every page opens with its own title in glass; the header is global -->
+    <GlassIntro lines={introLines} variant={introVariant} />
+    <Header />
     <slot />
   </body>
 </html>

@@ -115,6 +115,96 @@ export function makeShards(
   });
 }
 
+export type IntroShard = {
+  clip: string;
+  origin: string;
+  tx: number; // vw
+  ty: number; // vh
+  rz: number; // deg
+  rx: number; // deg
+  ry: number; // deg
+  sc: number; // scale at rest-broken state
+  delay: number; // s
+};
+
+/**
+ * Shatter geometry for the glass intro: jittered grid over the wordmark box,
+ * every cell split along a random diagonal into two triangles → a gap-free
+ * spray of angular glass. Vertices are pushed ~1.5% out from each triangle's
+ * centroid so reassembled edges overlap and no seams show. Scatter deltas push
+ * outward from centre, hardest at the rim — "really broken", then it converges.
+ */
+export function shatter(cols: number, rows: number, seed: number): IntroShard[] {
+  const rnd = mulberry32(seed);
+  const rand = (a: number, b: number) => a + rnd() * (b - a);
+
+  const gx: number[][] = [];
+  const gy: number[][] = [];
+  for (let r = 0; r <= rows; r++) {
+    gx[r] = [];
+    gy[r] = [];
+    for (let c = 0; c <= cols; c++) {
+      let x = (c / cols) * 100;
+      let y = (r / rows) * 100;
+      if (c > 0 && c < cols) x += rand(-0.38, 0.38) * (100 / cols);
+      if (r > 0 && r < rows) y += rand(-0.38, 0.38) * (100 / rows);
+      gx[r][c] = x;
+      gy[r][c] = y;
+    }
+  }
+
+  const shards: IntroShard[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const tl: [number, number] = [gx[r][c], gy[r][c]];
+      const tr: [number, number] = [gx[r][c + 1], gy[r][c + 1]];
+      const br: [number, number] = [gx[r + 1][c + 1], gy[r + 1][c + 1]];
+      const bl: [number, number] = [gx[r + 1][c], gy[r + 1][c]];
+      // random diagonal keeps the break from reading as a grid
+      const tris: Array<Array<[number, number]>> =
+        rnd() < 0.5
+          ? [
+              [tl, tr, br],
+              [tl, br, bl],
+            ]
+          : [
+              [tl, tr, bl],
+              [tr, br, bl],
+            ];
+
+      for (const pts of tris) {
+        const cx = (pts[0][0] + pts[1][0] + pts[2][0]) / 3;
+        const cy = (pts[0][1] + pts[1][1] + pts[2][1]) / 3;
+        const clip = `polygon(${pts
+          .map(([x, y]) => {
+            const ox = cx + (x - cx) * 1.015;
+            const oy = cy + (y - cy) * 1.015;
+            return `${ox.toFixed(2)}% ${oy.toFixed(2)}%`;
+          })
+          .join(', ')})`;
+
+        // distance from centre drives how far the piece is thrown
+        const dirX = (cx - 50) / 50;
+        const dirY = (cy - 50) / 50;
+        const throwK = 0.55 + Math.hypot(dirX, dirY) * 0.9;
+
+        shards.push({
+          clip,
+          origin: `${cx.toFixed(2)}% ${cy.toFixed(2)}%`,
+          tx: dirX * rand(26, 62) * throwK + rand(-10, 10),
+          ty: dirY * rand(18, 48) * throwK + rand(-12, 12),
+          rz: rand(-120, 120),
+          rx: rand(-70, 70),
+          ry: rand(-90, 90),
+          sc: rand(0.55, 1.5),
+          delay: rand(0, 0.34),
+        });
+      }
+    }
+  }
+  return shards;
+}
+
 /**
  * Jittered-grid tessellation for the assembly sheet: jitter interior grid
  * points, take each cell as a quad → gap-free tiling by construction. Each

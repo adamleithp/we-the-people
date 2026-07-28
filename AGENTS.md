@@ -15,6 +15,24 @@ Read **[`OVERVIEW.md`](./OVERVIEW.md)** first — it is the conceptual source of
 - **Brand:** British Racing Green `#004225` primary; dawn-yellow secondary; WE THE PEOPLE caps logo; imagery of faces + the British land. No identity-politics slant.
 - **Audience is "literally everyone"** — keep it simple, accessible, mobile-first.
 
+## Site structure (current direction)
+
+Reference feel: [blueheart.patagonia.com](https://blueheart.patagonia.com/) — off-black, big type, minimal.
+
+- **Glass intro** (`src/components/GlassIntro.astro`) — every page opens with its own title in glass. The title is shattered at build time into triangles (`shatter()` in `src/lib/shards.ts`); each shard is a clipped copy of the same title, so converging to `transform: none` reassembles it perfectly uniform. Replays on every load; skipped under `prefers-reduced-motion`.
+- **Layout** (`src/layouts/Layout.astro`) — renders the intro and the global `<Header />`. Pages pass `introLines` (and `introVariant="hero"` for the homepage).
+- **Home** (`/`) — 85vh hero wordmark, then three flexed panels: The Idea → `/idea`, In Practice → `/practice`, Join Us → `/join`.
+- **Deck pages** (`/idea`, `/practice`) — title hero, then slide-deck sections 1 and 2 as plain text in a 70ch column (`.prose` in `src/styles/base.css`). Text only for now; design later.
+
+### Motion rules (per Emil Kowalski's animations.dev)
+
+- **`.pane` in `base.css` is the contract.** `<GlassIntro>` and `<PageHero>` must use the same `.pane--*` modifier and the same `--lines` — that's the only reason the shattered title lands exactly on the real heading. Changing one without the other breaks the handoff.
+- **Frequency sets duration.** Homepage intro is cinematic (2.4s flight); section pages are seen repeatedly, so theirs runs at ~half that. Entrances are `ease-out` — never `ease-in`.
+- **Only `transform`/`opacity` animate.** An animated `filter: blur()` re-rasterises every shard layer each frame and drops frames; it was measured and removed.
+- **The intro fades its backdrop, not itself.** Fading the whole overlay composites the shards as a group and hairline seams appear between them.
+- `intro-sealing` on `<html>` releases `.fade-up` content while the glass is still lifting; the tagline leads, then the cue, then the header (~120ms apart).
+- Legacy from the earlier scroll-movie direction (unused by the current pages): `ShardField.astro`, `StoryBlock.astro`, `GlassAssembly.astro`, `src/scripts/glass.ts`, `MOVIE.md`, `DESIGN.md`.
+
 ## Conventions
 
 - Keep `OVERVIEW.md` as the canonical concept doc; update it (not scattered notes) when the movement's framing changes.

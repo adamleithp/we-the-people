@@ -1,11 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
 ---
 
-<Layout title="Join Us — We The People">
+<Layout title="Join Us — We The People" introLines={['Join Us']}>
+  <PageHero lines={['Join Us']}>
+    <p class="hero__kicker fade-up">Be part of hope</p>
+  </PageHero>
+
   <main class="join-page">
-    <p class="kicker">We The People</p>
-    <h1>Be part of hope.</h1>
     <p class="lede">
       Reunite the country. Transform the system. It starts with people like you standing
       together — sign-ups open soon.
@@ -22,29 +25,12 @@ import Layout from '../layouts/Layout.astro';
 
 <style>
   .join-page {
-    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 1.1rem;
-    padding: 8vh 6vw;
+    padding: 2rem 6vw clamp(6rem, 16vh, 10rem);
     text-align: center;
-  }
-  .kicker {
-    margin: 0;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    font-size: 0.85rem;
-    color: var(--color-wtp-dawn, #f2c14e);
-  }
-  h1 {
-    margin: 0;
-    font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
-    text-transform: uppercase;
-    font-size: clamp(2.6rem, 9vw, 6rem);
-    line-height: 0.95;
   }
   .lede {
     margin: 0;

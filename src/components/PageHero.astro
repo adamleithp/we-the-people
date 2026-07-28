@@ -1,0 +1,52 @@
+---
+/**
+ * The page's title block. Shares the `.pane` metrics with <GlassIntro />, which
+ * is what lets the shattered title land exactly where the real heading lives.
+ *
+ * Only the heading is in flow; anything passed to the default slot hangs out of
+ * flow below it, so the heading's centre stays the pane's centre. `.pane`'s
+ * min-height keeps that out-of-flow content off the next section.
+ */
+interface Props {
+  /** the title, one entry per line */
+  lines: string[];
+  variant?: 'hero' | 'page';
+}
+const { lines, variant = 'page' } = Astro.props;
+const hasBelow = Astro.slots.has('default');
+---
+
+<section class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
+  <div class="hero__inner">
+    <h1 class="wtp-wordmark" set:html={lines.join('<br />')} />
+    {
+      hasBelow && (
+        <div class="hero__below">
+          <slot />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    text-align: center;
+    align-content: center;
+  }
+  .hero__inner {
+    position: relative;
+  }
+  .hero__below {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    translate: -50% 0;
+    margin-top: 1.6rem;
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    width: max-content;
+    max-width: 90vw;
+  }
+</style>

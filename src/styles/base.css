@@ -6,7 +6,7 @@
   --color-wtp-paper: #f6f4ee;
   --color-wtp-dawn: #f2c14e; /* dawn yellow — secondary accent */
   --color-wtp-ink: #00160c; /* dark dark green */
-  --color-wtp-night: #050505; /* site ground — near-black */
+  --color-wtp-night: #0b0b0b; /* site ground — off-black */
 
   /* mountain ramp: far (pale, most fog) → near (deep) for atmospheric depth */
   --color-wtp-green-100: #a9c4b3;
@@ -50,5 +50,200 @@
   [data-cluster].is-live,
   [data-assembly].is-live .fragment {
     will-change: transform;
+  }
+
+  /* In-page anchors (the hero's scroll cue) glide instead of jumping */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Page is frozen behind the glass intro until it seals */
+  html.intro-running,
+  html.intro-running body {
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  :root {
+    /* strong ease-out — the built-in curves are too weak to read as intentional */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* The pane: the box a title is centred in. The glass intro and the page hero
+     BOTH use it with the same modifier, which is what makes the assembled
+     wordmark hand off to the real title without moving a pixel.
+     `--lines` (set inline per title) sizes the min-height floor, so squat
+     viewports never let out-of-flow content below spill onto the next section. */
+  .pane {
+    height: var(--pane-h);
+    min-height: calc(var(--wordmark-block) + var(--pane-slack));
+    display: grid;
+    place-items: center;
+    padding-inline: 5vw;
+    /* wordmark box height: N lines at line-height 0.84 */
+    --wordmark-block: calc(var(--wordmark-size) * 0.84 * var(--lines, 2));
+  }
+  .pane--hero {
+    --pane-h: 85dvh;
+    --pane-slack: 19rem; /* room for the tagline + scroll cue hanging below */
+    /* width-driven, capped by viewport height so squat windows shrink the type
+       instead of pushing the hero past the fold (vh, not dvh: a resizing URL bar
+       must not re-scale the wordmark mid-scroll) */
+    --wordmark-size: min(clamp(3.4rem, 16vw, 15rem), 24vh);
+  }
+  .pane--page {
+    --pane-h: 56dvh;
+    --pane-slack: 7rem;
+    --wordmark-size: min(clamp(2.6rem, 11vw, 8.5rem), 20vh);
+  }
+  /* fill the width on phones — the lockup should feel like a poster */
+  @media (max-width: 640px) {
+    .pane--hero {
+      --wordmark-size: min(21vw, 24vh);
+    }
+    .pane--page {
+      --wordmark-size: min(15vw, 20vh);
+    }
+  }
+
+  .wtp-wordmark {
+    margin: 0;
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: var(--wordmark-size);
+    line-height: 0.84;
+    letter-spacing: 0.005em;
+    text-align: center;
+    color: #fff;
+  }
+
+  /* Content that waits for the intro. It starts as the pane begins to lift
+     (`intro-sealing`), not after teardown — so the tagline is already arriving
+     while the glass fades, and leads the header and cue in by a short stagger. */
+  .fade-up {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  html.intro-sealing .fade-up,
+  html.intro-done .fade-up {
+    animation: fade-up 0.55s var(--ease-out) var(--fade-delay, 0s) both;
+  }
+  @keyframes fade-up {
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  /* reduced motion: keep the content, drop the movement */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up {
+      opacity: 1;
+      translate: 0 0;
+      animation: none !important;
+    }
+  }
+
+  /* the line under a page title, inside <PageHero>'s slot */
+  .hero__kicker {
+    margin: 0;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    font-size: 0.78rem;
+    color: var(--color-wtp-dawn);
+  }
+
+  /* Deck pages: one 70ch column, nothing else */
+  .prose {
+    max-width: 70ch;
+    margin-inline: auto;
+    padding: 1rem 1.5rem clamp(6rem, 16vh, 10rem);
+    font-size: clamp(1.02rem, 1.1rem, 1.15rem);
+    line-height: 1.7;
+    color: rgba(246, 244, 238, 0.86);
+  }
+  /* the page's opening statement — the title itself lives in <PageHero> */
+  .prose .prose__opener {
+    margin: 0 0 2.2rem;
+    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    line-height: 1;
+  }
+  .prose h2 {
+    margin: 3.4rem 0 1rem;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(1.45rem, 4vw, 2.1rem);
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+    color: #fff;
+  }
+  .prose p {
+    margin: 0 0 1.15rem;
+  }
+  .prose ul {
+    margin: 0 0 1.15rem;
+    padding-left: 1.15rem;
+    list-style: none;
+  }
+  .prose li {
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .prose li::before {
+    content: '';
+    position: absolute;
+    left: -1.15rem;
+    top: 0.72em;
+    width: 0.4rem;
+    height: 0.4rem;
+    background: var(--color-wtp-dawn);
+  }
+  .prose .kicker {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.34em;
+    font-size: 0.78rem;
+    color: var(--color-wtp-dawn);
+  }
+  .prose .lead {
+    font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+    line-height: 1.5;
+    color: #fff;
+    margin-bottom: 2rem;
+  }
+  .prose .pull {
+    margin: 2.6rem 0;
+    padding-left: 1.4rem;
+    border-left: 2px solid var(--color-wtp-dawn);
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+    line-height: 1.15;
+    color: #fff;
+  }
+  .prose .footnote {
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: rgba(246, 244, 238, 0.5);
+  }
+  .prose .footnote a {
+    color: inherit;
+  }
+  .prose .back {
+    display: inline-block;
+    margin-top: 3.5rem;
+    color: rgba(246, 244, 238, 0.6);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+  }
+  .prose .back:hover {
+    color: #fff;
   }
 }
