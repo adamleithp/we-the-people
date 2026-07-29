@@ -1,6 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
+
+// Mirrors the fields on wethepeoplegather.com's sign-up form.
+const CONTRIBUTIONS = [
+  'Democracy theory',
+  'Raising money',
+  'CA delivery',
+  'Media/Communications',
+  'Technology',
+  'Event production',
+  'Connections to cultural figures',
+  'Accounting/Legal',
+  'Other',
+];
 ---
 
 <Layout title="Join Us — We The People" introLines={['Join Us']}>
@@ -11,16 +24,51 @@ import PageHero from '../components/PageHero.astro';
   <main class="join-page">
     <p class="lede">
       Reunite the country. Transform the system. It starts with people like you standing
-      together — sign-ups open soon.
+      together — add your name.
     </p>
-    <!-- TODO: wire to the chosen sign-up service (Mailchimp / Action Network / …) -->
-    <form class="signup" onsubmit="return false">
-      <label class="sr-only" for="email">Email address</label>
-      <input id="email" type="email" name="email" placeholder="you@example.com" required />
-      <button type="submit" disabled title="Sign-ups open soon">Join Us</button>
+    <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
+         Right now the only record of a sign-up is the PostHog person profile. -->
+    <form class="signup" data-signup novalidate>
+      <div class="field">
+        <label for="name">Your name</label>
+        <input id="name" type="text" name="name" autocomplete="name" required />
+      </div>
+
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" type="email" name="email" autocomplete="email" required />
+      </div>
+
+      <div class="field">
+        <label for="contribution">How you can contribute</label>
+        <select id="contribution" name="contribution">
+          <option value="">Choose one…</option>
+          {CONTRIBUTIONS.map((c) => <option value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="message">Anything else you'd like to tell us</label>
+        <textarea id="message" name="message" rows="4"></textarea>
+      </div>
+
+      <button type="submit">Join Us</button>
     </form>
     <a class="back" href="/">← Back to home</a>
   </main>
+
+  <!-- Shown once the sign-up event has been captured. Esc or the ✕ closes it. -->
+  <div class="thanks" data-thanks hidden>
+    <div class="thanks__backdrop" data-thanks-dismiss></div>
+    <div class="thanks__panel" role="dialog" aria-modal="true" aria-labelledby="thanks-text">
+      <p class="thanks__text" id="thanks-text">
+        Thank you for joining us, we'll send over more information as soon as possible.
+      </p>
+      <button class="thanks__close" type="button" data-thanks-dismiss aria-label="Close">
+        <span aria-hidden="true">✕</span>
+      </button>
+    </div>
+  </div>
 </Layout>
 
 <style>
@@ -40,25 +88,68 @@ import PageHero from '../components/PageHero.astro';
     opacity: 0.9;
   }
   .signup {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-top: 0.8rem;
+    display: grid;
+    gap: 1.1rem;
+    width: min(28rem, 100%);
+    margin-top: 1.4rem;
+    text-align: left;
   }
-  .signup input {
-    padding: 0.85rem 1.2rem;
-    min-width: min(20rem, 70vw);
-    border: 1px solid rgba(246, 244, 238, 0.35);
-    border-radius: 999px;
-    background: rgba(246, 244, 238, 0.08);
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .field label {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(246, 244, 238, 0.6);
+  }
+  .signup input,
+  .signup select,
+  .signup textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(246, 244, 238, 0.28);
+    border-radius: 0.5rem;
+    background: rgba(246, 244, 238, 0.06);
     color: var(--color-wtp-paper, #f6f4ee);
+    font-family: inherit;
     font-size: 1rem;
+    transition: border-color 150ms ease;
   }
-  .signup input::placeholder {
-    color: rgba(246, 244, 238, 0.5);
+  .signup textarea {
+    resize: vertical;
+    min-height: 6rem;
+  }
+  .signup select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, rgba(246, 244, 238, 0.6) 50%),
+      linear-gradient(135deg, rgba(246, 244, 238, 0.6) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.15rem) 55%,
+      calc(100% - 0.85rem) 55%;
+    background-size:
+      0.32rem 0.32rem,
+      0.32rem 0.32rem;
+    background-repeat: no-repeat;
+    padding-right: 2.4rem;
+  }
+  .signup option {
+    background: var(--color-wtp-night);
+    color: var(--color-wtp-paper);
+  }
+  .signup input:focus-visible,
+  .signup select:focus-visible,
+  .signup textarea:focus-visible {
+    outline: none;
+    border-color: var(--color-wtp-dawn);
+  }
+  .signup input:user-invalid,
+  .signup select:user-invalid {
+    border-color: #e0736d;
   }
   .signup button {
+    justify-self: start;
     padding: 0.85rem 2.4rem;
     border: 0;
     border-radius: 999px;
@@ -68,10 +159,104 @@ import PageHero from '../components/PageHero.astro';
     letter-spacing: 0.04em;
     text-transform: uppercase;
     font-size: 1rem;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
   }
-  .signup button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  .signup button:active {
+    transform: scale(0.97);
+  }
+
+  /* --- thank-you overlay ---------------------------------------------------- */
+  .thanks {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    padding: 6vw;
+  }
+  .thanks[hidden] {
+    display: none;
+  }
+  .thanks__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 5, 5, 0.72);
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .thanks__panel {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.8rem;
+    max-width: 30rem;
+    padding: clamp(2rem, 6vw, 3rem);
+    background: var(--color-wtp-green);
+    text-align: center;
+    /* never from scale(0) — it should arrive, not appear from nothing */
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+    /* paired with the backdrop: same duration, same curve */
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+  .thanks.is-open .thanks__backdrop {
+    opacity: 1;
+  }
+  .thanks.is-open .thanks__panel {
+    opacity: 1;
+    transform: none;
+  }
+  /* exit is quicker than entry — the system responding, not the user deciding */
+  .thanks.is-closing .thanks__backdrop,
+  .thanks.is-closing .thanks__panel {
+    transition-duration: 150ms;
+  }
+  .thanks__text {
+    margin: 0;
+    font-size: clamp(1.05rem, 3vw, 1.3rem);
+    line-height: 1.5;
+    color: #fff;
+  }
+  .thanks__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem; /* 44px hit area */
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      transform 160ms var(--ease-out);
+  }
+  .thanks__close:active {
+    transform: scale(0.94);
+  }
+  .thanks__close:focus-visible {
+    outline: 2px solid var(--color-wtp-dawn);
+    outline-offset: 3px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .thanks__close:hover {
+      background-color: rgba(255, 255, 255, 0.14);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .thanks__backdrop,
+    .thanks__panel,
+    .thanks__close,
+    .signup button {
+      transition: none;
+    }
+    .thanks__panel {
+      transform: none;
+    }
   }
   .back {
     margin-top: 1.6rem;
@@ -91,3 +276,103 @@ import PageHero from '../components/PageHero.astro';
     white-space: nowrap;
   }
 </style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.posthog?.capture('join_page_viewed');
+
+    var form = document.querySelector('[data-signup]');
+    var emailInput = document.getElementById('email');
+    var thanks = document.querySelector('[data-thanks]');
+    var closeBtn = thanks && thanks.querySelector('.thanks__close');
+
+    if (emailInput) {
+      emailInput.addEventListener('blur', function () {
+        if (emailInput.value) {
+          window.posthog?.capture('join_signup_attempted');
+        }
+      });
+    }
+
+    // --- thank-you overlay ---------------------------------------------------
+    var lastFocused = null;
+
+    function openThanks() {
+      if (!thanks) return;
+      lastFocused = document.activeElement;
+      thanks.hidden = false;
+      document.body.style.overflow = 'hidden';
+      // next frame, so the transition runs from the closed state
+      requestAnimationFrame(function () {
+        thanks.classList.add('is-open');
+      });
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeThanks() {
+      if (!thanks || thanks.hidden) return;
+      thanks.classList.remove('is-open');
+      thanks.classList.add('is-closing');
+      window.setTimeout(function () {
+        thanks.hidden = true;
+        thanks.classList.remove('is-closing');
+        document.body.style.overflow = '';
+        if (lastFocused && lastFocused.focus) lastFocused.focus();
+      }, 160);
+    }
+
+    if (thanks) {
+      thanks.querySelectorAll('[data-thanks-dismiss]').forEach(function (el) {
+        el.addEventListener('click', closeThanks);
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (!thanks || thanks.hidden) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeThanks();
+      }
+      // the close button is the only focusable thing in here — keep focus in
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (closeBtn) closeBtn.focus();
+      }
+    });
+
+    // --- sign-up -------------------------------------------------------------
+    if (form && emailInput) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        var data = new FormData(form);
+        var email = String(data.get('email') || '').trim();
+        var name = String(data.get('name') || '').trim();
+        var contribution = String(data.get('contribution') || '').trim();
+        var message = String(data.get('message') || '').trim();
+
+        // PII (email, name, free text) goes on the person profile — PostHog's
+        // rule is PII belongs in identify(), never in capture() properties.
+        window.posthog?.identify(email, {
+          email: email,
+          name: name,
+          contribution: contribution,
+          message: message,
+        });
+        // The event records that a sign-up happened, with only the
+        // non-identifying bits as properties so it stays safe to break down on.
+        window.posthog?.capture('join_us_submitted', {
+          contribution: contribution || 'not_specified',
+          has_message: message.length > 0,
+        });
+
+        form.reset();
+        openThanks();
+      });
+    }
+  });
+</script>

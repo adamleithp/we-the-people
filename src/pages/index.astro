@@ -207,3 +207,14 @@ const SECTIONS = [
     }
   }
 </style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.panel').forEach(function (panel) {
+      panel.addEventListener('click', function () {
+        var title = panel.querySelector('.panel__title')?.textContent?.trim() || '';
+        window.posthog?.capture('homepage_panel_clicked', { panel_title: title });
+      });
+    });
+  });
+</script>

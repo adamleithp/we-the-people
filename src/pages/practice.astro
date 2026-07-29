@@ -163,3 +163,22 @@ import PageHero from '../components/PageHero.astro';
     <a class="back" href="/">← Back</a>
   </article>
 </Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    var backs = document.querySelectorAll('article.prose .back');
+    var lastBack = backs[backs.length - 1];
+    if (!lastBack) return;
+    var fired = false;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !fired) {
+          fired = true;
+          window.posthog?.capture('practice_article_read');
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(lastBack);
+  });
+</script>

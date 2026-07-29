@@ -3,6 +3,7 @@ import { Font } from 'astro:assets';
 import '../styles/base.css';
 import Header from '../components/Header.astro';
 import GlassIntro from '../components/GlassIntro.astro';
+import PostHog from '../components/posthog.astro';
 
 interface Props {
   title?: string;
@@ -28,6 +29,7 @@ const {
     <!-- Self-hosted, subset & preloaded by the Astro Fonts API -->
     <Font cssVariable="--font-anton" preload />
     <title>{title}</title>
+    <PostHog />
   </head>
   <body>
     <!-- every page opens with its own title in glass; the header is global -->

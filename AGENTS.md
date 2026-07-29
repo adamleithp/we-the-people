@@ -33,6 +33,15 @@ Reference feel: [blueheart.patagonia.com](https://blueheart.patagonia.com/) — 
 - `intro-sealing` on `<html>` releases `.fade-up` content while the glass is still lifting; the tagline leads, then the cue, then the header (~120ms apart).
 - Legacy from the earlier scroll-movie direction (unused by the current pages): `ShardField.astro`, `StoryBlock.astro`, `GlassAssembly.astro`, `src/scripts/glass.ts`, `MOVIE.md`, `DESIGN.md`.
 
+## Analytics
+
+PostHog, **EU cloud** (`https://eu.i.posthog.com`, project 235802 in the We The People org). Init lives in `src/components/posthog.astro`, loaded from `Layout.astro`; keys come from `.env` (`PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST` — see `.env.example`). Pageviews and autocapture are on by default.
+
+- Sign-up: `/join` mirrors wethepeoplegather.com's fields — name, email, "how you can contribute" (select), "anything else" (textarea). On submit: `identify(email, { email, name, contribution, message })` then `capture('join_us_submitted', { contribution, has_message })`, then the thank-you overlay. PII lives on the **person profile, never in event properties** — PostHog's own rule — so the event stays safe to break down on.
+- Action **Joined Us (form submitted)** (id 146569) matches `join_us_submitted`; workflow **Welcome Email Sequence** (`019fad20-ee9b-0000-b1df-7e8ddacd85bd`) triggers off that action, sends the welcome email, exits. Masked to once per person per 30 days. It is a **draft** — enabling is a deliberate, user-approved step, and delivery also needs a verified sender domain (Messaging settings) for `hello@wethepeoplegather.com`.
+- The PostHog MCP connector is authed against **US** cloud, so it cannot see this project. Driving it over MCP needs an EU personal API key.
+- Verifying captures with Playwright/Puppeteer: posthog-js's bot filter silently drops every capture unless `navigator.webdriver`, the UA, and `navigator.userAgentData` are all overridden. Stub `window.posthog` instead, and block `*.posthog.com` so smoke tests don't write to the real project.
+
 ## Conventions
 
 - Keep `OVERVIEW.md` as the canonical concept doc; update it (not scattered notes) when the movement's framing changes.
