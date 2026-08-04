@@ -1,6 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
+import HeroBackdrop from '../components/HeroBackdrop.astro';
+
+// Inlined (not <img src>) so the strokes inherit `currentColor` — the file ships
+// with black strokes rewritten to currentColor, which would be invisible on the
+// off-black ground otherwise.
+import signature from '../assets/signature.svg?raw';
 
 const SECTIONS = [
   {
@@ -38,6 +44,7 @@ const SECTIONS = [
   <main>
     <!-- the intro's pane matches this one, so the assembled wordmark lands here -->
     <PageHero lines={['We The', 'People']} variant="hero">
+      <HeroBackdrop slot="backdrop" />
       <!-- the tagline leads: it starts as the glass lifts, the cue follows -->
       <p class="hero__tagline fade-up">Reunite the Country · Transform the System</p>
       <a class="hero__cue fade-up" style="--fade-delay:0.12s" href="#sections">
@@ -45,6 +52,24 @@ const SECTIONS = [
         <span class="hero__arrow" aria-hidden="true"></span>
       </a>
     </PageHero>
+
+    <!-- The manifesto, in the founder's voice. Signature is a placeholder name. -->
+    <section class="creed">
+      <p class="creed__body">
+        There is a quiet most of us would recognise — the sense of being spoken for, and
+        rarely spoken to; the feeling that the argument itself has become the point. We do
+        not believe this country is divided in its heart. It is divided by the room it has
+        been given to speak in. So we are building a better room. One hundred of us, drawn
+        as a jury is drawn, from every corner and every conviction; sat together long
+        enough to hear the whole of a thing; trusted, at last, to write what comes next.
+        Not left, not right — forward. This is not a protest against anyone. It is an
+        invitation to everyone. Come as you are, bring your history, keep your beliefs. We
+        ask one thing only: hold the country above the quarrel. We are many. We are one.
+      </p>
+      <div class="creed__sign" role="img" aria-label="Edward Scarlett-Watts" set:html={signature} />
+      <p class="creed__name">Edward Scarlett-Watts</p>
+      <p class="creed__attrib">On behalf of We The People · London, 2026</p>
+    </section>
 
     <section class="panels" id="sections">
       {
@@ -115,6 +140,49 @@ const SECTIONS = [
       transform: translateY(6px);
       opacity: 1;
     }
+  }
+
+  /* --- the manifesto ------------------------------------------------------- */
+  .creed {
+    max-width: 46ch; /* short measure — it should read like a letter, not a page */
+    margin-inline: auto;
+    padding: clamp(4rem, 12vh, 8rem) 1.5rem clamp(4rem, 12vh, 7rem);
+    text-align: left;
+  }
+  .creed__body {
+    margin: 0;
+    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+    line-height: 1.85;
+    letter-spacing: 0.005em;
+    text-wrap: pretty;
+    color: rgba(246, 244, 238, 0.82);
+  }
+  .creed__body::first-line {
+    color: #fff;
+  }
+  .creed__sign {
+    margin-top: 2.4rem;
+    color: var(--color-wtp-dawn); /* the inlined strokes are currentColor */
+  }
+  .creed__sign :global(svg) {
+    display: block;
+    width: clamp(5.5rem, 13vw, 7.5rem);
+    height: auto;
+  }
+  .creed__name {
+    margin: 1.1rem 0 0;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+  .creed__attrib {
+    margin: 0.35rem 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(246, 244, 238, 0.45);
   }
 
   /* --- three flexed sections ---------------------------------------------- */

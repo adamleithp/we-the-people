@@ -14,9 +14,11 @@ interface Props {
 }
 const { lines, variant = 'page' } = Astro.props;
 const hasBelow = Astro.slots.has('default');
+const hasBackdrop = Astro.slots.has('backdrop');
 ---
 
 <section class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
+  {hasBackdrop && <slot name="backdrop" />}
   <div class="hero__inner">
     <h1 class="wtp-wordmark" set:html={lines.join('<br />')} />
     {
@@ -31,11 +33,13 @@ const hasBelow = Astro.slots.has('default');
 
 <style>
   .hero {
+    position: relative; /* the backdrop slot is absolutely filled to this box */
     text-align: center;
     align-content: center;
   }
   .hero__inner {
     position: relative;
+    z-index: 1; /* the title sits over the photograph */
   }
   .hero__below {
     position: absolute;
