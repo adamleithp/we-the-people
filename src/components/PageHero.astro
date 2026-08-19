@@ -7,6 +7,8 @@
  * flow below it, so the heading's centre stays the pane's centre. `.pane`'s
  * min-height keeps that out-of-flow content off the next section.
  */
+import ShatterTitle from './ShatterTitle.astro';
+
 interface Props {
   /** the title, one entry per line */
   lines: string[];
@@ -20,7 +22,7 @@ const hasBackdrop = Astro.slots.has('backdrop');
 <section class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
   {hasBackdrop && <slot name="backdrop" />}
   <div class="hero__inner">
-    <h1 class="wtp-wordmark" set:html={lines.join('<br />')} />
+    <ShatterTitle lines={lines} cols={variant === 'hero' ? 6 : 5} rows={2} />
     {
       hasBelow && (
         <div class="hero__below">

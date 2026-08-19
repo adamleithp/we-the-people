@@ -1,0 +1,183 @@
+---
+/**
+ * The page title as glass. At rest it is a plain <h1> — same font, same metrics,
+ * so <GlassIntro>'s assembled wordmark still hands off to it untouched.
+ *
+ * On pointer-enter the heading is swapped for a stack of shard copies: the same
+ * title repeated N times, each clipped to its own triangle (`shatter()`, the
+ * geometry the intro uses). The swap is instantaneous and pixel-identical, so
+ * nothing visibly changes — there is no crossfade, which is what would show the
+ * hairline seams between adjacent shards.
+ *
+ * Hovering a shard tilts it a couple of degrees and reveals a face behind the
+ * glass. Leaving the title puts the plain heading back.
+ *
+ * Faces come from `public/faces/` (portraits — the sad, ordinary faces of a
+ * divided country). Until that folder exists it falls back to `public/hero/`.
+ *
+ * Performance: only `transform` and `opacity` transition. The face images are
+ * declared as a custom property and only promoted to a real `background-image`
+ * once the title is hovered, so a page load never fetches N portraits.
+ */
+import { readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { shatter } from '../lib/shards';
+
+interface Props {
+  /** the title, one entry per line */
+  lines: string[];
+  /** grid the title is broken on — cols × rows × 2 triangles */
+  cols?: number;
+  rows?: number;
+}
+const { lines, cols = 6, rows = 2 } = Astro.props;
+
+const pick = (folder: string) => {
+  try {
+    return readdirSync(fileURLToPath(new URL(`../../public/${folder}`, import.meta.url)))
+      .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
+      .sort()
+      .map((f) => `/${folder}/${f}`);
+  } catch {
+    return [];
+  }
+};
+const faces = pick('faces').length ? pick('faces') : pick('hero');
+
+// cols × rows × 2 triangles — 6 × 2 = 24 pieces
+const shards = shatter(cols, rows, 20260804);
+const html = lines.join('<br />');
+
+/** Each piece lifts away from the centre of the title, so the break opens out. */
+const lift = shards.map((s, i) => {
+  const [cx, cy] = s.origin.split(' ').map(parseFloat);
+  const dirX = (cx - 50) / 50;
+  const dirY = (cy - 50) / 50;
+  const swing = ((i % 7) - 3) / 3; // -1 … 1, stable per piece
+  return {
+    dx: (dirX * 1.6 + swing * 0.5).toFixed(2),
+    dy: (dirY * 2.4 + swing * 0.6).toFixed(2),
+    rz: (swing * 5.5).toFixed(2),
+    rx: (-dirY * 9).toFixed(2),
+    ry: (dirX * 12).toFixed(2),
+  };
+});
+---
+
+<div class="stitle" data-shatter-title>
+  <h1 class="wtp-wordmark stitle__base" set:html={html} />
+  <div class="stitle__glass" aria-hidden="true">
+    {
+      shards.map((s, i) => (
+        <div
+          class="sshard"
+          style={`clip-path:${s.clip};transform-origin:${s.origin};--dx:${lift[i].dx}%;--dy:${lift[i].dy}%;--rz:${lift[i].rz}deg;--rx:${lift[i].rx}deg;--ry:${lift[i].ry}deg;--face:url('${faces[i % faces.length]}')`}
+        >
+          {/* the glass plate: the face, dimmed, filling the piece */}
+          <div class="sshard__face" />
+          {/* two copies of the title, crossfaded: white → cut from the photo */}
+          <p class="wtp-wordmark sshard__ink" set:html={html} />
+          <p class="wtp-wordmark sshard__cut" set:html={html} />
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .stitle {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+  .stitle__base {
+    grid-area: 1 / 1;
+  }
+  /* the shard stack sits exactly on the heading: same box, same centring */
+  .stitle__glass {
+    grid-area: 1 / 1;
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    perspective: 900px; /* the pieces tilt in space, like glass catching light */
+  }
+  .sshard {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    /* clip-path clips hit-testing too — each triangle is its own hover target */
+    pointer-events: auto;
+    transform-style: preserve-3d;
+    transition: transform 300ms var(--ease-out);
+  }
+  .sshard :global(p) {
+    grid-area: 1 / 1;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    transition: opacity 300ms var(--ease-out);
+  }
+  /* the photo cut out by the letterforms — this is the piece's own type */
+  .sshard__cut {
+    background-image: none;
+    background-position: center;
+    background-size: cover;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0;
+  }
+  /* a dim plate of the same photo, so the triangle reads as glass, not a hole */
+  .sshard__face {
+    grid-area: 1 / 1;
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-out);
+  }
+
+  /* Desktop pointers only: the whole effect is a hover. */
+  @media (hover: hover) and (pointer: fine) {
+    /* the swap is instant and pixel-identical, so it reads as nothing happening */
+    .stitle:hover .stitle__base {
+      visibility: hidden;
+    }
+    .stitle:hover .stitle__glass {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* the portraits are fetched on first hover, never on load */
+    .stitle:hover .sshard__face,
+    .stitle:hover .sshard__cut {
+      background-image: var(--face);
+    }
+    .stitle .sshard:hover {
+      transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--rz))
+        rotateX(var(--rx)) rotateY(var(--ry)) scale(1.06);
+      z-index: 2;
+    }
+    /* the piece's letters become the photograph; the white copy steps aside */
+    .stitle .sshard:hover .sshard__ink {
+      opacity: 0;
+    }
+    .stitle .sshard:hover .sshard__cut {
+      opacity: 1;
+    }
+    .stitle .sshard:hover .sshard__face {
+      opacity: 0.28;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stitle__glass {
+      display: none;
+    }
+  }
+</style>
