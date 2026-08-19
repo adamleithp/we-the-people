@@ -3,25 +3,33 @@
  * The page title as glass. At rest it is a plain <h1> — same font, same metrics,
  * so <GlassIntro>'s assembled wordmark still hands off to it untouched.
  *
- * On pointer-enter the heading is swapped for a stack of shard copies: the same
- * title repeated N times, each clipped to its own triangle (`shatter()`, the
- * geometry the intro uses). The swap is instantaneous and pixel-identical, so
- * nothing visibly changes — there is no crossfade, which is what would show the
- * hairline seams between adjacent shards.
+ * As a pointer approaches, the heading is swapped for a stack of shard copies:
+ * the same title repeated N times, each clipped to its own triangle (`shatter()`,
+ * the geometry the intro uses). The swap is instantaneous and pixel-identical —
+ * no crossfade, which is what would show the hairline seams between shards.
  *
- * Hovering a shard tilts it a couple of degrees and reveals a face behind the
- * glass. Leaving the title puts the plain heading back.
+ * The break is a *field*, not a hover target. Every shard reads its distance to
+ * the pointer and folds by that much: the pieces under the cursor cave back into
+ * the screen, tip their faces toward it and push outward, so a hole opens in the
+ * wordmark and the portraits behind it come through. Falloff is smoothstep over
+ * a radius, so the edge of the break is soft and the whole area moves as one.
  *
  * Faces come from `public/faces/` (portraits — the sad, ordinary faces of a
- * divided country). Until that folder exists it falls back to `public/hero/`.
+ * divided country). Until that folder has images it falls back to `public/hero/`.
  *
- * Performance: only `transform` and `opacity` transition. The face images are
- * declared as a custom property and only promoted to a real `background-image`
- * once the title is hovered, so a page load never fetches N portraits.
+ * Performance:
+ * - Shards are `pointer-events: none`; one window listener does the maths. No
+ *   hit-testing of N clipped polygons.
+ * - The frame loop writes three custom properties per shard (`--k`, `--ux`,
+ *   `--uy`); CSS composes the transform and the three opacities from them, so
+ *   only `transform`/`opacity` ever change.
+ * - Shards outside the radius are skipped once they have settled at rest.
+ * - Portraits are declared as a custom property and only promoted to a real
+ *   `background-image` once a title is armed, so a page load fetches none.
  */
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { shatter } from '../lib/shards';
+import { shatter, mulberry32 } from '../lib/shards';
 
 interface Props {
   /** the title, one entry per line */
@@ -30,7 +38,7 @@ interface Props {
   cols?: number;
   rows?: number;
 }
-const { lines, cols = 6, rows = 2 } = Astro.props;
+const { lines, cols = 8, rows = 3 } = Astro.props;
 
 const pick = (folder: string) => {
   try {
@@ -44,42 +52,47 @@ const pick = (folder: string) => {
 };
 const faces = pick('faces').length ? pick('faces') : pick('hero');
 
-// cols × rows × 2 triangles — 6 × 2 = 24 pieces
 const shards = shatter(cols, rows, 20260804);
 const html = lines.join('<br />');
 
-/** Each piece lifts away from the centre of the title, so the break opens out. */
-const lift = shards.map((s, i) => {
-  const [cx, cy] = s.origin.split(' ').map(parseFloat);
-  const dirX = (cx - 50) / 50;
-  const dirY = (cy - 50) / 50;
-  const swing = ((i % 7) - 3) / 3; // -1 … 1, stable per piece
-  return {
-    dx: (dirX * 1.6 + swing * 0.5).toFixed(2),
-    dy: (dirY * 2.4 + swing * 0.6).toFixed(2),
-    rz: (swing * 5.5).toFixed(2),
-    rx: (-dirY * 9).toFixed(2),
-    ry: (dirX * 12).toFixed(2),
-  };
-});
+/**
+ * Per-piece character for the fold. Direction is decided at runtime (it points
+ * away from the pointer), so what is baked here is only *how much* — how far
+ * this piece pushes, how deep it caves, how hard it tips and twists.
+ */
+const rnd = mulberry32(9184);
+const rand = (a: number, b: number) => a + rnd() * (b - a);
+const fold = shards.map(() => ({
+  push: rand(9, 26).toFixed(1), // px, outward from the pointer
+  dz: -rand(38, 132).toFixed(0), // px, back into the screen
+  tilt: rand(26, 50).toFixed(1), // deg at full strength, per unit direction
+  spin: rand(-16, 16).toFixed(1), // deg of in-plane twist
+  shrink: rand(0.04, 0.13).toFixed(3),
+  dim: rand(0.4, 0.86).toFixed(2), // how much light this plate keeps
+}));
 ---
 
 <div class="stitle" data-shatter-title>
   <h1 class="wtp-wordmark stitle__base" set:html={html} />
   <div class="stitle__glass" aria-hidden="true">
     {
-      shards.map((s, i) => (
-        <div
-          class="sshard"
-          style={`clip-path:${s.clip};transform-origin:${s.origin};--dx:${lift[i].dx}%;--dy:${lift[i].dy}%;--rz:${lift[i].rz}deg;--rx:${lift[i].rx}deg;--ry:${lift[i].ry}deg;--face:url('${faces[i % faces.length]}')`}
-        >
-          {/* the glass plate: the face, dimmed, filling the piece */}
-          <div class="sshard__face" />
-          {/* two copies of the title, crossfaded: white → cut from the photo */}
-          <p class="wtp-wordmark sshard__ink" set:html={html} />
-          <p class="wtp-wordmark sshard__cut" set:html={html} />
-        </div>
-      ))
+      shards.map((s, i) => {
+        const [cx, cy] = s.origin.split(' ');
+        return (
+          <div
+            class="sshard"
+            data-cx={parseFloat(cx)}
+            data-cy={parseFloat(cy)}
+            style={`clip-path:${s.clip};transform-origin:${s.origin};--push:${fold[i].push}px;--dz:${fold[i].dz}px;--tilt:${fold[i].tilt};--spin:${fold[i].spin};--shrink:${fold[i].shrink};--dim:${fold[i].dim};--face:url('${faces[i % faces.length]}')`}
+          >
+            {/* the glass plate: the portrait, dimmed, filling the piece */}
+            <div class="sshard__face" />
+            {/* two copies of the title, crossfaded: white → cut from the photo */}
+            <p class="wtp-wordmark sshard__ink" set:html={html} />
+            <p class="wtp-wordmark sshard__cut" set:html={html} />
+          </div>
+        );
+      })
     }
   </div>
 </div>
@@ -103,24 +116,37 @@ const lift = shards.map((s, i) => {
     height: 100%;
     opacity: 0;
     pointer-events: none;
-    perspective: 900px; /* the pieces tilt in space, like glass catching light */
+    perspective: 900px; /* the pieces fold in space, like glass caving in */
   }
   .sshard {
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    /* clip-path clips hit-testing too — each triangle is its own hover target */
-    pointer-events: auto;
-    transform-style: preserve-3d;
-    transition: transform 300ms var(--ease-out);
+    pointer-events: none; /* the field is driven by one window listener */
+    backface-visibility: hidden;
+    --k: 0; /* 0 at rest → 1 directly under the pointer */
+    --ux: 0; /* unit vector from the pointer to this piece */
+    --uy: 0;
+    transform: translate3d(
+        calc(var(--ux) * var(--push) * var(--k)),
+        calc(var(--uy) * var(--push) * var(--k)),
+        calc(var(--dz) * var(--k))
+      )
+      rotateX(calc(var(--uy) * var(--tilt) * var(--k) * 1deg))
+      rotateY(calc(var(--ux) * var(--tilt) * var(--k) * -1deg))
+      rotate(calc(var(--spin) * var(--k) * 1deg))
+      scale(calc(1 - var(--shrink) * var(--k)));
   }
   .sshard :global(p) {
     grid-area: 1 / 1;
     position: relative;
     z-index: 1;
     margin: 0;
-    transition: opacity 300ms var(--ease-out);
+  }
+  /* the white letters step aside as the piece folds */
+  .sshard__ink {
+    opacity: calc(1 - var(--k));
   }
   /* the photo cut out by the letterforms — this is the piece's own type */
   .sshard__cut {
@@ -130,48 +156,37 @@ const lift = shards.map((s, i) => {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    opacity: 0;
+    opacity: var(--k);
   }
-  /* a dim plate of the same photo, so the triangle reads as glass, not a hole */
+  /* a plate of the same photo, so the triangle reads as glass, not a hole.
+     `--dim` is per-piece, so the planes read at different depths instead of
+     flattening into one bright collage. */
   .sshard__face {
     grid-area: 1 / 1;
     position: absolute;
     inset: 0;
     background-position: center;
     background-size: cover;
-    opacity: 0;
-    transition: opacity 300ms var(--ease-out);
+    opacity: calc(var(--k) * var(--dim));
   }
 
-  /* Desktop pointers only: the whole effect is a hover. */
+  /* Desktop pointers only: the whole effect is a pointer field. */
   @media (hover: hover) and (pointer: fine) {
     /* the swap is instant and pixel-identical, so it reads as nothing happening */
-    .stitle:hover .stitle__base {
+    .stitle.is-live .stitle__base {
       visibility: hidden;
     }
-    .stitle:hover .stitle__glass {
+    .stitle.is-live .stitle__glass {
       opacity: 1;
-      pointer-events: auto;
     }
-    /* the portraits are fetched on first hover, never on load */
-    .stitle:hover .sshard__face,
-    .stitle:hover .sshard__cut {
+    /* the portraits are fetched when a pointer first comes near, never on load */
+    .stitle.is-armed .sshard__cut {
       background-image: var(--face);
     }
-    .stitle .sshard:hover {
-      transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--rz))
-        rotateX(var(--rx)) rotateY(var(--ry)) scale(1.06);
-      z-index: 2;
-    }
-    /* the piece's letters become the photograph; the white copy steps aside */
-    .stitle .sshard:hover .sshard__ink {
-      opacity: 0;
-    }
-    .stitle .sshard:hover .sshard__cut {
-      opacity: 1;
-    }
-    .stitle .sshard:hover .sshard__face {
-      opacity: 0.28;
+    /* the plate carries a scrim so the break stays sombre against the off-black */
+    .stitle.is-armed .sshard__face {
+      background-image: linear-gradient(rgba(8, 11, 9, 0.5), rgba(8, 11, 9, 0.5)),
+        var(--face);
     }
   }
 
@@ -181,3 +196,124 @@ const lift = shards.map((s, i) => {
     }
   }
 </style>
+
+<script>
+  /**
+   * One frame loop for every shattered title on the page. Each shard eases its
+   * own `--k` toward the pointer falloff, so the break opens and closes softly
+   * rather than snapping to wherever the cursor jumped.
+   */
+  const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (FINE && !CALM) {
+    type Piece = { el: HTMLElement; cx: number; cy: number; k: number; t: number };
+    type Field = { root: HTMLElement; pieces: Piece[]; armed: boolean; live: boolean };
+
+    const fields: Field[] = [...document.querySelectorAll<HTMLElement>('[data-shatter-title]')].map(
+      (root) => ({
+        root,
+        armed: false,
+        live: false,
+        pieces: [...root.querySelectorAll<HTMLElement>('.sshard')].map((el) => ({
+          el,
+          cx: Number(el.dataset.cx) / 100,
+          cy: Number(el.dataset.cy) / 100,
+          k: 0,
+          t: 0,
+        })),
+      }),
+    );
+
+    if (fields.length) {
+      let px = -1e5;
+      let py = -1e5;
+      let running = false;
+
+      const smooth = (t: number) => t * t * (3 - 2 * t);
+
+      const frame = () => {
+        let busy = false;
+
+        for (const field of fields) {
+          const box = field.root.getBoundingClientRect();
+          // the break is a circle in page space, sized off the title
+          const radius = Math.min(box.width * 0.34, 420);
+          const near =
+            px > box.left - radius * 1.6 &&
+            px < box.right + radius * 1.6 &&
+            py > box.top - radius * 1.6 &&
+            py < box.bottom + radius * 1.6;
+
+          if (near && !field.armed) {
+            field.armed = true;
+            field.root.classList.add('is-armed'); // start fetching the portraits
+          }
+
+          for (const piece of field.pieces) {
+            // the shard's centroid, in page space
+            const sx = box.left + piece.cx * box.width;
+            const sy = box.top + piece.cy * box.height;
+            const dx = sx - px;
+            const dy = sy - py;
+            const dist = Math.hypot(dx, dy) || 0.001;
+
+            piece.t = near && dist < radius ? smooth(1 - dist / radius) : 0;
+            piece.k += (piece.t - piece.k) * 0.18;
+
+            if (piece.k < 0.002) {
+              if (piece.k === 0) continue; // already at rest — nothing to write
+              piece.k = 0;
+            } else {
+              busy = true;
+            }
+
+            const el = piece.el.style;
+            el.setProperty('--k', piece.k.toFixed(3));
+            el.setProperty('--ux', (dx / dist).toFixed(3));
+            el.setProperty('--uy', (dy / dist).toFixed(3));
+          }
+
+          // the glass stack is only shown while something is actually folded
+          const live = busy || near;
+          if (live !== field.live) {
+            field.live = live;
+            field.root.classList.toggle('is-live', live);
+          }
+          if (near) busy = true;
+        }
+
+        running = busy;
+        if (busy) requestAnimationFrame(frame);
+      };
+
+      const kick = () => {
+        if (!running) {
+          running = true;
+          requestAnimationFrame(frame);
+        }
+      };
+
+      addEventListener(
+        'pointermove',
+        (e) => {
+          if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+          px = e.clientX;
+          py = e.clientY;
+          kick();
+        },
+        { passive: true },
+      );
+      addEventListener(
+        'pointerleave',
+        () => {
+          px = -1e5;
+          py = -1e5;
+          kick();
+        },
+        { passive: true },
+      );
+      addEventListener('scroll', kick, { passive: true });
+    }
+  }
+</script>

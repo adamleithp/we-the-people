@@ -88,7 +88,7 @@
   }
   .pane--hero {
     --pane-h: 85dvh;
-    --pane-slack: 19rem; /* room for the tagline + scroll cue hanging below */
+    --pane-slack: 11rem; /* room for the tagline hanging below */
     /* width-driven, capped by viewport height so squat windows shrink the type
        instead of pushing the hero past the fold (vh, not dvh: a resizing URL bar
        must not re-scale the wordmark mid-scroll) */

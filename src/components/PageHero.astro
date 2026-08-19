@@ -22,7 +22,7 @@ const hasBackdrop = Astro.slots.has('backdrop');
 <section class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
   {hasBackdrop && <slot name="backdrop" />}
   <div class="hero__inner">
-    <ShatterTitle lines={lines} cols={variant === 'hero' ? 6 : 5} rows={2} />
+    <ShatterTitle lines={lines} cols={variant === 'hero' ? 8 : 7} rows={3} />
     {
       hasBelow && (
         <div class="hero__below">

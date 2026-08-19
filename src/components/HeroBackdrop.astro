@@ -1,51 +1,18 @@
 ---
 /**
- * The hero's photograph — faces + the British land, behind the wordmark.
+ * The hero's photograph — the British land, behind the wordmark. A scrim sits
+ * over it so the white wordmark keeps its contrast.
  *
- * The file list is read from `public/hero/` at build time, so dropping an image
- * in that folder is all it takes to add a candidate. A scrim sits over it so the
- * white wordmark keeps its contrast whatever the picture is doing underneath.
- *
- * In `astro dev` a small pager (top right, under the header) steps through the
- * candidates — ←/→ or the buttons — so each render can be judged in place. The
- * choice is kept in localStorage so a reload holds it. It is compiled out of the
- * production build.
+ * The other candidates still live in `public/hero/`; <ShatterTitle> uses them as
+ * its portrait fallback until `public/faces/` has images.
  */
-import { readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-
-const dir = fileURLToPath(new URL('../../public/hero', import.meta.url));
-const images = readdirSync(dir)
-  .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
-  .sort()
-  .map((f) => `/hero/${f}`);
-
-const debug = import.meta.env.DEV;
-const first = images[0];
+const image = '/hero/evgeniy-prokofiev-mLQIoxX9yAo-unsplash.jpg';
 ---
 
-{
-  first && (
-    <div class="backdrop" aria-hidden="true" data-hero-backdrop data-images={JSON.stringify(images)}>
-      <img class="backdrop__img" src={first} alt="" fetchpriority="high" decoding="async" />
-      <div class="backdrop__scrim" />
-    </div>
-  )
-}
-
-{
-  debug && images.length > 0 && (
-    <div class="pager" data-hero-pager hidden>
-      <button type="button" data-hero-prev aria-label="Previous hero image">
-        ←
-      </button>
-      <span class="pager__label" data-hero-label />
-      <button type="button" data-hero-next aria-label="Next hero image">
-        →
-      </button>
-    </div>
-  )
-}
+<div class="backdrop" aria-hidden="true">
+  <img class="backdrop__img" src={image} alt="" fetchpriority="high" decoding="async" />
+  <div class="backdrop__scrim"></div>
+</div>
 
 <style>
   .backdrop {
@@ -76,81 +43,4 @@ const first = images[0];
       ),
       radial-gradient(120% 80% at 50% 45%, transparent 30%, rgba(11, 11, 11, 0.55));
   }
-
-  /* --- dev pager ---------------------------------------------------------- */
-  .pager {
-    position: fixed;
-    top: 4.6rem;
-    right: clamp(1.2rem, 4vw, 2.6rem);
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.4rem;
-    border: 1px solid rgba(246, 244, 238, 0.18);
-    border-radius: 999px;
-    background: rgba(11, 11, 11, 0.72);
-    backdrop-filter: blur(6px);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.7rem;
-    color: rgba(246, 244, 238, 0.8);
-  }
-  .pager button {
-    all: unset;
-    cursor: pointer;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: grid;
-    place-items: center;
-    border-radius: 999px;
-    color: inherit;
-    transition: background-color 120ms ease;
-  }
-  .pager button:hover {
-    background: rgba(246, 244, 238, 0.14);
-  }
-  .pager button:active {
-    transform: scale(0.94);
-  }
-  .pager__label {
-    min-width: 12ch;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 </style>
-
-<script>
-  const backdrop = document.querySelector<HTMLElement>('[data-hero-backdrop]');
-  const pager = document.querySelector<HTMLElement>('[data-hero-pager]');
-
-  if (backdrop && pager) {
-    const img = backdrop.querySelector<HTMLImageElement>('.backdrop__img')!;
-    const label = pager.querySelector<HTMLElement>('[data-hero-label]')!;
-    const images: string[] = JSON.parse(backdrop.dataset.images || '[]');
-    const KEY = 'wtp:hero-image';
-
-    let i = Math.max(0, images.indexOf(localStorage.getItem(KEY) || images[0]));
-
-    const show = (next: number) => {
-      i = (next + images.length) % images.length;
-      img.src = images[i];
-      localStorage.setItem(KEY, images[i]);
-      label.textContent = `${i + 1}/${images.length} ${images[i].replace('/hero/', '')}`;
-      label.title = images[i];
-    };
-
-    pager.hidden = false;
-    show(i);
-
-    pager.querySelector('[data-hero-prev]')!.addEventListener('click', () => show(i - 1));
-    pager.querySelector('[data-hero-next]')!.addEventListener('click', () => show(i + 1));
-    addEventListener('keydown', (e) => {
-      // don't fight a text field
-      if ((e.target as HTMLElement)?.closest('input, textarea, select')) return;
-      if (e.key === 'ArrowLeft') show(i - 1);
-      if (e.key === 'ArrowRight') show(i + 1);
-    });
-  }
-</script>
