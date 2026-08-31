@@ -1,6 +1,14 @@
 ---
 // PostHog analytics initialization
 // is:inline prevents Astro from processing this script through TypeScript
+
+// A CI build without the token ships a site that silently drops every sign-up.
+// Fail the build instead. Locally the .env file provides it (see .env.example).
+if (!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN && process.env.CI) {
+  throw new Error(
+    'PUBLIC_POSTHOG_PROJECT_TOKEN is not set. Add it as a GitHub Actions variable and pass it through in .github/workflows/deploy.yml.',
+  );
+}
 ---
 <script is:inline define:vars={{ apiKey: import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN, apiHost: import.meta.env.PUBLIC_POSTHOG_HOST, isDev: import.meta.env.DEV }}>
   if (!apiKey) {
