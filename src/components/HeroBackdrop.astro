@@ -3,14 +3,21 @@
  * The hero's photograph — the British land, behind the wordmark. A scrim sits
  * over it so the white wordmark keeps its contrast.
  *
- * The other candidates still live in `public/hero/`; <ShatterTitle> uses them as
- * its portrait fallback until `public/faces/` has images.
+ * The other candidates live in `src/assets/hero/`; <ShatterTitle> uses them as
+ * its portrait fallback until `src/assets/faces/` has images.
+ *
+ * The originals are 4–40 megapixel Unsplash JPEGs. They go through `getImage()`
+ * rather than `public/`, so what ships is a ~2400px WebP instead of a 1 MB JPEG
+ * the browser has to decode at full size before it can paint the hero.
  */
-const image = '/hero/evgeniy-prokofiev-mLQIoxX9yAo-unsplash.jpg';
+import { getImage } from 'astro:assets';
+import source from '../assets/hero/evgeniy-prokofiev-mLQIoxX9yAo-unsplash.jpg';
+
+const image = await getImage({ src: source, width: 2400, format: 'webp', quality: 72 });
 ---
 
 <div class="backdrop" aria-hidden="true">
-  <img class="backdrop__img" src={image} alt="" fetchpriority="high" decoding="async" />
+  <img class="backdrop__img" src={image.src} alt="" fetchpriority="high" decoding="async" />
   <div class="backdrop__scrim"></div>
 </div>
 

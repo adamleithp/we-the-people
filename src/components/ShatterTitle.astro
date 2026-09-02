@@ -14,21 +14,40 @@
  * wordmark and the portraits behind it come through. Falloff is smoothstep over
  * a radius, so the edge of the break is soft and the whole area moves as one.
  *
- * Faces come from `public/faces/` (portraits — the sad, ordinary faces of a
- * divided country). Until that folder has images it falls back to `public/hero/`.
+ * Faces come from `src/assets/faces/` (portraits — the sad, ordinary faces of a
+ * divided country). Until that folder has images it falls back to
+ * `src/assets/hero/`. They are imported, not read out of `public/`, so Astro
+ * resizes them: the originals are 4–40 megapixel Unsplash JPEGs, and a shard
+ * plate is a few hundred pixels wide. Painting the originals meant decoding
+ * ~160 MB of RGBA the first time a title was hovered — an ~800ms stall, on top
+ * of 22 MB of downloads.
  *
- * Performance:
- * - Shards are `pointer-events: none`; one window listener does the maths. No
- *   hit-testing of N clipped polygons.
- * - The frame loop writes three custom properties per shard (`--k`, `--ux`,
- *   `--uy`); CSS composes the transform and the three opacities from them, so
- *   only `transform`/`opacity` ever change.
- * - Shards outside the radius are skipped once they have settled at rest.
- * - Portraits are declared as a custom property and only promoted to a real
- *   `background-image` once a title is armed, so a page load fetches none.
+ * PERFORMANCE — this used to be the laggiest thing on the site. Three fixes:
+ *
+ * 1. Each shard is sized to its own triangle's bounding box, with a stage-sized
+ *    wrapper inside offset back into place (`shatter()` bakes the numbers). It
+ *    used to be `inset: 0` — every shard a full-wordmark box holding a photo
+ *    plate and two full-size copies of the title. That is N full-title rasters
+ *    and, once promoted, N full-title GPU textures. Now the painted and
+ *    composited area across all shards is ≈1× the title instead of N×.
+ * 2. The frame loop writes `style.transform` and the three opacities directly.
+ *    It used to write custom properties (`--k/--ux/--uy`) and let CSS `calc()`
+ *    compose them — but a custom property is inherited, so each write dirtied
+ *    the style of the shard *and its three children*: ~200 style recalcs per
+ *    frame, on the main thread, none of it compositable.
+ * 3. An idle title holds no compositor layer and paints nothing — no transform
+ *    on any shard, and the whole stack is `visibility: hidden`. Promotion is
+ *    then per-FIELD (`.is-live`), never per-piece: toggling `will-change` on
+ *    shards as they crossed in and out of the break radius made Chrome build and
+ *    discard layers several times a second, which measured as 200ms+ spikes.
+ *
+ * Still true: shards are `pointer-events: none` (one window listener does the
+ * maths, no hit-testing of N polygons), the element rect is cached and only
+ * re-read on scroll/resize, and portraits are held in a custom property and
+ * only promoted to a real `background-image` once a title is armed, so a page
+ * load fetches none.
  */
-import { readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { getImage } from 'astro:assets';
 import { shatter, mulberry32 } from '../lib/shards';
 
 interface Props {
@@ -38,19 +57,33 @@ interface Props {
   cols?: number;
   rows?: number;
 }
-const { lines, cols = 8, rows = 3 } = Astro.props;
+const { lines, cols = 6, rows = 3 } = Astro.props;
 
-const pick = (folder: string) => {
-  try {
-    return readdirSync(fileURLToPath(new URL(`../../public/${folder}`, import.meta.url)))
-      .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
-      .sort()
-      .map((f) => `/${folder}/${f}`);
-  } catch {
-    return [];
-  }
-};
-const faces = pick('faces').length ? pick('faces') : pick('hero');
+/* Both folders are globbed at build time; dropping a file into `faces/` is
+   still the whole job. Sorted so rebuilds stay byte-stable. */
+const sorted = (mod: Record<string, { default: ImageMetadata }>) =>
+  Object.keys(mod)
+    .sort()
+    .map((k) => mod[k].default);
+
+const inFaces = sorted(
+  import.meta.glob<{ default: ImageMetadata }>('../assets/faces/*.{jpg,jpeg,png,webp,avif}', {
+    eager: true,
+  }),
+);
+const inHero = sorted(
+  import.meta.glob<{ default: ImageMetadata }>('../assets/hero/*.{jpg,jpeg,png,webp,avif}', {
+    eager: true,
+  }),
+);
+
+/* A shard plate is at most the width of the wordmark, so ~1100px covers it at
+   2× DPR. Anything larger is decode cost with nothing on screen to show for it. */
+const faces = await Promise.all(
+  (inFaces.length ? inFaces : inHero).map((src) =>
+    getImage({ src, width: 1100, format: 'webp', quality: 62 }).then((i) => i.src),
+  ),
+);
 
 const shards = shatter(cols, rows, 20260804);
 const html = lines.join('<br />');
@@ -76,14 +109,22 @@ const fold = shards.map(() => ({
   <h1 class="wtp-wordmark stitle__base" set:html={html} />
   <div class="stitle__glass" aria-hidden="true">
     {
-      shards.map((s, i) => {
-        const [cx, cy] = s.origin.split(' ');
-        return (
+      shards.map((s, i) => (
+        <div
+          class="sshard"
+          data-cx={s.cx.toFixed(3)}
+          data-cy={s.cy.toFixed(3)}
+          data-push={fold[i].push}
+          data-dz={fold[i].dz}
+          data-tilt={fold[i].tilt}
+          data-spin={fold[i].spin}
+          data-shrink={fold[i].shrink}
+          data-dim={fold[i].dim}
+          style={`left:${s.bx.toFixed(4)}%;top:${s.by.toFixed(4)}%;width:${s.bw.toFixed(4)}%;height:${s.bh.toFixed(4)}%;clip-path:${s.clip};transform-origin:${s.origin};--face:url('${faces[i % faces.length]}')`}
+        >
           <div
-            class="sshard"
-            data-cx={parseFloat(cx)}
-            data-cy={parseFloat(cy)}
-            style={`clip-path:${s.clip};transform-origin:${s.origin};--push:${fold[i].push}px;--dz:${fold[i].dz}px;--tilt:${fold[i].tilt};--spin:${fold[i].spin};--shrink:${fold[i].shrink};--dim:${fold[i].dim};--face:url('${faces[i % faces.length]}')`}
+            class="sshard__in"
+            style={`left:${s.ox.toFixed(4)}%;top:${s.oy.toFixed(4)}%;width:${s.sw.toFixed(4)}%;height:${s.sh.toFixed(4)}%;`}
           >
             {/* the glass plate: the portrait, dimmed, filling the piece */}
             <div class="sshard__face" />
@@ -91,8 +132,8 @@ const fold = shards.map(() => ({
             <p class="wtp-wordmark sshard__ink" set:html={html} />
             <p class="wtp-wordmark sshard__cut" set:html={html} />
           </div>
-        );
-      })
+        </div>
+      ))
     }
   </div>
 </div>
@@ -106,37 +147,42 @@ const fold = shards.map(() => ({
   .stitle__base {
     grid-area: 1 / 1;
   }
-  /* the shard stack sits exactly on the heading: same box, same centring */
+  /* the shard stack sits exactly on the heading: same box, same centring.
+     `visibility: hidden` (not just opacity: 0) so an idle title paints nothing
+     at all — the stack is a few dozen clipped photo plates. */
   .stitle__glass {
     grid-area: 1 / 1;
     position: relative;
-    display: grid;
-    place-items: center;
     width: 100%;
     height: 100%;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
     perspective: 900px; /* the pieces fold in space, like glass caving in */
   }
+  /* Sized to its own triangle (inline left/top/width/height). `overflow: hidden`
+     is what caps the raster: without it the stage-sized child inflates the paint
+     and layer bounds straight back to the full wordmark. */
   .sshard {
     position: absolute;
-    inset: 0;
+    overflow: hidden;
+    pointer-events: none; /* the field is driven by one window listener */
+    /* no transform at rest: an idle title holds no compositor layer at all */
+  }
+  /* Promotion is per-FIELD, not per-piece. Toggling `will-change` on individual
+     shards as they cross in and out of the break radius makes Chrome build and
+     throw away a layer several times a second — measured as 200ms+ frame spikes.
+     Arming the whole stack once, while the pointer is anywhere near, costs a few
+     dozen triangle-sized textures and no churn. */
+  .stitle.is-live .sshard {
+    will-change: transform;
+  }
+  /* the stage, put back exactly where it was, so the title lands on the same
+     pixels it would inside a full-size shard */
+  .sshard__in {
+    position: absolute;
     display: grid;
     place-items: center;
-    pointer-events: none; /* the field is driven by one window listener */
-    backface-visibility: hidden;
-    --k: 0; /* 0 at rest → 1 directly under the pointer */
-    --ux: 0; /* unit vector from the pointer to this piece */
-    --uy: 0;
-    transform: translate3d(
-        calc(var(--ux) * var(--push) * var(--k)),
-        calc(var(--uy) * var(--push) * var(--k)),
-        calc(var(--dz) * var(--k))
-      )
-      rotateX(calc(var(--uy) * var(--tilt) * var(--k) * 1deg))
-      rotateY(calc(var(--ux) * var(--tilt) * var(--k) * -1deg))
-      rotate(calc(var(--spin) * var(--k) * 1deg))
-      scale(calc(1 - var(--shrink) * var(--k)));
   }
   .sshard :global(p) {
     grid-area: 1 / 1;
@@ -144,9 +190,9 @@ const fold = shards.map(() => ({
     z-index: 1;
     margin: 0;
   }
-  /* the white letters step aside as the piece folds */
+  /* the white letters step aside as the piece folds (opacity written by JS) */
   .sshard__ink {
-    opacity: calc(1 - var(--k));
+    opacity: 1;
   }
   /* the photo cut out by the letterforms — this is the piece's own type */
   .sshard__cut {
@@ -156,7 +202,7 @@ const fold = shards.map(() => ({
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    opacity: var(--k);
+    opacity: 0;
   }
   /* a plate of the same photo, so the triangle reads as glass, not a hole.
      `--dim` is per-piece, so the planes read at different depths instead of
@@ -167,7 +213,7 @@ const fold = shards.map(() => ({
     inset: 0;
     background-position: center;
     background-size: cover;
-    opacity: calc(var(--k) * var(--dim));
+    opacity: 0;
   }
 
   /* Desktop pointers only: the whole effect is a pointer field. */
@@ -178,6 +224,7 @@ const fold = shards.map(() => ({
     }
     .stitle.is-live .stitle__glass {
       opacity: 1;
+      visibility: visible;
     }
     /* the portraits are fetched when a pointer first comes near, never on load */
     .stitle.is-armed .sshard__cut {
@@ -200,87 +247,163 @@ const fold = shards.map(() => ({
 <script>
   /**
    * One frame loop for every shattered title on the page. Each shard eases its
-   * own `--k` toward the pointer falloff, so the break opens and closes softly
+   * own fold toward the pointer falloff, so the break opens and closes softly
    * rather than snapping to wherever the cursor jumped.
+   *
+   * Everything per-frame is a direct `style.transform` / `style.opacity` write.
+   * No custom properties: those inherit, so writing one dirties the shard's
+   * whole subtree and forces a style recalc per child, per frame.
    */
   const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (FINE && !CALM) {
-    type Piece = { el: HTMLElement; cx: number; cy: number; k: number; t: number };
-    type Field = { root: HTMLElement; pieces: Piece[]; armed: boolean; live: boolean };
+    type Piece = {
+      el: HTMLElement;
+      ink: HTMLElement | null;
+      cut: HTMLElement | null;
+      face: HTMLElement | null;
+      cx: number;
+      cy: number;
+      push: number;
+      dz: number;
+      tilt: number;
+      spin: number;
+      shrink: number;
+      dim: number;
+      k: number;
+      on: boolean;
+    };
+    type Field = {
+      root: HTMLElement;
+      pieces: Piece[];
+      box: DOMRect;
+      armed: boolean;
+      live: boolean;
+    };
 
-    const fields: Field[] = [...document.querySelectorAll<HTMLElement>('[data-shatter-title]')].map(
-      (root) => ({
-        root,
-        armed: false,
-        live: false,
-        pieces: [...root.querySelectorAll<HTMLElement>('.sshard')].map((el) => ({
-          el,
-          cx: Number(el.dataset.cx) / 100,
-          cy: Number(el.dataset.cy) / 100,
-          k: 0,
-          t: 0,
-        })),
-      }),
-    );
+    const num = (el: HTMLElement, key: string) => Number(el.dataset[key]) || 0;
+
+    const fields: Field[] = [
+      ...document.querySelectorAll<HTMLElement>('[data-shatter-title]'),
+    ].map((root) => ({
+      root,
+      box: root.getBoundingClientRect(),
+      armed: false,
+      live: false,
+      pieces: [...root.querySelectorAll<HTMLElement>('.sshard')].map((el) => ({
+        el,
+        ink: el.querySelector<HTMLElement>('.sshard__ink'),
+        cut: el.querySelector<HTMLElement>('.sshard__cut'),
+        face: el.querySelector<HTMLElement>('.sshard__face'),
+        cx: num(el, 'cx') / 100,
+        cy: num(el, 'cy') / 100,
+        push: num(el, 'push'),
+        dz: num(el, 'dz'),
+        tilt: num(el, 'tilt'),
+        spin: num(el, 'spin'),
+        shrink: num(el, 'shrink'),
+        dim: num(el, 'dim'),
+        k: 0,
+        on: false,
+      })),
+    }));
 
     if (fields.length) {
       let px = -1e5;
       let py = -1e5;
       let running = false;
+      // the element rect only moves on scroll/resize, so it is read then — not
+      // once per field per frame, which would force layout inside the loop
+      let boxesDirty = true;
 
       const smooth = (t: number) => t * t * (3 - 2 * t);
 
+      /** put a piece back to rest — the CSS resting state, no inline styles */
+      const rest = (p: Piece) => {
+        p.on = false;
+        p.el.style.transform = '';
+        if (p.ink) p.ink.style.opacity = '';
+        if (p.cut) p.cut.style.opacity = '';
+        if (p.face) p.face.style.opacity = '';
+      };
+
       const frame = () => {
+        if (boxesDirty) {
+          for (const field of fields) field.box = field.root.getBoundingClientRect();
+          boxesDirty = false;
+        }
+
         let busy = false;
 
         for (const field of fields) {
-          const box = field.root.getBoundingClientRect();
+          const box = field.box;
           // the break is a circle in page space, sized off the title
-          const radius = Math.min(box.width * 0.34, 420);
+          const radius = Math.min(box.width * 0.34, 420) || 1;
+          const r2 = radius * radius;
+          const reach = radius * 1.6;
           const near =
-            px > box.left - radius * 1.6 &&
-            px < box.right + radius * 1.6 &&
-            py > box.top - radius * 1.6 &&
-            py < box.bottom + radius * 1.6;
+            px > box.left - reach &&
+            px < box.right + reach &&
+            py > box.top - reach &&
+            py < box.bottom + reach;
 
           if (near && !field.armed) {
             field.armed = true;
             field.root.classList.add('is-armed'); // start fetching the portraits
           }
 
-          for (const piece of field.pieces) {
+          let folded = false;
+
+          for (const p of field.pieces) {
             // the shard's centroid, in page space
-            const sx = box.left + piece.cx * box.width;
-            const sy = box.top + piece.cy * box.height;
-            const dx = sx - px;
-            const dy = sy - py;
-            const dist = Math.hypot(dx, dy) || 0.001;
+            const dx = box.left + p.cx * box.width - px;
+            const dy = box.top + p.cy * box.height - py;
+            const d2 = dx * dx + dy * dy;
 
-            piece.t = near && dist < radius ? smooth(1 - dist / radius) : 0;
-            piece.k += (piece.t - piece.k) * 0.18;
-
-            if (piece.k < 0.002) {
-              if (piece.k === 0) continue; // already at rest — nothing to write
-              piece.k = 0;
-            } else {
-              busy = true;
+            let dist = 0;
+            let t = 0;
+            if (near && d2 < r2) {
+              dist = Math.sqrt(d2) || 0.001;
+              t = smooth(1 - dist / radius);
             }
 
-            const el = piece.el.style;
-            el.setProperty('--k', piece.k.toFixed(3));
-            el.setProperty('--ux', (dx / dist).toFixed(3));
-            el.setProperty('--uy', (dy / dist).toFixed(3));
+            const k = p.k + (t - p.k) * 0.18;
+
+            if (k < 0.002) {
+              p.k = 0;
+              if (p.on) rest(p); // settled — hand it back to the CSS resting state
+              continue;
+            }
+
+            p.k = k;
+            folded = true;
+            p.on = true;
+
+            if (!dist) dist = Math.sqrt(d2) || 0.001;
+            const ux = dx / dist;
+            const uy = dy / dist;
+            const kp = p.push * k;
+
+            p.el.style.transform =
+              `translate3d(${(ux * kp).toFixed(2)}px,${(uy * kp).toFixed(2)}px,${(p.dz * k).toFixed(1)}px)` +
+              ` rotateX(${(uy * p.tilt * k).toFixed(2)}deg)` +
+              ` rotateY(${(-ux * p.tilt * k).toFixed(2)}deg)` +
+              ` rotate(${(p.spin * k).toFixed(2)}deg)` +
+              ` scale(${(1 - p.shrink * k).toFixed(4)})`;
+
+            if (p.ink) p.ink.style.opacity = (1 - k).toFixed(3);
+            if (p.cut) p.cut.style.opacity = k.toFixed(3);
+            if (p.face) p.face.style.opacity = (k * p.dim).toFixed(3);
           }
 
           // the glass stack is only shown while something is actually folded
-          const live = busy || near;
+          const live = folded || near;
           if (live !== field.live) {
             field.live = live;
             field.root.classList.toggle('is-live', live);
           }
-          if (near) busy = true;
+          if (live) busy = true;
         }
 
         running = busy;
@@ -313,7 +436,22 @@ const fold = shards.map(() => ({
         },
         { passive: true },
       );
-      addEventListener('scroll', kick, { passive: true });
+      addEventListener(
+        'scroll',
+        () => {
+          boxesDirty = true;
+          kick();
+        },
+        { passive: true },
+      );
+      addEventListener('resize', () => {
+        boxesDirty = true;
+        kick();
+      });
+      // the wordmark box changes size when the display font arrives
+      document.fonts?.ready.then(() => {
+        boxesDirty = true;
+      });
     }
   }
 </script>

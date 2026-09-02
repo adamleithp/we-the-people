@@ -35,7 +35,10 @@
     color: var(--color-wtp-paper);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    /* No `text-rendering: optimizeLegibility` — it forces full kerning/ligature
+       shaping on every text run, and the shatter effects hold dozens of copies
+       of the same wordmark. Browsers do kerning by default anyway; this only
+       bought re-shaping work. */
   }
 
   /* Decorative shards thinned out on small screens (authored, not JS) */
@@ -119,6 +122,11 @@
     letter-spacing: 0.005em;
     text-align: center;
     color: #fff;
+    /* Line breaks in a wordmark are authored (`<br />`), never found. This is
+       load-bearing for the shatter effects: a shard's inner box is sized by
+       percentage and lands a fraction of a pixel narrower than the real <h1>,
+       which is enough to wrap the title inside every shard and nowhere else. */
+    white-space: nowrap;
   }
 
   /* Content that waits for the intro. It starts as the pane begins to lift

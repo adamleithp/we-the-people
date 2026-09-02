@@ -16,8 +16,13 @@
  *
  * Performance: only `transform` and `opacity` animate, so every shard stays on
  * the compositor and rasterises once. No animated `filter` (a moving blur
- * re-rasterises each layer every frame), and shard boxes are stage-sized, not
- * viewport-sized, to keep layer memory sane.
+ * re-rasterises each layer every frame).
+ *
+ * Each shard is sized to its OWN triangle's bounding box (`shatter()` emits it),
+ * with a stage-sized wrapper inside offset back into place. Shards used to be
+ * `inset: 0` — a full-wordmark layer each, so N shards meant N full-title
+ * rasters and N full-title GPU textures (hundreds of MB at hero scale, and the
+ * stutter that came with it). Same pixels, ~1/N the layer area.
  */
 import { shatter } from '../lib/shards';
 
@@ -57,9 +62,14 @@ const doneAt = sealAt + (hero ? 950 : 550);
           <div
             class="shard"
             aria-hidden="true"
-            style={`clip-path:${s.clip};transform-origin:${s.origin};--tx:${s.tx.toFixed(1)}vw;--ty:${s.ty.toFixed(1)}vh;--rz:${s.rz.toFixed(1)}deg;--rx:${s.rx.toFixed(1)}deg;--ry:${s.ry.toFixed(1)}deg;--sc:${s.sc.toFixed(2)};--d:${s.delay.toFixed(2)}s;`}
+            style={`left:${s.bx.toFixed(4)}%;top:${s.by.toFixed(4)}%;width:${s.bw.toFixed(4)}%;height:${s.bh.toFixed(4)}%;clip-path:${s.clip};transform-origin:${s.origin};--tx:${s.tx.toFixed(1)}vw;--ty:${s.ty.toFixed(1)}vh;--rz:${s.rz.toFixed(1)}deg;--rx:${s.rx.toFixed(1)}deg;--ry:${s.ry.toFixed(1)}deg;--sc:${s.sc.toFixed(2)};--d:${s.delay.toFixed(2)}s;`}
           >
-            <p class="wtp-wordmark" set:html={lines.join('<br />')} />
+            <div
+              class="shard__in"
+              style={`left:${s.ox.toFixed(4)}%;top:${s.oy.toFixed(4)}%;width:${s.sw.toFixed(4)}%;height:${s.sh.toFixed(4)}%;`}
+            >
+              <p class="wtp-wordmark" set:html={lines.join('<br />')} />
+            </div>
           </div>
         ))
       }
@@ -130,16 +140,25 @@ const doneAt = sealAt + (hero ? 950 : 550);
     visibility: hidden;
   }
 
+  /* Sized to its own triangle (inline left/top/width/height), so the layer this
+     shard promotes is the triangle — not the whole wordmark. `overflow: hidden`
+     is what caps the raster: without it the stage-sized child would inflate the
+     layer bounds straight back to full size. */
   .shard {
     position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
+    overflow: hidden;
     /* compositor-only properties: rasterise once, then just move */
     will-change: transform, opacity;
     backface-visibility: hidden;
     animation: shard-assemble var(--flight) cubic-bezier(0.16, 1, 0.3, 1)
       calc(var(--d) * var(--sk)) both;
+  }
+  /* the stage, put back exactly where it was: the title lands on the same pixels
+     it would have inside a full-size shard */
+  .shard__in {
+    position: absolute;
+    display: grid;
+    place-items: center;
   }
 
   @keyframes shard-assemble {

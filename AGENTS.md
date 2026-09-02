@@ -31,6 +31,11 @@ Reference feel: [blueheart.patagonia.com](https://blueheart.patagonia.com/) — 
 - **Only `transform`/`opacity` animate.** An animated `filter: blur()` re-rasterises every shard layer each frame and drops frames; it was measured and removed.
 - **The intro fades its backdrop, not itself.** Fading the whole overlay composites the shards as a group and hairline seams appear between them.
 - `intro-sealing` on `<html>` releases `.fade-up` content while the glass is still lifting; the tagline leads, then the cue, then the header (~120ms apart).
+- **A shard is sized to its own triangle, never to the title.** `shatter()` emits each piece's bounding box (`bx/by/bw/bh`) plus a stage-sized inner wrapper (`ox/oy/sw/sh`), and `overflow: hidden` caps the raster to the triangle. The old `inset: 0` shard was a full-wordmark box per piece — N full-title rasters, N full-title GPU textures. Keep the inner wrapper: it is what puts the title back on the same pixels.
+- **Never drive a per-frame animation through custom properties.** Custom properties inherit, so writing `--k` on a shard dirties the style of every child too. `ShatterTitle`'s loop writes `style.transform` and `style.opacity` directly; measured ~5× faster frames.
+- **Promote per field, not per piece.** `will-change` toggled on individual shards as they crossed the break radius made Chrome build and discard layers several times a second (200ms+ spikes). `.stitle.is-live .sshard` arms the whole stack once.
+- **`.wtp-wordmark` is `white-space: nowrap`** — line breaks are authored with `<br />`. A shard's inner box lands a fraction of a pixel narrower than the real `<h1>`, which is enough to wrap the title inside every shard and nowhere else.
+- **Photography lives in `src/assets/`, never `public/`.** `public/` ships files untouched; `src/assets/` goes through `getImage()`. The shard portraits were 4–40 megapixel Unsplash JPEGs painted into a few-hundred-pixel plate: 22 MB of downloads and an ~800ms decode stall on the first hover of a title. Now ~272 kB of WebP.
 - Legacy from the earlier scroll-movie direction (unused by the current pages): `ShardField.astro`, `StoryBlock.astro`, `GlassAssembly.astro`, `src/scripts/glass.ts`, `MOVIE.md`, `DESIGN.md`.
 
 ## Analytics

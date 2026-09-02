@@ -116,8 +116,23 @@ export function makeShards(
 }
 
 export type IntroShard = {
+  /** clip polygon, in % of THIS shard's own box (not the stage) */
   clip: string;
+  /** transform-origin, in % of this shard's own box */
   origin: string;
+  /** centroid, in % of the stage — the pointer field measures against this */
+  cx: number;
+  cy: number;
+  /** the shard's box: its triangle's bounding box, in % of the stage */
+  bx: number;
+  by: number;
+  bw: number;
+  bh: number;
+  /** the stage-sized inner wrapper, expressed in % of the shard's own box */
+  ox: number;
+  oy: number;
+  sw: number;
+  sh: number;
   tx: number; // vw
   ty: number; // vh
   rz: number; // deg
@@ -133,6 +148,21 @@ export type IntroShard = {
  * spray of angular glass. Vertices are pushed ~1.5% out from each triangle's
  * centroid so reassembled edges overlap and no seams show. Scatter deltas push
  * outward from centre, hardest at the rim — "really broken", then it converges.
+ *
+ * PERFORMANCE — why each shard carries a bounding box.
+ * The naive build gives every shard the full stage box (`inset: 0`) and clips it.
+ * That makes N compositor layers each the size of the whole wordmark: at hero
+ * scale one layer is ~2400×1200 device px ≈ 11 MB, so 40 shards ask the GPU for
+ * ~450 MB and re-raster the entire title N times. It is the whole reason the
+ * effect stutters.
+ *
+ * So each shard is emitted with the bounding box of its own triangle (`bx/by/
+ * bw/bh`, padded a hair so the clip never touches the overflow edge). The
+ * component sizes the shard to that box and puts a stage-sized wrapper inside,
+ * offset by `ox/oy` and sized `sw/sh` — all expressed in % of the shard box, so
+ * they need no pixel measurements. The content lands on exactly the same pixels
+ * as before, but the layer, and the raster, is only the triangle. Total layer
+ * area across all shards drops from N× the title to ≈1× the title.
  */
 export function shatter(cols: number, rows: number, seed: number): IntroShard[] {
   const rnd = mulberry32(seed);
@@ -175,12 +205,30 @@ export function shatter(cols: number, rows: number, seed: number): IntroShard[] 
       for (const pts of tris) {
         const cx = (pts[0][0] + pts[1][0] + pts[2][0]) / 3;
         const cy = (pts[0][1] + pts[1][1] + pts[2][1]) / 3;
-        const clip = `polygon(${pts
-          .map(([x, y]) => {
-            const ox = cx + (x - cx) * 1.015;
-            const oy = cy + (y - cy) * 1.015;
-            return `${ox.toFixed(2)}% ${oy.toFixed(2)}%`;
-          })
+
+        // vertices pushed out from the centroid so reassembled edges overlap
+        const out = pts.map(
+          ([x, y]) => [cx + (x - cx) * 1.015, cy + (y - cy) * 1.015] as [number, number],
+        );
+
+        // the shard's own box: the triangle's bounds, padded so the clip edge
+        // never lands exactly on the box edge (the box is overflow-clipped)
+        const xs = out.map((p) => p[0]);
+        const ys = out.map((p) => p[1]);
+        const x0 = Math.min(...xs);
+        const x1 = Math.max(...xs);
+        const y0 = Math.min(...ys);
+        const y1 = Math.max(...ys);
+        const padX = (x1 - x0) * 0.04 + 0.08;
+        const padY = (y1 - y0) * 0.04 + 0.08;
+        const bx = x0 - padX;
+        const by = y0 - padY;
+        const bw = x1 - x0 + padX * 2;
+        const bh = y1 - y0 + padY * 2;
+
+        // clip + origin re-expressed against the shard's box instead of the stage
+        const clip = `polygon(${out
+          .map(([x, y]) => `${(((x - bx) / bw) * 100).toFixed(2)}% ${(((y - by) / bh) * 100).toFixed(2)}%`)
           .join(', ')})`;
 
         // distance from centre drives how far the piece is thrown
@@ -190,7 +238,19 @@ export function shatter(cols: number, rows: number, seed: number): IntroShard[] 
 
         shards.push({
           clip,
-          origin: `${cx.toFixed(2)}% ${cy.toFixed(2)}%`,
+          origin: `${(((cx - bx) / bw) * 100).toFixed(2)}% ${(((cy - by) / bh) * 100).toFixed(2)}%`,
+          cx,
+          cy,
+          bx,
+          by,
+          bw,
+          bh,
+          // the stage, as a box inside this shard: width 100/bw of the shard,
+          // shifted back by the shard's own offset
+          ox: (-bx / bw) * 100,
+          oy: (-by / bh) * 100,
+          sw: 10000 / bw,
+          sh: 10000 / bh,
           tx: dirX * rand(26, 62) * throwK + rand(-10, 10),
           ty: dirY * rand(18, 48) * throwK + rand(-12, 12),
           rz: rand(-120, 120),
