@@ -23,8 +23,24 @@ const CONTRIBUTIONS = [
 
   <main class="join-page">
     <p class="lede">
-      Reunite the country. Transform the system. It starts with people like you standing
-      together — add your name.
+      We would love you to build this movement of peace, unity and democratic revolution
+      with us.
+    </p>
+    <p class="lede">
+      We know you will have questions, ideas, doubts. We want to hear them all.
+    </p>
+    <p class="lede">
+      We only ask that, at some point, you might be willing to pledge to hold your own
+      personal political affiliations secondary to a higher cause:
+    </p>
+    <p class="pledge">
+      To heal our divisions<br />
+      Reclaim our power &amp;<br />
+      See our democracy reborn
+    </p>
+    <p class="lede">
+      Sign up below or email
+      <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
     </p>
     <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
          Right now the only record of a sign-up is the PostHog person profile. -->
@@ -86,6 +102,17 @@ const CONTRIBUTIONS = [
     font-size: clamp(1rem, 2.6vw, 1.2rem);
     line-height: 1.55;
     opacity: 0.9;
+  }
+  .lede a {
+    color: var(--color-wtp-dawn);
+  }
+  .pledge {
+    margin: 0.8rem 0;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+    line-height: 1.2;
+    color: #fff;
   }
   .signup {
     display: grid;
