@@ -66,6 +66,32 @@ These are GitHub's shared anycast addresses, not specific to this repo. If the
 site goes dark with no failed deploy, re-check them against
 [GitHub's apex domain docs](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
 
+### Analytics proxy
+
+PostHog's **managed reverse proxy** (free on Cloud, routed via Cloudflare — see
+PostHog's subprocessor list). Analytics go out over our own domain, so the ad
+blockers that list `*.posthog.com` stop dropping sign-ups.
+
+| Type | Name | Value |
+| --- | --- | --- |
+| CNAME | `e` | `cfb5072d975bebd6107e.cf-prod-eu-proxy.europehog.com.` |
+
+DNS only (grey cloud), like every other record here. PostHog issues the
+certificate itself once it sees the CNAME; proxying it through Cloudflare would
+put our certificate in front of theirs.
+
+Proxy record `01a09276-a853-0000-132a-5c768e612e90`, created 2026-09-11, in
+[organization proxy settings](https://eu.posthog.com/settings/organization-proxy).
+It read `valid` within five minutes of the CNAME going in, and
+`PUBLIC_POSTHOG_HOST` now points at it in `.env` and in the GitHub Actions
+variable of the same name. Never set that host to a proxy still reading
+`waiting` — the SDK would post to a host that isn't answering and every event
+would be dropped.
+
+`ui_host` in `src/components/posthog.astro` stays `https://eu.posthog.com`.
+Without it, replay and toolbar links would point at the proxy, which serves the
+ingestion endpoints but no app.
+
 ### Mail — do not touch without checking
 
 `@wethepeoplegather.com` email is **live Google Workspace**. The mailboxes are at
@@ -78,9 +104,20 @@ delivery immediately.
 | TXT | `@` | `v=spf1 include:_spf.google.com ~all` |
 | TXT | `_dmarc` | `v=DMARC1; p=none` |
 
-There is no DKIM key configured, and DMARC is at `p=none`. That is a weak
-deliverability posture — adding Google's DKIM key and moving to `p=quarantine`
-is worth doing.
+Three **SES DKIM** keys (`*._domainkey` CNAMEs) are in place and verified, so
+mail PostHog sends is signed. **Google Workspace DKIM is not set up** —
+`google._domainkey` is empty, so replies typed in Gmail go out unsigned, passing
+SPF but not DKIM. Worth adding from Google Admin → Apps → Google Workspace →
+Gmail → Authenticate email. DMARC is still `p=none`; move it to `p=quarantine`
+once both senders are signed and sending looks clean.
+
+The domain is **already verified with Amazon SES** (`_amazonses` TXT token,
+`include:amazonses.com` in the apex SPF, and `hello.wethepeoplegather.com` as
+the MAIL FROM subdomain with its own SPF and an SES feedback MX in
+`eu-central-1`). PostHog sends through SES, so a sender domain added in
+Workflows → Channels → Email may verify with little or no new DNS. The apex SPF
+is `v=spf1 include:_spf.google.com include:amazonses.com ~all` — one record
+covering both senders. Keep it that way; a second SPF record breaks both.
 
 ## Deprecated: wethepeople.foundation
 
