@@ -50,7 +50,7 @@ const doneAt = sealAt + (hero ? 950 : 550);
   data-intro
   data-seal={sealAt}
   data-done={doneAt}
-  style={`--flight:${flight}s;--sk:${staggerScale};--fade:${hero ? 0.9 : 0.5}s`}
+  style={`--flight:${flight}s;--sk:${staggerScale};--fade:${hero ? 0.9 : 0.5}s;--glow:${hero ? 1 : 0.55}`}
 >
   <div class="intro__backdrop" aria-hidden="true"></div>
   <div class={`pane pane--${variant} intro__pane`} style={`--lines:${lines.length}`}>
@@ -121,10 +121,26 @@ const doneAt = sealAt + (hero ? 950 : 550);
      cracks across the letters. The assembled shards are pixel-identical to the
      real heading beneath, so they can simply be removed at the end — no seams,
      no crossfade of two copies. */
+  /* Night at the edges, the photograph's own ember through the middle — the
+     glow sits where the sun does behind the wordmark, so the glass lifts into
+     dawn instead of cutting from flat black to a sunrise. The colours are
+     sampled from the hero plate itself: #fbb86d where the sun sits, #bb672f
+     along the horizon, #57301b for the earth below it. Alpha stays modest —
+     the white shards sit on this and have to stay legible. `--glow` carries
+     the strength: full on the homepage, halved on the section pages, which
+     have no photograph behind them and would otherwise fade orange to black. */
   .intro__backdrop {
     position: absolute;
     inset: 0;
-    background: var(--color-wtp-night, #0b0b0b);
+    background:
+      radial-gradient(
+        120% 75% at 50% 46%,
+        rgba(251, 184, 109, calc(0.32 * var(--glow, 1))) 0%,
+        rgba(187, 103, 47, calc(0.26 * var(--glow, 1))) 28%,
+        rgba(87, 48, 27, calc(0.2 * var(--glow, 1))) 50%,
+        transparent 72%
+      ),
+      var(--color-wtp-night, #0b0b0b);
     transition: opacity var(--fade) ease;
   }
   .intro.is-sealed .intro__backdrop {
