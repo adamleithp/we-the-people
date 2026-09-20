@@ -24,6 +24,16 @@ Reference feel: [blueheart.patagonia.com](https://blueheart.patagonia.com/) — 
 - **Home** (`/`) — 85vh hero wordmark, then three flexed panels: The Idea → `/idea`, In Practice → `/practice`, Join Us → `/join`.
 - **Deck pages** (`/idea`, `/practice`) — title hero, then slide-deck sections 1 and 2 as plain text in a 70ch column (`.prose` in `src/styles/base.css`). Text only for now; design later.
 
+## Content
+
+Every word on the site lives in `src/content/*.yml`, not in the pages. `src/lib/content.ts` imports and types those files (via `@rollup/plugin-yaml`) and the pages read from it; `src/components/Prose.astro` turns a deck page's list of blocks into the `.prose` column, and `src/lib/inline.ts` is the only formatting a line of copy may carry — `[label](href)`, `**bold**`, `_italics_`, everything escaped first.
+
+Non-technical partners edit those same files through **Sveltia CMS at `/admin`** (`public/admin/index.html` + `config.yml`), a git-backed CMS: saving commits to `main` and the normal Pages deploy publishes it about two minutes later. Read **[`CMS.md`](./CMS.md)** before changing anything in this area. Three rules it explains in full:
+
+- **`config.yml` and `src/content/` must stay in step.** `scripts/check-content.mjs` runs at the head of `npm run build` and fails it if a field exists on one side only.
+- **Never leave comments in `src/content/*.yml`.** The CMS rewrites the file when it saves and drops them. Explanations go in the field's `hint` in `config.yml`.
+- **The CMS script is pinned to an exact version** in `public/admin/index.html`, because that page holds write access to the repo.
+
 ### Motion rules (per Emil Kowalski's animations.dev)
 
 - **`.pane` in `base.css` is the contract.** `<GlassIntro>` and `<PageHero>` must use the same `.pane--*` modifier and the same `--lines` — that's the only reason the shattered title lands exactly on the real heading. Changing one without the other breaks the handoff.

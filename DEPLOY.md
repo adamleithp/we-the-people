@@ -5,6 +5,10 @@ The site is a static Astro build hosted on GitHub Pages at
 
 Every push to `main` rebuilds and redeploys. There is no manual step.
 
+That includes edits made by a partner in the CMS at `/admin`: saving there is a
+commit on `main` like any other, so the words are live about two minutes later.
+See [`CMS.md`](./CMS.md).
+
 ## How it works
 
 `.github/workflows/deploy.yml` runs on push to `main`:

@@ -1,85 +1,71 @@
 ---
+// The words and the form's labels live in src/content/join.yml — that file is
+// what the CMS at /admin edits. The field *names* stay here: PostHog's person
+// properties are keyed off them.
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
-
-// Mirrors the fields on wethepeoplegather.com's sign-up form.
-const CONTRIBUTIONS = [
-  'Democracy theory',
-  'Raising money',
-  'CA delivery',
-  'Media/Communications',
-  'Technology',
-  'Event production',
-  'Connections to cultural figures',
-  'Accounting/Legal',
-  'Other',
-];
+import { join } from '../lib/content';
+import { inline } from '../lib/inline';
 ---
 
-<Layout title="Join Us — We The People" introLines={['Join Us']}>
-  <PageHero lines={['Join Us']}>
-    <p class="hero__kicker fade-up">Be part of hope</p>
+<Layout title={join.page_title} introLines={join.title_lines}>
+  <PageHero lines={join.title_lines}>
+    <p class="hero__kicker fade-up">{join.kicker}</p>
   </PageHero>
 
   <main class="join-page">
-    <p class="lede">
-      We would love you to build this movement of peace, unity and democratic revolution
-      with us.
-    </p>
-    <p class="lede">
-      We know you will have questions, ideas, doubts. We want to hear them all.
-    </p>
-    <p class="lede">
-      We only ask that, at some point, you might be willing to pledge to hold your own
-      personal political affiliations secondary to a higher cause:
-    </p>
-    <p class="pledge">
-      To heal our divisions<br />
-      Reclaim our power &amp;<br />
-      See our democracy reborn
-    </p>
-    <p class="lede">
-      Sign up below or email
-      <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
-    </p>
+    {
+      join.intro.map((block) =>
+        block.type === 'pledge' ? (
+          <p class="pledge">
+            {block.lines.map((line, i) => (
+              <Fragment>
+                {i > 0 && <br />}
+                {line}
+              </Fragment>
+            ))}
+          </p>
+        ) : (
+          <p class="lede" set:html={inline(block.text)} />
+        ),
+      )
+    }
     <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
          Right now the only record of a sign-up is the PostHog person profile. -->
     <form class="signup" data-signup novalidate>
       <div class="field">
-        <label for="name">Your name</label>
+        <label for="name">{join.form.name_label}</label>
         <input id="name" type="text" name="name" autocomplete="name" required />
       </div>
 
       <div class="field">
-        <label for="email">Your email</label>
+        <label for="email">{join.form.email_label}</label>
         <input id="email" type="email" name="email" autocomplete="email" required />
       </div>
 
       <div class="field">
-        <label for="contribution">How you can contribute</label>
+        <label for="contribution">{join.form.contribution_label}</label>
         <select id="contribution" name="contribution">
-          <option value="">Choose one…</option>
-          {CONTRIBUTIONS.map((c) => <option value={c}>{c}</option>)}
+          <option value="">{join.form.contribution_placeholder}</option>
+          {join.form.contributions.map((c) => <option value={c}>{c}</option>)}
         </select>
       </div>
 
       <div class="field">
-        <label for="message">Anything else you'd like to tell us</label>
+        <label for="message">{join.form.message_label}</label>
         <textarea id="message" name="message" rows="4"></textarea>
       </div>
 
-      <button type="submit">Join Us</button>
+      <button type="submit">{join.form.submit_label}</button>
     </form>
-    <a class="back" href="/">← Back to home</a>
+    <a class="back" href="/">{join.back_label}</a>
   </main>
 
   <!-- Shown once the sign-up event has been captured. Esc or the ✕ closes it. -->
   <div class="thanks" data-thanks hidden>
     <div class="thanks__backdrop" data-thanks-dismiss></div>
     <div class="thanks__panel" role="dialog" aria-modal="true" aria-labelledby="thanks-text">
-      <p class="thanks__text" id="thanks-text">
-        Thank you for joining us, we'll send over more information as soon as possible.
-      </p>
+      <p class="thanks__text" id="thanks-text">{join.thanks}</p>
       <button class="thanks__close" type="button" data-thanks-dismiss aria-label="Close">
         <span aria-hidden="true">✕</span>
       </button>

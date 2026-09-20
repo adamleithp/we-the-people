@@ -1,0 +1,286 @@
+# What the editors at /admin can change. Every field here maps to a key in one
+# of the src/content/*.yml files, which is where the site's pages read from —
+# see src/lib/content.ts. Change one without the other and a page loses its copy.
+#
+# Saving in the CMS commits straight to main; GitHub Actions rebuilds and the
+# change is live in about two minutes. Every edit is an ordinary commit, so
+# anything can be undone from the repository's history.
+
+backend:
+  name: github
+  repo: adamleithp/we-the-people
+  branch: main
+  commit_messages:
+    update: 'Edit {{collection}} from the CMS'
+    openAuthoring: 'Edit {{collection}} from the CMS'
+  # Sign-in. Until the OAuth worker in docs/CMS.md is deployed, editors sign in
+  # with a GitHub personal access token. Afterwards, delete `auth_methods` and
+  # uncomment `base_url` with the worker's address — then it's a GitHub button.
+  auth_methods: [token]
+  # base_url: https://YOUR-WORKER.workers.dev
+
+app_title: We The People
+site_url: https://wethepeoplegather.com
+display_url: https://wethepeoplegather.com
+logo_url: /favicon.svg
+
+# No page has an editable image yet. This is where one would be committed.
+media_folder: src/assets
+public_folder: /
+
+singletons:
+  - name: home
+    label: Home page
+    file: src/content/home.yml
+    format: yaml
+    preview_path: /
+    fields:
+      - name: title_lines
+        label: Big title
+        widget: list
+        field: { name: line, label: Line, widget: string }
+        hint: >-
+          The huge WE THE PEOPLE title, one entry per line. It is shattered into
+          glass at build time, so keep it short — two or three words a line.
+      - name: tagline
+        label: Tagline
+        widget: string
+        hint: The small spaced-out line under the title.
+      - name: creed
+        label: Opening statement
+        widget: text
+        hint: The short paragraph that reads like a letter, under the title.
+      - name: panels
+        label: The three panels
+        widget: list
+        summary: '{{fields.number}} — {{fields.title}}'
+        fields:
+          - { name: number, label: Number, widget: string }
+          - { name: title, label: Title, widget: string }
+          - { name: blurb, label: Blurb, widget: text }
+          - { name: cta, label: Link text, widget: string }
+          - name: href
+            label: Links to
+            widget: select
+            options: ['/idea', '/practice', '/join']
+      - name: footer
+        label: Footer
+        widget: object
+        fields:
+          - { name: mark, label: Footer line, widget: string }
+          - { name: link_label, label: Link text, widget: string }
+          - name: link_href
+            label: Links to
+            widget: select
+            options: ['/idea', '/practice', '/join']
+      - name: page_title
+        label: Browser tab title
+        widget: string
+        hint: Shown in the browser tab and as the headline in Google results.
+
+  - name: idea
+    label: The Idea
+    file: src/content/idea.yml
+    format: yaml
+    preview_path: /idea
+    fields: &deck_fields
+      - name: title_lines
+        label: Page title
+        widget: list
+        field: { name: line, label: Line, widget: string }
+        hint: The big glass title, one entry per line.
+      - name: kicker
+        label: Kicker
+        widget: string
+        hint: The small spaced-out line under the title.
+      - name: blocks
+        label: The page
+        label_singular: block
+        widget: list
+        collapsed: false
+        summary: '{{fields.text}}'
+        hint: >-
+          The page, top to bottom. Add a block for each paragraph and drag to
+          reorder. Inside any text you can write a link as
+          `[the words](https://example.com)`, and emphasise with `**bold**` or
+          `_italics_`.
+        types:
+          - name: text
+            label: Paragraph
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Text, widget: text, required: true }
+          - name: heading
+            label: Heading
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Heading, widget: string, required: true }
+          - name: opener
+            label: Opening statement
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Text, widget: text, required: true }
+            # one per page, at the very top — it is the page's first big line
+          - name: lead
+            label: Lead paragraph
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Text, widget: text, required: true }
+          - name: pull
+            label: Pull quote
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Text, widget: text, required: true }
+          - name: list
+            label: Bullet list
+            widget: object
+            fields:
+              - name: items
+                label: Bullets
+                label_singular: bullet
+                widget: list
+                field: { name: item, label: Bullet, widget: text }
+          - name: footnote
+            label: Footnote
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Text, widget: text, required: true }
+            # one per page, at the very bottom. Point at it from the copy above
+            # with [*](#fn1).
+      - name: links
+        label: Links at the foot of the page
+        widget: list
+        summary: '{{fields.label}}'
+        fields:
+          - { name: label, label: Link text, widget: string }
+          - name: href
+            label: Links to
+            widget: select
+            options: ['/', '/idea', '/practice', '/join']
+      - name: page_title
+        label: Browser tab title
+        widget: string
+        hint: Shown in the browser tab and as the headline in Google results.
+
+  - name: practice
+    label: In Practice
+    file: src/content/practice.yml
+    format: yaml
+    preview_path: /practice
+    fields: *deck_fields
+
+  - name: join
+    label: Join Us
+    file: src/content/join.yml
+    format: yaml
+    preview_path: /join
+    fields:
+      - name: title_lines
+        label: Page title
+        widget: list
+        field: { name: line, label: Line, widget: string }
+        hint: The big glass title, one entry per line.
+      - name: kicker
+        label: Kicker
+        widget: string
+        hint: The small spaced-out line under the title.
+      - name: intro
+        label: Words above the form
+        label_singular: block
+        widget: list
+        collapsed: false
+        hint: >-
+          Inside any text you can write a link as
+          `[the words](mailto:hello@wethepeoplegather.com)`.
+        types:
+          - name: text
+            label: Paragraph
+            widget: object
+            summary: '{{fields.text}}'
+            fields:
+              - { name: text, label: Text, widget: text, required: true }
+          - name: pledge
+            label: The pledge
+            widget: object
+            fields:
+              - name: lines
+                label: Lines
+                label_singular: line
+                widget: list
+                field: { name: line, label: Line, widget: string }
+      - name: form
+        label: The sign-up form
+        widget: object
+        hint: >-
+          Only the labels people read. The answers still reach us the same way,
+          and renaming a label does not change what has already been collected.
+        fields:
+          - { name: name_label, label: Name field, widget: string }
+          - { name: email_label, label: Email field, widget: string }
+          - { name: contribution_label, label: Contribution field, widget: string }
+          - name: contribution_placeholder
+            label: Contribution field, unchosen
+            widget: string
+          - name: contributions
+            label: Ways to contribute
+            label_singular: option
+            widget: list
+            field: { name: option, label: Option, widget: string }
+            hint: >-
+              The choices in the drop-down. These are reported in the analytics,
+              so renaming one starts a new line in the numbers.
+          - { name: message_label, label: Message field, widget: string }
+          - { name: submit_label, label: Button, widget: string }
+      - name: thanks
+        label: Thank-you message
+        widget: text
+        hint: Shown in the panel that appears once someone has signed up.
+      - name: back_label
+        label: Link back home
+        widget: string
+      - name: page_title
+        label: Browser tab title
+        widget: string
+        hint: Shown in the browser tab and as the headline in Google results.
+
+  - divider: true
+    name: divider_site
+
+  - name: site
+    label: Header & search
+    file: src/content/site.yml
+    format: yaml
+    preview_path: /
+    fields:
+      - name: meta_description
+        label: Search description
+        widget: text
+        hint: >-
+          The sentence under the title in Google results and on social cards.
+          Around 150 characters.
+      - name: header
+        label: Header
+        widget: object
+        hint: The bar fixed to the top of every page.
+        fields:
+          - { name: wordmark, label: Wordmark, widget: string }
+          - name: links
+            label: Links
+            widget: list
+            summary: '{{fields.label}}'
+            fields:
+              - { name: label, label: Link text, widget: string }
+              - name: href
+                label: Links to
+                widget: select
+                options: ['/idea', '/practice', '/join']
+              - name: highlight
+                label: Highlighted in yellow
+                widget: boolean
+                default: false

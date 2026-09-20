@@ -5,15 +5,20 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/check-content.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "og": "node scripts/generate-og.mjs"
+    "og": "node scripts/generate-og.mjs",
+    "check:content": "node scripts/check-content.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^5",
     "sharp": "^0.35.2",
     "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-yaml": "^5.0.0",
+    "js-yaml": "^4.3.2"
   }
 }

@@ -1,0 +1,13 @@
+meta_description: We The People — Reunite the Country, Transform the System.
+header:
+  wordmark: We the People
+  links:
+    - label: The Idea
+      href: /idea
+      highlight: false
+    - label: In Practice
+      href: /practice
+      highlight: false
+    - label: Join Us
+      href: /join
+      highlight: true

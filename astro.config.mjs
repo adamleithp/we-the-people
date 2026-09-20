@@ -1,12 +1,15 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import yaml from '@rollup/plugin-yaml';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://wethepeoplegather.com',
   vite: {
-    plugins: [tailwindcss()],
+    // Lets the pages import src/content/*.yml directly — see src/lib/content.ts.
+    // Those files are what the CMS at /admin writes to.
+    plugins: [tailwindcss(), yaml()],
   },
   experimental: {
     fonts: [

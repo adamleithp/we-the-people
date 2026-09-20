@@ -1,0 +1,32 @@
+page_title: We The People — Reunite the Country, Transform the System
+title_lines:
+  - We The
+  - People
+tagline: Reunite the Country · Transform the System
+creed: >-
+  Britain in 2026 is in a tough place. We The People is a vision of how we can change
+  our fortunes and our future together. The task is enormous. This is how it begins.
+panels:
+  - number: '01'
+    title: The Idea
+    blurb: >-
+      Our system is breaking. The politicians are a big part of the problem. But there
+      is another way.
+    cta: Read the idea
+    href: /idea
+  - number: '02'
+    title: In Practice
+    blurb: From national to local level, this is how we start to turn things around.
+    cta: See the plan
+    href: /practice
+  - number: '03'
+    title: Join Us
+    blurb: >-
+      If you believe in unity. If you want to see peace. Help make it happen — and be
+      part of hope.
+    cta: Sign up
+    href: /join
+footer:
+  mark: Be part of hope
+  link_label: Join Us
+  link_href: /join

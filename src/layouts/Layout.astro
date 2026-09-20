@@ -4,6 +4,7 @@ import '../styles/base.css';
 import Header from '../components/Header.astro';
 import GlassIntro from '../components/GlassIntro.astro';
 import PostHog from '../components/posthog.astro';
+import { site } from '../lib/content';
 
 interface Props {
   title?: string;
@@ -24,7 +25,7 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="We The People — Reunite the Country, Transform the System." />
+    <meta name="description" content={site.meta_description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- Self-hosted, subset & preloaded by the Astro Fonts API -->
     <Font cssVariable="--font-anton" preload />

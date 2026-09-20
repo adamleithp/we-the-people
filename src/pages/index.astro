@@ -1,64 +1,35 @@
 ---
+// The words on this page live in src/content/home.yml — that file is what the
+// CMS at /admin edits.
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import HeroBackdrop from '../components/HeroBackdrop.astro';
-
-const SECTIONS = [
-  {
-    n: '01',
-    title: 'The Idea',
-    blurb:
-      'Our system is breaking. The politicians are a big part of the problem. But there is another way.',
-    cta: 'Read the idea',
-    href: '/idea',
-  },
-  {
-    n: '02',
-    title: 'In Practice',
-    blurb: 'From national to local level, this is how we start to turn things around.',
-    cta: 'See the plan',
-    href: '/practice',
-  },
-  {
-    n: '03',
-    title: 'Join Us',
-    blurb:
-      'If you believe in unity. If you want to see peace. Help make it happen — and be part of hope.',
-    cta: 'Sign up',
-    href: '/join',
-  },
-];
+import { home } from '../lib/content';
+import { inline } from '../lib/inline';
 ---
 
-<Layout
-  title="We The People — Reunite the Country, Transform the System"
-  introLines={['We The', 'People']}
-  introVariant="hero"
->
+<Layout title={home.page_title} introLines={home.title_lines} introVariant="hero">
   <main>
     <!-- the intro's pane matches this one, so the assembled wordmark lands here -->
-    <PageHero lines={['We The', 'People']} variant="hero">
+    <PageHero lines={home.title_lines} variant="hero">
       <HeroBackdrop slot="backdrop" />
       <!-- the tagline starts as the glass lifts -->
-      <p class="hero__tagline fade-up">Reunite the Country · Transform the System</p>
+      <p class="hero__tagline fade-up">{home.tagline}</p>
     </PageHero>
 
     <section class="creed">
-      <p class="creed__body">
-        Britain in 2026 is in a tough place. We The People is a vision of how we can change
-        our fortunes and our future together. The task is enormous. This is how it begins.
-      </p>
+      <p class="creed__body" set:html={inline(home.creed)} />
     </section>
 
     <section class="panels" id="sections">
       {
-        SECTIONS.map((s) => (
-          <a class="panel" href={s.href}>
-            <span class="panel__n">{s.n}</span>
-            <h2 class="panel__title">{s.title}</h2>
-            <p class="panel__blurb">{s.blurb}</p>
+        home.panels.map((panel) => (
+          <a class="panel" href={panel.href}>
+            <span class="panel__n">{panel.number}</span>
+            <h2 class="panel__title">{panel.title}</h2>
+            <p class="panel__blurb">{panel.blurb}</p>
             <span class="panel__cta">
-              {s.cta} <span aria-hidden="true">→</span>
+              {panel.cta} <span aria-hidden="true">→</span>
             </span>
           </a>
         ))
@@ -66,8 +37,10 @@ const SECTIONS = [
     </section>
 
     <footer class="foot">
-      <p class="foot__mark">Be part of hope</p>
-      <a class="foot__link" href="/join">Join Us</a>
+      <p class="foot__mark">{home.footer.mark}</p>
+      <a class="foot__link" href={home.footer.link_href}>
+        {home.footer.link_label}
+      </a>
     </footer>
   </main>
 </Layout>

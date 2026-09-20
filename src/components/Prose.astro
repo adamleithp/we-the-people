@@ -1,0 +1,55 @@
+---
+/**
+ * A deck page's single 70ch column, built from the blocks in the page's YAML
+ * file. Each block type maps to the markup `.prose` in base.css already styles,
+ * so the editor in /admin picks a kind of paragraph rather than writing HTML.
+ */
+import { inline } from '../lib/inline';
+import type { NavLink, ProseBlock } from '../lib/content';
+
+interface Props {
+  blocks: ProseBlock[];
+  links?: NavLink[];
+}
+const { blocks, links = [] } = Astro.props;
+---
+
+<article class="prose">
+  {
+    blocks.map((block) => {
+      switch (block.type) {
+        case 'opener':
+          return <h2 class="prose__opener" set:html={inline(block.text)} />;
+        case 'heading':
+          return <h2 set:html={inline(block.text)} />;
+        case 'lead':
+          return <p class="lead" set:html={inline(block.text)} />;
+        case 'pull':
+          return <p class="pull" set:html={inline(block.text)} />;
+        case 'list':
+          return (
+            <ul>
+              {block.items.map((item) => (
+                <li set:html={inline(item)} />
+              ))}
+            </ul>
+          );
+        /* the one footnote a page can carry; [*](#fn1) in the copy links to it */
+        case 'footnote':
+          return <p class="footnote" id="fn1" set:html={inline(block.text)} />;
+        default:
+          return <p set:html={inline(block.text)} />;
+      }
+    })
+  }
+  {
+    links.map((link, i) => (
+      <Fragment>
+        {i > 0 && <br />}
+        <a class="back" href={link.href}>
+          {link.label}
+        </a>
+      </Fragment>
+    ))
+  }
+</article>

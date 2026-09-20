@@ -1,0 +1,43 @@
+page_title: Join Us — We The People
+title_lines:
+  - Join Us
+kicker: Be part of hope
+intro:
+  - type: text
+    text: >-
+      We would love you to build this movement of peace, unity and democratic revolution
+      with us.
+  - type: text
+    text: We know you will have questions, ideas, doubts. We want to hear them all.
+  - type: text
+    text: >-
+      We only ask that, at some point, you might be willing to pledge to hold your own
+      personal political affiliations secondary to a higher cause:
+  - type: pledge
+    lines:
+      - To heal our divisions
+      - Reclaim our power &
+      - See our democracy reborn
+  - type: text
+    text: >-
+      Sign up below or email
+      [hello@wethepeoplegather.com](mailto:hello@wethepeoplegather.com).
+form:
+  name_label: Your name
+  email_label: Your email
+  contribution_label: How you can contribute
+  contribution_placeholder: Choose one…
+  contributions:
+    - Democracy theory
+    - Raising money
+    - CA delivery
+    - Media/Communications
+    - Technology
+    - Event production
+    - Connections to cultural figures
+    - Accounting/Legal
+    - Other
+  message_label: Anything else you'd like to tell us
+  submit_label: Join Us
+thanks: Thank you for joining us, we'll send over more information as soon as possible.
+back_label: ← Back to home
