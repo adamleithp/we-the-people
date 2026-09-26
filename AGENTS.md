@@ -21,7 +21,7 @@ Reference feel: [blueheart.patagonia.com](https://blueheart.patagonia.com/) — 
 
 - **Glass intro** (`src/components/GlassIntro.astro`) — every page opens with its own title in glass. The title is shattered at build time into triangles (`shatter()` in `src/lib/shards.ts`); each shard is a clipped copy of the same title, so converging to `transform: none` reassembles it perfectly uniform. Replays on every load; skipped under `prefers-reduced-motion`.
 - **Layout** (`src/layouts/Layout.astro`) — renders the intro and the global `<Header />`. Pages pass `introLines` (and `introVariant="hero"` for the homepage).
-- **Home** (`/`) — 85vh hero wordmark, then three flexed panels: The Idea → `/idea`, In Practice → `/practice`, Join Us → `/join`.
+- **Home** (`/`) — opens on the creed instead of the glass overlay (`Layout intro={false}`): `src/components/CreedIntro.astro` fades the text in word by word, with a pause after each sentence, while the page is held (`html.intro-running`). Trying to scroll, tap or press a key speeds up the rest of the words instead of skipping them. Then the header and scroll cue fade in. Scrolling down reaches the 85vh hero wordmark, which assembles in glass as it comes into view (`<GlassIntro trigger="scroll">` in `<PageHero>`'s `glass` slot, same pane, no backdrop), then three flexed panels: The Idea → `/idea`, In Practice → `/practice`, Join Us → `/join`.
 - **Deck pages** (`/idea`, `/practice`) — title hero, then slide-deck sections 1 and 2 as plain text in a 70ch column (`.prose` in `src/styles/base.css`). Text only for now; design later.
 
 ### Motion rules (per Emil Kowalski's animations.dev)

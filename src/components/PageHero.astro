@@ -13,13 +13,14 @@ interface Props {
   /** the title, one entry per line */
   lines: string[];
   variant?: 'hero' | 'page';
+  id?: string;
 }
-const { lines, variant = 'page' } = Astro.props;
+const { lines, variant = 'page', id } = Astro.props;
 const hasBelow = Astro.slots.has('default');
 const hasBackdrop = Astro.slots.has('backdrop');
 ---
 
-<section class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
+<section id={id} class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
   {hasBackdrop && <slot name="backdrop" />}
   <div class="hero__inner">
     <ShatterTitle lines={lines} cols={variant === 'hero' ? 8 : 7} rows={3} />
@@ -31,6 +32,8 @@ const hasBackdrop = Astro.slots.has('backdrop');
       )
     }
   </div>
+  <!-- a <GlassIntro trigger="scroll" /> goes here: same pane, over the title -->
+  <slot name="glass" />
 </section>
 
 <style>

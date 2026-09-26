@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import HeroBackdrop from '../components/HeroBackdrop.astro';
+import CreedIntro from '../components/CreedIntro.astro';
+import GlassIntro from '../components/GlassIntro.astro';
 
 const SECTIONS = [
   {
@@ -32,23 +34,21 @@ const SECTIONS = [
 
 <Layout
   title="We The People — Reunite the Country, Transform the System"
-  introLines={['We The', 'People']}
-  introVariant="hero"
+  intro={false}
 >
   <main>
-    <!-- the intro's pane matches this one, so the assembled wordmark lands here -->
-    <PageHero lines={['We The', 'People']} variant="hero">
-      <HeroBackdrop slot="backdrop" />
-      <!-- the tagline starts as the glass lifts -->
-      <p class="hero__tagline fade-up">Reunite the Country · Transform the System</p>
-    </PageHero>
+    <!-- the homepage opens on the creed, word by word, with the page held -->
+    <CreedIntro
+      text="Britain in 2026 is in a tough place. We The People is a vision of how we can change our fortunes and our future together. The task is enormous. This is how it begins."
+    />
 
-    <section class="creed">
-      <p class="creed__body">
-        Britain in 2026 is in a tough place. We The People is a vision of how we can change
-        our fortunes and our future together. The task is enormous. This is how it begins.
-      </p>
-    </section>
+    <!-- scrolling down, the wordmark assembles in glass in its own pane -->
+    <PageHero id="hero" lines={['We The', 'People']} variant="hero">
+      <HeroBackdrop slot="backdrop" />
+      <GlassIntro slot="glass" lines={['We The', 'People']} variant="hero" trigger="scroll" />
+      <!-- the tagline follows the glass in -->
+      <p class="hero__tagline">Reunite the Country · Transform the System</p>
+    </PageHero>
 
     <section class="panels" id="sections">
       {
@@ -79,24 +79,6 @@ const SECTIONS = [
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: rgba(246, 244, 238, 0.62);
-  }
-  /* --- the manifesto ------------------------------------------------------- */
-  .creed {
-    max-width: 46ch; /* short measure — it should read like a letter, not a page */
-    margin-inline: auto;
-    padding: clamp(4rem, 12vh, 8rem) 1.5rem clamp(4rem, 12vh, 7rem);
-    text-align: left;
-  }
-  .creed__body {
-    margin: 0;
-    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
-    line-height: 1.85;
-    letter-spacing: 0.005em;
-    text-wrap: pretty;
-    color: rgba(246, 244, 238, 0.82);
-  }
-  .creed__body::first-line {
-    color: #fff;
   }
   /* --- three flexed sections ---------------------------------------------- */
   .panels {

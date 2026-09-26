@@ -23,6 +23,11 @@
  * `inset: 0` — a full-wordmark layer each, so N shards meant N full-title
  * rasters and N full-title GPU textures (hundreds of MB at hero scale, and the
  * stutter that came with it). Same pixels, ~1/N the layer area.
+ *
+ * `trigger="scroll"` (the homepage, which opens on <CreedIntro /> instead):
+ * no overlay and no backdrop. It sits in <PageHero>'s `glass` slot, inside the
+ * hero's own pane, held paused until the hero scrolls into view, then plays
+ * and hands off to the real title the same way.
  */
 import { shatter } from '../lib/shards';
 import { INTRO, INTRO_SEED } from '../lib/intro';
@@ -34,8 +39,11 @@ interface Props {
   /** video export (`/capture/*`): no backdrop, no teardown — the render script
    *  owns the clock and seeks the animations frame by frame */
   capture?: boolean;
+  /** `load`: fixed overlay, plays at once. `scroll`: in place, plays on view */
+  trigger?: 'load' | 'scroll';
 }
-const { lines, variant = 'page', capture = false } = Astro.props;
+const { lines, variant = 'page', capture = false, trigger = 'load' } = Astro.props;
+const inline = trigger === 'scroll';
 
 const hero = variant === 'hero';
 // fewer, larger pieces for the smaller/faster page titles (see lib/intro.ts)
@@ -50,15 +58,16 @@ const doneAt = sealAt + (hero ? 950 : 550);
 ---
 
 <div
-  class="intro"
+  class:list={['intro', { 'intro--inline': inline }]}
   data-intro
+  data-trigger={trigger}
   data-capture={capture ? '' : undefined}
   data-land={Math.round(land)}
   data-seal={sealAt}
   data-done={doneAt}
   style={`--flight:${flight}s;--sk:${staggerScale};--fade:${hero ? 0.9 : 0.5}s;--glow:${hero ? 1 : 0.55}`}
 >
-  {!capture && <div class="intro__backdrop" aria-hidden="true"></div>}
+  {!capture && !inline && <div class="intro__backdrop" aria-hidden="true"></div>}
   <div class={`pane pane--${variant} intro__pane`} style={`--lines:${lines.length}`}>
     <div class="intro__stage">
       <!-- invisible copy sets the stage box; every shard centres on the same box -->
@@ -93,7 +102,35 @@ const doneAt = sealAt + (hero ? 950 : 550);
     intro?.remove();
   };
 
-  if (!intro) {
+  // In place, on view: the page owns the intro classes (<CreedIntro />); this
+  // only hides the real title, assembles over it, then swaps back.
+  const playOnView = (glass: HTMLElement) => {
+    const host = glass.parentElement;
+    if (!host || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      glass.remove();
+      return;
+    }
+    host.dataset.glassPending = '';
+    const land = Number(glass.dataset.land) || 2900;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        glass.classList.add('is-playing');
+        // the assembled shards are pixel-identical to the title: swap in one frame
+        setTimeout(() => {
+          delete host.dataset.glassPending;
+          glass.remove();
+        }, land + 100);
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(host);
+  };
+
+  if (intro?.dataset.trigger === 'scroll') {
+    playOnView(intro);
+  } else if (!intro) {
     root.classList.add('intro-done');
   } else if (intro.dataset.capture !== undefined) {
     // Video export: the render script seeks every animation itself.
@@ -123,6 +160,32 @@ const doneAt = sealAt + (hero ? 950 : 550);
   }
   .intro.is-sealed {
     pointer-events: none;
+  }
+  /* in place: over the hero's own title, same pane, inside the hero's box */
+  .intro--inline {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+  }
+  /* held at the first keyframe (opacity 0) until the hero is in view; a paused
+     animation's delay doesn't run either, so the stagger starts on play */
+  .intro--inline:not(.is-playing) .shard {
+    animation-play-state: paused;
+    will-change: auto;
+  }
+  /* the real title and its tagline wait for the glass. Without JS nothing sets
+     the flag, and the title is simply there. */
+  :global([data-glass-pending] .stitle) {
+    opacity: 0;
+  }
+  :global(.hero__below) {
+    transition:
+      opacity 0.6s var(--ease-out) 0.15s,
+      translate 0.6s var(--ease-out) 0.15s;
+  }
+  :global([data-glass-pending] .hero__below) {
+    opacity: 0;
+    translate: 0 10px;
   }
   /* Only the backdrop fades. Fading the whole overlay would composite the shards
      as a group, and adjacent antialiased shard edges then show as hairline

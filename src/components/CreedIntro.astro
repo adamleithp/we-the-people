@@ -1,0 +1,178 @@
+---
+/**
+ * The homepage's intro — the creed, one word at a time.
+ *
+ * The page opens on a full screen of night with the page frozen behind it
+ * (`html.intro-running`). Each word fades up in turn, with a longer beat at
+ * the end of every sentence so it reads like it's being said. When the last
+ * word lands the page is released: `intro-sealing`/`intro-done` bring the
+ * header and the scroll cue in, and scrolling down reaches the wordmark, which
+ * assembles in glass as it comes into view (`<GlassIntro trigger="scroll">`).
+ *
+ * Trying to scroll, tap or press a key while the words are still arriving
+ * doesn't scroll — it plays the rest of the words through quickly, then lets go.
+ *
+ * Delays are baked at build time; only `opacity` and `translate` animate.
+ * Reduced motion: the words are simply there and nothing is held.
+ */
+
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+
+// beat before the first word · gap between words · extra pause after a sentence
+const LEAD = 0.5;
+const STEP = 0.11;
+const PAUSE = 0.5;
+const FADE = 0.8;
+
+let t = LEAD;
+let sentence = 0;
+const words = text
+  .trim()
+  .split(/\s+/)
+  .map((w) => {
+    const word = { w, d: t, lead: sentence === 0 };
+    t += STEP;
+    if (/[.!?]$/.test(w)) {
+      t += PAUSE;
+      sentence++;
+    }
+    return word;
+  });
+const end = Math.round((words[words.length - 1].d + FADE) * 1000);
+---
+
+<section class="creed" data-creed data-end={end}>
+  <p class="creed__body">
+    {
+      words.map(({ w, d, lead }) => (
+        <>
+          <span class:list={['creed__word', { 'creed__word--lead': lead }]} style={`--d:${d.toFixed(2)}s`}>
+            {w}
+          </span>{' '}
+        </>
+      ))
+    }
+  </p>
+  <a class="creed__cue fade-up" href="#hero" style="--fade-delay:0.5s">
+    <span>We The People</span>
+    <span class="creed__arrow" aria-hidden="true">↓</span>
+  </a>
+</section>
+
+<script>
+  const creed = document.querySelector<HTMLElement>('[data-creed]');
+  const root = document.documentElement;
+  const INPUTS = ['wheel', 'touchmove', 'keydown', 'pointerdown'] as const;
+
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    INPUTS.forEach((type) => window.removeEventListener(type, hurry));
+    root.classList.remove('intro-running');
+    root.classList.add('intro-sealing', 'intro-done');
+  };
+
+  // Scrolling (or tapping) mid-intro plays the remaining words through fast
+  // instead of scrolling past them, then releases once the last one is in.
+  let hurried = false;
+  function hurry() {
+    if (hurried || !creed) return;
+    hurried = true;
+    const words = creed.getAnimations({ subtree: true });
+    words.forEach((a) => a.updatePlaybackRate(7));
+    Promise.all(words.map((a) => a.finished)).then(
+      () => setTimeout(release, 250),
+      release,
+    );
+  }
+
+  if (!creed || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    release();
+  } else {
+    // a refresh halfway down would otherwise play the intro off-screen
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    root.classList.add('intro-running');
+    INPUTS.forEach((type) => window.addEventListener(type, hurry, { passive: true }));
+    setTimeout(release, (Number(creed.dataset.end) || 5000) + 200);
+  }
+</script>
+
+<style>
+  .creed {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 6rem 1.5rem;
+  }
+  .creed__body {
+    max-width: 24ch;
+    margin: 0;
+    font-size: clamp(1.45rem, 3.4vw, 2.6rem);
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+    color: rgba(246, 244, 238, 0.72);
+  }
+  .creed__word--lead {
+    color: #fff;
+  }
+  .creed__word {
+    display: inline-block;
+    opacity: 0;
+    translate: 0 0.25em;
+    animation: creed-word 0.8s var(--ease-out) var(--d) both;
+  }
+  @keyframes creed-word {
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  .creed__cue {
+    position: absolute;
+    bottom: clamp(1.5rem, 5vh, 2.6rem);
+    inset-inline: 0;
+    width: max-content;
+    margin-inline: auto;
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-wordmark);
+    font-size: 0.78rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-wtp-dawn);
+  }
+  .creed__arrow {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    letter-spacing: 0;
+  }
+  html.intro-done .creed__arrow {
+    animation: creed-nudge 1.8s ease-in-out 1.2s infinite;
+  }
+  @keyframes creed-nudge {
+    50% {
+      translate: 0 5px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .creed__word {
+      opacity: 1;
+      translate: none;
+      animation: none;
+    }
+    html.intro-done .creed__arrow {
+      animation: none;
+    }
+  }
+</style>

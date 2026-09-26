@@ -10,12 +10,15 @@ interface Props {
   /** the page's own title for the glass intro, one entry per line */
   introLines?: string[];
   introVariant?: 'hero' | 'page';
+  /** false: the page runs its own intro (the homepage opens on <CreedIntro />) */
+  intro?: boolean;
 }
 
 const {
   title = 'We The People',
   introLines = ['We The', 'People'],
   introVariant = 'page',
+  intro = true,
 } = Astro.props;
 ---
 
@@ -33,7 +36,7 @@ const {
   </head>
   <body>
     <!-- every page opens with its own title in glass; the header is global -->
-    <GlassIntro lines={introLines} variant={introVariant} />
+    {intro && <GlassIntro lines={introLines} variant={introVariant} />}
     <Header />
     <slot />
   </body>
