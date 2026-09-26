@@ -116,6 +116,8 @@ export function makeShards(
 }
 
 export type IntroShard = {
+  /** the triangle's vertices (pushed out for overlap), in % of the stage */
+  pts: Array<[number, number]>;
   /** clip polygon, in % of THIS shard's own box (not the stage) */
   clip: string;
   /** transform-origin, in % of this shard's own box */
@@ -237,6 +239,7 @@ export function shatter(cols: number, rows: number, seed: number): IntroShard[] 
         const throwK = 0.55 + Math.hypot(dirX, dirY) * 0.9;
 
         shards.push({
+          pts: out,
           clip,
           origin: `${(((cx - bx) / bw) * 100).toFixed(2)}% ${(((cy - by) / bh) * 100).toFixed(2)}%`,
           cx,

@@ -1,0 +1,745 @@
+---
+/**
+ * Glass Studio — make a video of any title shattering into place, the way the
+ * site's intro does, without touching a command line. Type, pick a look, press
+ * Render; the file downloads. Everything happens in the visitor's browser
+ * (`lib/glass-renderer.ts` draws, `lib/glass-export.ts` encodes).
+ *
+ * Unlinked and noindex: a tool for the team, not a page of the movement.
+ */
+import { Font } from 'astro:assets';
+import '../styles/base.css';
+import PostHog from '../components/posthog.astro';
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <Font cssVariable="--font-anton" preload />
+    <title>Glass Studio · We The People</title>
+    <PostHog />
+  </head>
+  <body>
+    <main class="studio">
+      <header class="studio__head">
+        <a href="/" class="studio__brand">We The People</a>
+        <h1 class="studio__title">Glass Studio</h1>
+        <p class="studio__lede">
+          Type a title, choose how it looks, press <strong>Render</strong>. The video downloads
+          to your computer — nothing is uploaded anywhere.
+        </p>
+      </header>
+
+      <section class="studio__preview" aria-label="Preview">
+        <div class="frame is-transparent" data-frame>
+          <canvas data-preview aria-label="Live preview of the title shattering into place"></canvas>
+        </div>
+        <div class="preview__bar">
+          <button type="button" class="btn btn--ghost" data-replay>↻ Replay</button>
+          <span class="preview__note" data-preview-note></span>
+        </div>
+        <p class="warn" data-font-warn hidden>
+          The title font didn't load, so the preview is using a stand-in. Check your internet
+          connection and reload the page before rendering.
+        </p>
+        <p class="warn" data-gl-warn hidden>
+          This browser can't draw the preview (WebGL2 is off or unsupported). Try the latest Chrome,
+          Edge, Firefox or Safari.
+        </p>
+      </section>
+
+      <form class="studio__controls" data-form>
+        <label class="field">
+          <span class="field__label">Title</span>
+          <textarea name="title" rows="2" spellcheck="false">We The
+People</textarea>
+          <span class="field__hint">Put each line of the title on its own line.</span>
+        </label>
+
+        <fieldset class="field">
+          <legend class="field__label">Style</legend>
+          <div class="seg">
+            <label><input type="radio" name="variant" value="hero" checked /><span>Cinematic <small>~3 s</small></span></label>
+            <label><input type="radio" name="variant" value="page" /><span>Quick <small>~1.5 s</small></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="field__label">Shape</legend>
+          <div class="seg">
+            <label><input type="radio" name="aspect" value="16:9" checked /><span>Wide <small>YouTube</small></span></label>
+            <label><input type="radio" name="aspect" value="9:16" /><span>Tall <small>Shorts · Reels</small></span></label>
+            <label><input type="radio" name="aspect" value="1:1" /><span>Square</span></label>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span class="field__label">Title size <output data-size-out></output></span>
+          <input type="range" name="size" min="8" max="40" step="1" value="22" />
+        </label>
+
+        <fieldset class="field">
+          <legend class="field__label">Text colour</legend>
+          <div class="swatches">
+            <label title="White"><input type="radio" name="text" value="#ffffff" checked /><i style="--c:#ffffff"></i></label>
+            <label title="Paper"><input type="radio" name="text" value="#f6f4ee" /><i style="--c:#f6f4ee"></i></label>
+            <label title="Dawn yellow"><input type="radio" name="text" value="#f2c14e" /><i style="--c:#f2c14e"></i></label>
+            <label title="Racing green"><input type="radio" name="text" value="#004225" /><i style="--c:#004225"></i></label>
+            <label title="Pick any colour" class="swatch-custom"><input type="radio" name="text" value="custom" /><input type="color" name="textCustom" value="#ffffff" aria-label="Custom text colour" /></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="field__label">How the glass breaks</legend>
+          <div class="row">
+            <button type="button" class="btn btn--ghost" data-shuffle>⟳ Shuffle</button>
+            <button type="button" class="btn btn--ghost" data-reset-seed>Same as the website</button>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span class="field__label">Hold the finished title for <output data-hold-out></output></span>
+          <input type="range" name="hold" min="0.5" max="6" step="0.5" value="1.5" />
+        </label>
+
+        <fieldset class="field">
+          <legend class="field__label">What do you need?</legend>
+          <div class="cards">
+            <label class="card">
+              <input type="radio" name="format" value="mov" checked />
+              <span>
+                <b>Transparent video, for editing</b>
+                <small>.mov (ProRes 4444) — drop it over your footage in Premiere, After Effects, Final Cut or DaVinci Resolve.</small>
+              </span>
+            </label>
+            <label class="card">
+              <input type="radio" name="format" value="mp4" />
+              <span>
+                <b>Ready-to-post video</b>
+                <small>.mp4 on a solid background — upload straight to YouTube or social.</small>
+              </span>
+            </label>
+            <label class="card">
+              <input type="radio" name="format" value="zip" />
+              <span>
+                <b>Transparent image sequence</b>
+                <small>.zip of PNG frames — if your editor won't open the .mov.</small>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field" data-bg-field hidden>
+          <legend class="field__label">Background</legend>
+          <div class="swatches">
+            <label title="Night"><input type="radio" name="bg" value="#0b0b0b" checked /><i style="--c:#0b0b0b"></i></label>
+            <label title="Racing green"><input type="radio" name="bg" value="#004225" /><i style="--c:#004225"></i></label>
+            <label title="Ink"><input type="radio" name="bg" value="#00160c" /><i style="--c:#00160c"></i></label>
+            <label title="Paper"><input type="radio" name="bg" value="#f6f4ee" /><i style="--c:#f6f4ee"></i></label>
+            <label title="Pick any colour" class="swatch-custom"><input type="radio" name="bg" value="custom" /><input type="color" name="bgCustom" value="#0b0b0b" aria-label="Custom background colour" /></label>
+          </div>
+        </fieldset>
+
+        <details class="more">
+          <summary>More options</summary>
+          <fieldset class="field">
+            <legend class="field__label">Quality</legend>
+            <div class="seg">
+              <label><input type="radio" name="quality" value="1080" checked /><span>HD <small>1080p · faster</small></span></label>
+              <label><input type="radio" name="quality" value="2160" /><span>4K <small>slower</small></span></label>
+            </div>
+          </fieldset>
+          <fieldset class="field">
+            <legend class="field__label">Frame rate</legend>
+            <div class="seg">
+              <label><input type="radio" name="fps" value="24" /><span>24</span></label>
+              <label><input type="radio" name="fps" value="25" /><span>25</span></label>
+              <label><input type="radio" name="fps" value="30" checked /><span>30</span></label>
+              <label><input type="radio" name="fps" value="60" /><span>60</span></label>
+            </div>
+            <span class="field__hint">Match your video project. Not sure? Leave it on 30.</span>
+          </fieldset>
+          <label class="check">
+            <input type="checkbox" name="blur" checked />
+            <span>Motion blur on the flying glass</span>
+          </label>
+        </details>
+
+        <div class="render">
+          <button type="submit" class="btn btn--go" data-render>Render &amp; download</button>
+          <button type="button" class="btn btn--ghost" data-cancel hidden>Cancel</button>
+          <div class="progress" data-progress hidden>
+            <div class="progress__bar"><i data-progress-bar></i></div>
+            <p class="progress__text" data-progress-text aria-live="polite"></p>
+          </div>
+          <p class="done" data-done hidden>
+            Saved <b data-done-name></b>. Check your Downloads folder.
+            <a data-done-link>Download again</a>
+          </p>
+          <p class="warn" data-error hidden></p>
+        </div>
+      </form>
+
+      <span class="font-probe" aria-hidden="true" data-font-probe>WTP</span>
+    </main>
+
+    <script>
+      import { buildScene, GlassRenderer, hexToRgb, type Scene } from '../lib/glass-renderer';
+      import type { ExportFormat } from '../lib/glass-export';
+      import { INTRO_SEED, type IntroVariant } from '../lib/intro';
+
+      const $ = <T extends Element>(s: string) => document.querySelector<T>(s)!;
+      const form = $<HTMLFormElement>('[data-form]');
+      const frameEl = $<HTMLElement>('[data-frame]');
+      const canvas = $<HTMLCanvasElement>('[data-preview]');
+
+      let seed = INTRO_SEED;
+
+      const val = (name: string) => (form.elements.namedItem(name) as RadioNodeList | HTMLInputElement).value;
+      const colour = (name: string) => (val(name) === 'custom' ? val(`${name}Custom`) : val(name));
+
+      function readState() {
+        const format = val('format') as ExportFormat;
+        const aspect = val('aspect');
+        const short = Number(val('quality'));
+        const long = Math.round((short * 16) / 9 / 2) * 2;
+        const [width, height] = aspect === '16:9' ? [long, short] : aspect === '9:16' ? [short, long] : [short, short];
+        return {
+          lines: val('title')
+            .split('\n')
+            .map((l) => l.trim())
+            .filter(Boolean),
+          variant: val('variant') as IntroVariant,
+          size: Number(val('size')) / 100,
+          text: colour('text'),
+          bg: format === 'mp4' ? colour('bg') : null,
+          format,
+          width,
+          height,
+          fps: Number(val('fps')),
+          hold: Number(val('hold')),
+          blur: (form.elements.namedItem('blur') as HTMLInputElement).checked,
+        };
+      }
+
+      // --- font -------------------------------------------------------------
+      const probe = $<HTMLElement>('[data-font-probe]');
+      const fontFamily = getComputedStyle(probe).fontFamily;
+      const fontReady = document.fonts.load(`400 100px ${fontFamily}`).then(() => {
+        const ok = [...document.fonts].some(
+          (f) => /anton/i.test(f.family) && !/fallback/i.test(f.family) && f.status === 'loaded',
+        );
+        $<HTMLElement>('[data-font-warn]').hidden = ok;
+        return ok;
+      });
+
+      // --- preview ------------------------------------------------------------
+      let renderer: GlassRenderer | null = null;
+      try {
+        renderer = new GlassRenderer(canvas);
+      } catch {
+        $<HTMLElement>('[data-gl-warn]').hidden = false;
+        $<HTMLButtonElement>('[data-render]').disabled = true;
+      }
+
+      let scene: Scene | null = null;
+      let state = readState();
+      let started = performance.now();
+
+      function rebuild(replay = false) {
+        state = readState();
+        $<HTMLOutputElement>('[data-size-out]').value = `${Math.round(state.size * 100)}%`;
+        $<HTMLOutputElement>('[data-hold-out]').value = `${state.hold} s`;
+        $<HTMLElement>('[data-bg-field]').hidden = state.format !== 'mp4';
+        frameEl.classList.toggle('is-transparent', !state.bg);
+        frameEl.style.aspectRatio = `${state.width} / ${state.height}`;
+        // tall frames are capped by the viewport height, not the column width
+        frameEl.style.width = `min(100%, calc(72vh * ${state.width / state.height}))`;
+        if (!renderer) return;
+
+        // preview at display resolution, same layout maths as the export
+        const box = frameEl.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const k = Math.min(1, 1600 / Math.max(box.width * dpr, box.height * dpr));
+        const w = Math.max(2, Math.round(box.width * dpr * k));
+        const h = Math.max(2, Math.round((w * state.height) / state.width));
+        scene = buildScene({ lines: state.lines, variant: state.variant, seed, fontFamily, size: state.size }, w, h);
+        renderer.setScene(scene);
+        const total = scene.land + state.hold;
+        $<HTMLElement>('[data-preview-note]').textContent =
+          `${total.toFixed(1)} s · ${state.width}×${state.height} · ${state.fps} fps`;
+        if (replay) started = performance.now();
+      }
+
+      function tick(now: number) {
+        if (renderer && scene) {
+          const loop = scene.land + state.hold + 0.8; // a beat of nothing before it replays
+          const t = ((now - started) / 1000) % loop;
+          renderer.render(Math.min(t, scene.land + state.hold), {
+            text: hexToRgb(state.text),
+            background: state.bg ? hexToRgb(state.bg) : null,
+          });
+        }
+        requestAnimationFrame(tick);
+      }
+
+      fontReady.then(() => {
+        rebuild(true);
+        requestAnimationFrame(tick);
+      });
+      form.addEventListener('input', (e) => {
+        const name = (e.target as HTMLInputElement).name;
+        // picking a custom colour selects its swatch
+        if (name === 'textCustom' || name === 'bgCustom') {
+          const radio = form.querySelector<HTMLInputElement>(`input[name="${name.replace('Custom', '')}"][value="custom"]`);
+          if (radio) radio.checked = true;
+        }
+        rebuild(['title', 'variant', 'aspect', 'size', 'hold'].includes(name));
+      });
+      new ResizeObserver(() => rebuild()).observe(frameEl);
+      $('[data-replay]').addEventListener('click', () => (started = performance.now()));
+      $('[data-shuffle]').addEventListener('click', () => {
+        seed = Math.floor(Math.random() * 2 ** 31);
+        rebuild(true);
+      });
+      $('[data-reset-seed]').addEventListener('click', () => {
+        seed = INTRO_SEED;
+        rebuild(true);
+      });
+
+      // --- render ---------------------------------------------------------------
+      const renderBtn = $<HTMLButtonElement>('[data-render]');
+      const cancelBtn = $<HTMLButtonElement>('[data-cancel]');
+      const progress = $<HTMLElement>('[data-progress]');
+      const bar = $<HTMLElement>('[data-progress-bar]');
+      const barText = $<HTMLElement>('[data-progress-text]');
+      const done = $<HTMLElement>('[data-done]');
+      const errorEl = $<HTMLElement>('[data-error]');
+      let controller: AbortController | null = null;
+      let lastUrl: string | null = null;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (controller) return;
+        const s = readState();
+        const slug =
+          s.lines.join(' ').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'title';
+        const ext = s.format === 'zip' ? 'zip' : s.format;
+        const filename = `${slug}-${s.width}x${s.height}-${s.fps}fps${s.format === 'mp4' ? '' : '-transparent'}.${ext}`;
+
+        controller = new AbortController();
+        renderBtn.disabled = true;
+        cancelBtn.hidden = false;
+        progress.hidden = false;
+        done.hidden = true;
+        errorEl.hidden = true;
+        bar.style.width = '0%';
+        window.posthog?.capture('studio_render_started', { format: s.format, width: s.width, height: s.height, fps: s.fps });
+        const t0 = performance.now();
+        try {
+          await fontReady;
+          const { renderToFile } = await import('../lib/glass-export');
+          const blob = await renderToFile(
+            { lines: s.lines, variant: s.variant, seed, fontFamily, size: s.size },
+            { text: hexToRgb(s.text), background: s.bg ? hexToRgb(s.bg) : null },
+            { width: s.width, height: s.height, fps: s.fps, hold: s.hold, blur: s.blur, format: s.format },
+            ({ phase, value }) => {
+              barText.textContent = phase;
+              bar.style.width = `${(value * 100).toFixed(1)}%`;
+            },
+            controller.signal,
+          );
+          if (lastUrl) URL.revokeObjectURL(lastUrl);
+          lastUrl = URL.createObjectURL(blob);
+          const a = $<HTMLAnchorElement>('[data-done-link]');
+          a.href = lastUrl;
+          a.download = filename;
+          a.click();
+          $('[data-done-name]').textContent = `${filename} (${(blob.size / 1e6).toFixed(1)} MB)`;
+          done.hidden = false;
+          window.posthog?.capture('studio_render_finished', {
+            format: s.format,
+            seconds: Math.round((performance.now() - t0) / 1000),
+          });
+        } catch (err) {
+          if ((err as Error).name !== 'AbortError' && !controller.signal.aborted) {
+            errorEl.textContent = `Something went wrong: ${(err as Error).message} Try HD instead of 4K, or a different browser.`;
+            errorEl.hidden = false;
+          }
+        } finally {
+          controller = null;
+          renderBtn.disabled = false;
+          cancelBtn.hidden = true;
+          progress.hidden = true;
+        }
+      });
+      cancelBtn.addEventListener('click', () => controller?.abort());
+    </script>
+  </body>
+</html>
+
+<style>
+  .studio {
+    --panel: #151515;
+    --line: rgba(246, 244, 238, 0.14);
+    --muted: rgba(246, 244, 238, 0.62);
+    display: grid;
+    gap: 1.5rem 2.5rem;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 1.5rem 16px 4rem;
+    grid-template-areas: 'head' 'preview' 'controls';
+  }
+  @media (min-width: 960px) {
+    .studio {
+      padding-inline: 2rem;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      grid-template-areas: 'head head' 'preview controls';
+      align-items: start;
+    }
+    .studio__preview {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+  .studio__head {
+    grid-area: head;
+  }
+  .studio__brand {
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-wtp-dawn);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .studio__title {
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    line-height: 0.9;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .studio__lede {
+    max-width: 60ch;
+    color: var(--muted);
+    margin: 0;
+  }
+  .studio__lede strong {
+    color: var(--color-wtp-paper);
+  }
+  .studio__preview {
+    grid-area: preview;
+  }
+  .studio__controls {
+    grid-area: controls;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .frame {
+    margin-inline: auto;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #000;
+  }
+  /* checkerboard = "this is see-through" */
+  .frame.is-transparent {
+    background: repeating-conic-gradient(#262626 0 25%, #1a1a1a 0 50%) 0 0 / 24px 24px;
+  }
+  .frame canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .preview__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.6rem;
+  }
+  .preview__note {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.45rem;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .field__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    padding: 0;
+  }
+  .field__label output {
+    color: var(--color-wtp-paper);
+    margin-left: 0.3em;
+  }
+  .field__hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  textarea {
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: 1.6rem;
+    line-height: 1.05;
+    background: var(--panel);
+    color: var(--color-wtp-paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    resize: vertical;
+  }
+  textarea:focus-visible,
+  .btn:focus-visible,
+  .seg label:has(input:focus-visible),
+  .swatches label:has(input:focus-visible),
+  .card:has(input:focus-visible) {
+    outline: 2px solid var(--color-wtp-dawn);
+    outline-offset: 2px;
+  }
+  input[type='range'] {
+    accent-color: var(--color-wtp-dawn);
+    width: 100%;
+  }
+
+  .seg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .seg label {
+    position: relative;
+    flex: 1 1 0;
+    min-width: max-content;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    text-align: center;
+  }
+  .seg input,
+  .swatches input[type='radio'],
+  .card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .seg span {
+    display: block;
+    padding: 0.55rem 0.7rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  .seg small {
+    display: block;
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .seg label:has(input:checked) {
+    border-color: var(--color-wtp-dawn);
+    background: rgba(242, 193, 78, 0.1);
+  }
+
+  .swatches {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+  .swatches label {
+    position: relative;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 3px;
+    border: 2px solid transparent;
+  }
+  .swatches label:has(input:checked) {
+    border-color: var(--color-wtp-dawn);
+  }
+  .swatches i {
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: var(--c);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .swatch-custom input[type='color'] {
+    display: block;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .swatch-custom input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  .swatch-custom input[type='color']::-webkit-color-swatch {
+    border: 0;
+    border-radius: 999px;
+  }
+
+  .row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cards {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+    padding: 0.75rem 0.9rem;
+  }
+  .card b {
+    display: block;
+    font-size: 0.98rem;
+  }
+  .card small {
+    display: block;
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+    line-height: 1.4;
+  }
+  .card:has(input:checked) {
+    border-color: var(--color-wtp-dawn);
+    background: rgba(242, 193, 78, 0.08);
+  }
+
+  .more {
+    border-top: 1px solid var(--line);
+    padding-top: 0.9rem;
+  }
+  .more summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .more[open] {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .check {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+    cursor: pointer;
+  }
+  .check input {
+    accent-color: var(--color-wtp-dawn);
+    width: 18px;
+    height: 18px;
+  }
+
+  .btn {
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--color-wtp-paper);
+    transition: transform 120ms var(--ease-out), background-color 150ms ease;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn--ghost:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .btn--go {
+    width: 100%;
+    padding: 0.95rem 1.2rem;
+    border: 0;
+    background: var(--color-wtp-green);
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 1.35rem;
+  }
+  .btn--go:hover {
+    background: #005a33;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: progress;
+  }
+  .render {
+    display: grid;
+    gap: 0.7rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.2rem;
+  }
+  .progress__bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .progress__bar i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-wtp-dawn);
+    transition: width 200ms linear;
+  }
+  .progress__text {
+    margin: 0.45rem 0 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .done {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .done a {
+    color: var(--color-wtp-dawn);
+    margin-left: 0.3em;
+  }
+  .warn {
+    margin: 0.6rem 0 0;
+    padding: 0.65rem 0.8rem;
+    border-radius: 8px;
+    background: rgba(242, 193, 78, 0.12);
+    color: var(--color-wtp-dawn);
+    font-size: 0.88rem;
+  }
+  .font-probe {
+    position: absolute;
+    visibility: hidden;
+    font-family: var(--font-wordmark);
+  }
+</style>

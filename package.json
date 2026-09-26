@@ -12,8 +12,11 @@
     "shatter": "node scripts/render-shatter.mjs"
   },
   "dependencies": {
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^5",
+    "fflate": "^0.8.3",
     "sharp": "^0.35.2",
     "tailwindcss": "^4.3.1"
   }

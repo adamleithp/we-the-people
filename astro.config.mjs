@@ -7,6 +7,9 @@ export default defineConfig({
   site: 'https://wethepeoplegather.com',
   vite: {
     plugins: [tailwindcss()],
+    // ffmpeg.wasm (the /studio encoder) spawns its own worker by URL; Vite's
+    // dependency pre-bundling breaks that path, so leave it as shipped
+    optimizeDeps: { exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'] },
   },
   experimental: {
     fonts: [

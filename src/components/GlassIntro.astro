@@ -25,6 +25,7 @@
  * stutter that came with it). Same pixels, ~1/N the layer area.
  */
 import { shatter } from '../lib/shards';
+import { INTRO, INTRO_SEED } from '../lib/intro';
 
 interface Props {
   /** the title, one entry per line */
@@ -37,12 +38,12 @@ interface Props {
 const { lines, variant = 'page', capture = false } = Astro.props;
 
 const hero = variant === 'hero';
-// fewer, larger pieces for the smaller/faster page titles
-const shards = hero ? shatter(7, 3, 20260728) : shatter(5, 2, 20260728);
+// fewer, larger pieces for the smaller/faster page titles (see lib/intro.ts)
+const { cols, rows, flight, staggerScale } = INTRO[variant];
+const shards = shatter(cols, rows, INTRO_SEED);
 
 // duration of one shard's flight + the longest stagger = when the title lands
-const flight = hero ? 2.4 : 1.1;
-const staggerScale = hero ? 1 : 0.5; // baked delays run 0 → 0.55s
+// (baked delays run 0 → 0.55s)
 const land = (flight + 0.55 * staggerScale) * 1000;
 const sealAt = Math.round(land + (hero ? 400 : 200));
 const doneAt = sealAt + (hero ? 950 : 550);
