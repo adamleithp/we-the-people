@@ -30,8 +30,11 @@ interface Props {
   /** the title, one entry per line */
   lines: string[];
   variant?: 'hero' | 'page';
+  /** video export (`/capture/*`): no backdrop, no teardown — the render script
+   *  owns the clock and seeks the animations frame by frame */
+  capture?: boolean;
 }
-const { lines, variant = 'page' } = Astro.props;
+const { lines, variant = 'page', capture = false } = Astro.props;
 
 const hero = variant === 'hero';
 // fewer, larger pieces for the smaller/faster page titles
@@ -48,11 +51,13 @@ const doneAt = sealAt + (hero ? 950 : 550);
 <div
   class="intro"
   data-intro
+  data-capture={capture ? '' : undefined}
+  data-land={Math.round(land)}
   data-seal={sealAt}
   data-done={doneAt}
   style={`--flight:${flight}s;--sk:${staggerScale};--fade:${hero ? 0.9 : 0.5}s;--glow:${hero ? 1 : 0.55}`}
 >
-  <div class="intro__backdrop" aria-hidden="true"></div>
+  {!capture && <div class="intro__backdrop" aria-hidden="true"></div>}
   <div class={`pane pane--${variant} intro__pane`} style={`--lines:${lines.length}`}>
     <div class="intro__stage">
       <!-- invisible copy sets the stage box; every shard centres on the same box -->
@@ -89,6 +94,8 @@ const doneAt = sealAt + (hero ? 950 : 550);
 
   if (!intro) {
     root.classList.add('intro-done');
+  } else if (intro.dataset.capture !== undefined) {
+    // Video export: the render script seeks every animation itself.
   } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     // Motion is unwelcome: straight to the page.
     done();

@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "og": "node scripts/generate-og.mjs"
+    "og": "node scripts/generate-og.mjs",
+    "shatter": "node scripts/render-shatter.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.1",

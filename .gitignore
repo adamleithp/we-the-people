@@ -12,3 +12,5 @@ npm-debug.log*
 # macOS
 .DS_Store
 .vercel
+# video renders (npm run shatter)
+renders/

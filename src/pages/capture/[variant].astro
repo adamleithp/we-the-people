@@ -1,0 +1,73 @@
+---
+/**
+ * Render target for `scripts/render-shatter.mjs` — the glass intro alone, on a
+ * transparent page, for exporting to video with an alpha channel.
+ *
+ * Dev server only: `getStaticPaths` returns nothing in a production build, so
+ * these pages never ship.
+ *
+ * The shard geometry comes from `shatter()` at build time exactly as on the
+ * site, so the pieces fly the same way. The title is swapped in on the client
+ * from `?title=` (lines split on `|`): every shard is a clipped copy of the
+ * title positioned in % of the stage, so any text reassembles just as cleanly.
+ * `?size=` overrides the wordmark size (any CSS length, e.g. `22vh`).
+ */
+import { Font } from 'astro:assets';
+import '../../styles/base.css';
+import GlassIntro from '../../components/GlassIntro.astro';
+
+export function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  return [{ params: { variant: 'hero' } }, { params: { variant: 'page' } }];
+}
+
+const variant = Astro.params.variant as 'hero' | 'page';
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <Font cssVariable="--font-anton" preload />
+    <title>Shatter capture</title>
+  </head>
+  <body>
+    <GlassIntro lines={['We The', 'People']} variant={variant} capture />
+  </body>
+</html>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const pane = document.querySelector<HTMLElement>('.intro__pane');
+  const title = params.get('title');
+  if (pane && title) {
+    const lines = title.split('|').map((l) => l.trim());
+    pane.style.setProperty('--lines', String(lines.length));
+    for (const el of pane.querySelectorAll('.wtp-wordmark')) {
+      el.replaceChildren(
+        ...lines.flatMap((l, i) => (i ? [document.createElement('br'), l] : [l])),
+      );
+    }
+  }
+  const size = params.get('size');
+  if (pane && size) pane.style.setProperty('--wordmark-size', size);
+  document.documentElement.dataset.captureReady = '';
+</script>
+
+<style is:global>
+  /* transparent frame: only the shards draw, so the PNGs carry real alpha */
+  html,
+  body {
+    background: transparent !important;
+  }
+  /* the title sits dead centre of the frame, not in the site's 85dvh hero */
+  .intro__pane {
+    --pane-h: 100dvh !important;
+  }
+  astro-dev-toolbar,
+  vite-error-overlay {
+    display: none !important;
+  }
+</style>
