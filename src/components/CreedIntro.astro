@@ -12,7 +12,13 @@
  * Trying to scroll, tap or press a key while the words are still arriving
  * doesn't scroll — it plays the rest of the words through quickly, then lets go.
  *
- * Delays are baked at build time; only `opacity` and `translate` animate.
+ * The screen starts pure black. As the words arrive, warmth rises from the
+ * bottom edge — a radial glow in the hero photograph's own dawn colours, timed
+ * to the whole creed, so the last word lands as the light does and scrolling
+ * down walks straight into the sunrise. It's one pre-painted layer that only
+ * fades and rises, and a hurried intro speeds it up with the words.
+ *
+ * Delays are baked at build time; only `opacity` and transforms animate.
  * Reduced motion: the words are simply there and nothing is held.
  */
 
@@ -44,7 +50,8 @@ const words = text
 const end = Math.round((words[words.length - 1].d + FADE) * 1000);
 ---
 
-<section class="creed" data-creed data-end={end}>
+<section class="creed" data-creed data-end={end} style={`--warm:${end}ms`}>
+  <div class="creed__warmth" aria-hidden="true"></div>
   <p class="creed__body">
     {
       words.map(({ w, d, lead }) => (
@@ -109,8 +116,38 @@ const end = Math.round((words[words.length - 1].d + FADE) * 1000);
     display: grid;
     place-items: center;
     padding: 6rem 1.5rem;
+    overflow: clip;
+    background: #000;
+  }
+  /* Warmth from below. Colours are sampled from the hero plate (the sun, the
+     horizon, the earth), kept low so the words stay the brightest thing. The
+     glow is painted once at full size; the animation only lifts and fades it. */
+  .creed__warmth {
+    position: absolute;
+    inset: 0 -20%; /* wider than the screen, so its sides never show as it grows */
+    /* sized in viewport units, not %, so the hero's seam can mirror it exactly */
+    background: radial-gradient(
+      120vw 70svh at 50% calc(100% + 8svh),
+      rgba(251, 184, 109, 0.3) 0%,
+      rgba(187, 103, 47, 0.2) 30%,
+      rgba(87, 48, 27, 0.1) 55%,
+      transparent 78%
+    );
+    transform-origin: 50% 100%;
+    animation: creed-warmth var(--warm, 5s) cubic-bezier(0.33, 0, 0.2, 1) both;
+  }
+  @keyframes creed-warmth {
+    from {
+      opacity: 0;
+      transform: translateY(35%) scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
   .creed__body {
+    position: relative; /* over the warmth */
     max-width: 24ch;
     margin: 0;
     font-size: clamp(1.45rem, 3.4vw, 2.6rem);
@@ -166,6 +203,9 @@ const end = Math.round((words[words.length - 1].d + FADE) * 1000);
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .creed__warmth {
+      animation: none;
+    }
     .creed__word {
       opacity: 1;
       translate: none;

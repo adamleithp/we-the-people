@@ -45,6 +45,8 @@ const SECTIONS = [
     <!-- scrolling down, the wordmark assembles in glass in its own pane -->
     <PageHero id="hero" lines={['We The', 'People']} variant="hero">
       <HeroBackdrop slot="backdrop" />
+      <!-- carries the creed's warmth over the top of the photograph: no seam -->
+      <div slot="backdrop" class="hero__seam" aria-hidden="true"></div>
       <GlassIntro slot="glass" lines={['We The', 'People']} variant="hero" trigger="scroll" />
       <!-- the tagline follows the glass in -->
       <p class="hero__tagline">Reunite the Country · Transform the System</p>
@@ -79,6 +81,27 @@ const SECTIONS = [
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: rgba(246, 244, 238, 0.62);
+  }
+  /* The creed ends on black with its glow rising from the bottom edge. This is
+     that same glow mirrored (same stops as .creed__warmth in CreedIntro, centre
+     8svh above this edge instead of below that one), on the same black, fading
+     out into the photograph — so scrolling down crosses no line. */
+  .hero__seam {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 45%;
+    z-index: 0;
+    background:
+      radial-gradient(
+        120vw 70svh at 50% -8svh,
+        rgba(251, 184, 109, 0.3) 0%,
+        rgba(187, 103, 47, 0.2) 30%,
+        rgba(87, 48, 27, 0.1) 55%,
+        transparent 78%
+      ),
+      #000;
+    mask-image: linear-gradient(to bottom, #000, transparent);
+    pointer-events: none;
   }
   /* --- three flexed sections ---------------------------------------------- */
   .panels {
