@@ -252,6 +252,13 @@ const ffmpegArgs = [
 console.log(`PNG sequence (alpha): ${rel(framesDir)}/  (${frameCount} frames, ${px.width}×${px.height}, ${fps}fps)`);
 if (opt['no-prores']) process.exit(0);
 
+// ProRes 4444 from FFmpeg < 7 plays with an opaque alpha on Apple Silicon (Resolve,
+// Final Cut, Premiere): the title lands on black. See src/lib/prores.ts.
+const ffVersion = spawnSync(process.env.FFMPEG || 'ffmpeg', ['-version'], { encoding: 'utf8' }).stdout ?? '';
+const ffMajor = Number(/ffmpeg version n?(\d+)/.exec(ffVersion)?.[1]);
+if (ffMajor && ffMajor < 7) {
+  console.warn(`\nffmpeg ${ffMajor}.x found — its ProRes alpha shows as black on Apple Silicon Macs. Upgrade to ffmpeg 7+.\n`);
+}
 const ff = spawnSync(process.env.FFMPEG || 'ffmpeg', ffmpegArgs, { stdio: 'inherit' });
 if (ff.error || ff.status !== 0) {
   console.log(

@@ -3,14 +3,16 @@
  * `GlassRenderer`, encoded to PNG, then packed into the chosen file —
  *
  *  - `mov`: ProRes 4444 with alpha, for editing (Premiere, After Effects, Final
- *    Cut, Resolve). Encoded by ffmpeg compiled to WebAssembly.
+ *    Cut, Resolve). Encoded by FFmpeg 9 via libav.js — see `prores.ts` for why
+ *    not ffmpeg.wasm. Frames go straight to the encoder, no PNGs.
  *  - `mp4`: H.264 on a solid background, ready to upload as-is.
  *  - `zip`: the PNG sequence with alpha, for anything that won't read the .mov.
  *
- * Everything runs in the visitor's browser; nothing is uploaded. The ffmpeg core
- * (~32 MB) is fetched only when a video is actually rendered, and cached after.
+ * Everything runs in the visitor's browser; nothing is uploaded. Each encoder is
+ * fetched only when a video is actually rendered, and cached after.
  */
 import { buildScene, GlassRenderer, type FrameStyle, type SceneOptions } from './glass-renderer';
+import { createProresEncoder } from './prores';
 
 export type ExportFormat = 'mov' | 'mp4' | 'zip';
 
@@ -57,7 +59,9 @@ export async function renderToFile(
     if (signal.aborted) throw new DOMException('Render cancelled', 'AbortError');
   };
 
-  const ffmpeg = format === 'zip' ? null : await loadFfmpeg(onProgress);
+  if (format === 'mov') return renderMov(scene, style, settings, onProgress, signal, abort);
+
+  const ffmpeg = format === 'mp4' ? await loadFfmpeg(onProgress) : null;
   const stopFfmpeg = () => ffmpeg?.terminate();
   signal.addEventListener('abort', stopFfmpeg);
 
@@ -101,7 +105,7 @@ export async function renderToFile(
       return new Blob([zipSync(zipFiles, { level: 0 }) as Uint8Array<ArrayBuffer>], { type: 'application/zip' });
     }
 
-    const encodeLabel = format === 'mov' ? 'Encoding transparent video' : 'Encoding video';
+    const encodeLabel = 'Encoding video';
     ffmpeg.on('log', ({ message }) => {
       const m = /frame=\s*(\d+)/.exec(message);
       if (m)
@@ -111,19 +115,62 @@ export async function renderToFile(
         });
     });
     onProgress({ phase: `${encodeLabel}…`, value: frameShare });
-    const out = format === 'mov' ? 'out.mov' : 'out.mp4';
-    const codec =
-      format === 'mov'
-        ? ['-c:v', 'prores_ks', '-profile:v', '4444', '-pix_fmt', 'yuva444p10le', '-alpha_bits', '16', '-vendor', 'apl0']
-        : ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '16', '-pix_fmt', 'yuv420p', '-movflags', '+faststart'];
-    const code = await ffmpeg.exec(['-framerate', String(fps), '-i', 'frame_%04d.png', ...codec, out]);
+    const code = await ffmpeg.exec([
+      '-framerate', String(fps), '-i', 'frame_%04d.png',
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '16', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+      'out.mp4',
+    ]);
     abort();
     if (code !== 0) throw new Error('The video encoder failed.');
-    const data = (await ffmpeg.readFile(out)) as Uint8Array<ArrayBuffer>;
-    return new Blob([data], { type: format === 'mov' ? 'video/quicktime' : 'video/mp4' });
+    const data = (await ffmpeg.readFile('out.mp4')) as Uint8Array<ArrayBuffer>;
+    return new Blob([data], { type: 'video/mp4' });
   } finally {
     signal.removeEventListener('abort', stopFfmpeg);
     stopFfmpeg();
+    renderer.dispose();
+  }
+}
+
+/** ProRes 4444: draw each frame and hand its alpha straight to the encoder. */
+async function renderMov(
+  scene: SceneOptions,
+  style: FrameStyle,
+  settings: ExportSettings,
+  onProgress: (p: Progress) => void,
+  signal: AbortSignal,
+  abort: () => void,
+): Promise<Blob> {
+  const { width, height, fps } = settings;
+  onProgress({ phase: 'Loading the video encoder (first time only)…', value: 0 });
+  const encoder = await createProresEncoder(width, height, fps, style.text);
+  signal.addEventListener('abort', encoder.close);
+  const renderer = new GlassRenderer(document.createElement('canvas'));
+  try {
+    abort();
+    const built = buildScene(scene, width, height);
+    renderer.setScene(built);
+    const frames = Math.ceil((built.land + settings.hold) * fps) + 1;
+    let landed: Uint8ClampedArray | null = null; // once every shard is home, frames repeat
+    for (let i = 0; i < frames; i++) {
+      abort();
+      const t = i / fps;
+      let rgba: Uint8ClampedArray | null = landed;
+      if (!rgba) {
+        // alpha only: the encoder applies the text colour itself
+        renderer.render(t, { ...style, background: null }, { samples: settings.blur ? 8 : 1, shutter: 0.5, fps, exportFrame: true });
+        rgba = renderer.read().data;
+        if (t >= built.land) landed = rgba;
+      }
+      await encoder.write(rgba);
+      onProgress({ phase: `Drawing and encoding frame ${i + 1} of ${frames}`, value: ((i + 1) / frames) * 0.97 });
+    }
+    onProgress({ phase: 'Finishing the file…', value: 0.98 });
+    const blob = await encoder.finish();
+    abort();
+    return blob;
+  } finally {
+    signal.removeEventListener('abort', encoder.close);
+    encoder.close();
     renderer.dispose();
   }
 }
