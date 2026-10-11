@@ -2,22 +2,23 @@
 // Part 3 — copy from "Copy update 28 Sept" (docs/). Three choices, one per level
 // of the movement; hovering one widens it and brings up its photograph. Each
 // opens its section below: a 70ch column broken up by full-bleed <Scene>s. The
-// photographs are unlicensed placeholders (src/assets/story/README.md).
+// photographs are from Unsplash (credits in src/assets/story/README.md); the
+// You section's copy is from the AgreeOnTea campaign doc (docs/).
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import Scene from '../components/Scene.astro';
 import ReadProgress from '../components/ReadProgress.astro';
-import tea from '../assets/story/you-01-tea-hands.jpeg';
+import tea from '../assets/story/you-01-tea-mugs.jpg';
 import spread from '../assets/story/you-02-spread-the-word.jpg';
 import plan from '../assets/story/you-03-the-plan.jpg';
 import community from '../assets/story/community-06-we-the-people-of.jpg';
-import chamber from '../assets/story/country-01-chamber.png';
-import stage from '../assets/story/country-02-stage.png';
-import following from '../assets/story/country-03-shadow.png';
-import festival from '../assets/story/country-04-festival.png';
-import child from '../assets/story/country-05-child.png';
-import celebration from '../assets/story/country-06-celebration.png';
+import chamber from '../assets/story/country-01-chamber.jpg';
+import stage from '../assets/story/country-02-the-mall.jpg';
+import following from '../assets/story/country-03-following.jpg';
+import festival from '../assets/story/country-04-festival.jpg';
+import child from '../assets/story/country-05-child.jpg';
+import celebration from '../assets/story/country-06-jubilee.jpg';
 // the level panels' photos: royalty-free from Unsplash
 import communityPanel from '../assets/story/level-community.jpg';
 import countryPanel from '../assets/story/level-country.jpg';
@@ -96,7 +97,7 @@ const LEVELS = [
 
     <!-- I: YOU ------------------------------------------------------------- -->
     <article class="prose level-section" id="you">
-      <Scene first src={tea} alt="Two pairs of hands around mugs of tea on a table" kicker="I · You" heading="Can you #AgreeOnTea?" />
+      <Scene first src={tea} alt="Two pairs of hands around mugs of milky tea on a wooden table" kicker="I · You" heading="Can you #AgreeOnTea?" />
 
       <p class="lead">
         Even in these divided times, there is surely one last thing we Brits can agree on…
@@ -274,7 +275,7 @@ const LEVELS = [
 
     <!-- III: OUR COUNTRY --------------------------------------------------- -->
     <article class="prose level-section" id="country">
-      <Scene first src={chamber} alt="A circular debating chamber seen from above" kicker="III · Our Country" heading="A National Council of the People" />
+      <Scene first src={chamber} alt="An empty horseshoe-shaped debating chamber, rows of seats facing the centre" kicker="III · Our Country" heading="A National Council of the People" />
 
       <p class="lead">
         Starting with you, through your community, we hope that the wave of reconnection and
@@ -305,7 +306,7 @@ const LEVELS = [
         search of a more united, hopeful future.
       </p>
 
-      <Scene src={stage} alt="A performer on stage in a Union Jack vest, lit from behind" heading="A Moment of National Cultural Impact" focus="50% 30%" />
+      <Scene src={stage} alt="A man up on a friend's shoulders taking a photo, in a crowd on The Mall with a Union Jack behind" heading="A Moment of National Cultural Impact" focus="50% 25%" />
       <p>
         In that way, the national Council of the People aims to have a positive impact
         across our society.
@@ -319,7 +320,7 @@ const LEVELS = [
         TV both to drive public awareness and of course share their perspectives too.
       </p>
 
-      <Scene src={following} alt="A shadow cast on a sunlit wall" heading="With The People" />
+      <Scene src={following} alt="Four friends leaning in to watch something on a phone together in a café" heading="With The People" />
       <p>
         We will also create a broad media ecosystem for people to engage whoever and
         wherever they are in the country.
@@ -339,7 +340,7 @@ const LEVELS = [
           national memory on immigration
         </li>
       </ul>
-      <Scene src={festival} alt="A festival site at sunset, crowds among the trees" />
+      <Scene src={festival} alt="A crowd gathered at golden hour under festival bunting" />
       <p>
         The site itself will be accessible with music, food, exhibitions and relevant events
         to draw audiences to attend in person.
@@ -351,7 +352,7 @@ const LEVELS = [
       </p>
       <p>The prototype on which we can build a new political system fit for whatever the future may hold.</p>
 
-      <Scene src={child} alt="A child on an escalator, looking up into the light" heading="To the Future, With Hope" />
+      <Scene src={child} alt="A small child standing in a long, light-filled hallway, looking up" heading="To the Future, With Hope" />
       <p>Immigration is only the start.</p>
       <p>
         We will go on to apply our Councils of the People to other issues tearing us apart,
@@ -379,7 +380,7 @@ const LEVELS = [
     <!-- the doc ends on something triumphal: many of us, together -->
     <Scene
       src={celebration}
-      alt="A huge crowd waving Union flags at a national celebration"
+      alt="A huge crowd filling The Mall under rows of Union Jacks"
       heading="Be part of hope"
     />
   </main>
