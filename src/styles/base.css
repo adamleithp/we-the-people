@@ -2,11 +2,14 @@
 
 /* Brand tokens — exposed as Tailwind utilities (bg-wtp-green, text-wtp-paper, font-wordmark, …) */
 @theme {
-  --color-wtp-green: #004225; /* British Racing Green */
-  --color-wtp-paper: #f6f4ee;
+  /* "Hedgerow" palette (Oct 2026): the site sits on deep forest greens, not black */
+  --color-wtp-night: #050c07; /* site ground */
+  --color-wtp-green: #16301f; /* general green: surfaces, cards, the I'm In footer */
+  --color-wtp-bramble: #2a4a33; /* subtle highlights: hairlines, borders, hovers */
   --color-wtp-dawn: #f2c14e; /* dawn yellow — secondary accent */
-  --color-wtp-ink: #00160c; /* dark dark green */
-  --color-wtp-night: #0b0b0b; /* site ground — off-black */
+  --color-wtp-paper: #f6f4ee;
+  --color-wtp-ink: #00160c; /* dark dark green — type on dawn and paper */
+  --color-wtp-racing: #004225; /* British Racing Green — the brand mark, not the UI */
 
   /* mountain ramp: far (pale, most fog) → near (deep) for atmospheric depth */
   --color-wtp-green-100: #a9c4b3;

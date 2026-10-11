@@ -326,3 +326,145 @@ export function tessellate(cols: number, rows: number, seed: number): Fragment[]
   }
   return frags;
 }
+
+export type ImpactShard = {
+  /** the piece's outline, pushed out a hair for overlap, in % of the stage */
+  pts: Array<[number, number]>;
+  /** the same outline in % of this shard's own box (for its edge, say) */
+  outline: Array<[number, number]>;
+  /** `outline` as a clip-path polygon */
+  clip: string;
+  /** transform-origin, in % of this shard's own box */
+  origin: string;
+  /** centroid, in % of the stage */
+  cx: number;
+  cy: number;
+  /** how far the centroid is from the impact, in % of the stage height */
+  dist: number;
+  /** unit vector from the impact to the centroid, aspect-corrected */
+  ux: number;
+  uy: number;
+  /** the shard's box and the stage-sized inner wrapper, as in `shatter()` */
+  bx: number;
+  by: number;
+  bw: number;
+  bh: number;
+  ox: number;
+  oy: number;
+  sw: number;
+  sh: number;
+};
+
+/**
+ * A pane struck at one point: cracks run out from the impact like spokes, and
+ * rings of fracture cross them, close together near the hit and wider apart
+ * further out, so the pieces go from slivers in the middle to big plates at
+ * the edge. Not every spoke reaches the rim, which merges the outer pieces.
+ *
+ * Every edge is sampled from one shared function of (ring, angle), so two
+ * neighbours trace exactly the same curve and the pieces tile with no gaps.
+ * Rings wobble and spokes kink a little at each ring so nothing reads as a
+ * compass rose. Geometry is worked out in aspect-correct units (`aspect` is
+ * stage width / height) so the rings are round on screen, then returned in %.
+ */
+export function impact(
+  aspect: number,
+  hitX: number,
+  hitY: number,
+  seed: number,
+  { spokes = 22, radii = [0, 3, 7, 12, 19, 28, 39, 54, 76, 130] } = {},
+): ImpactShard[] {
+  const rnd = mulberry32(seed);
+  const rand = (a: number, b: number) => a + rnd() * (b - a);
+  const TAU = Math.PI * 2;
+  const bands = radii.length - 1;
+
+  // spoke angles, evenly spread then jittered, and how many bands each reaches
+  const theta = Array.from({ length: spokes }, (_, j) => ((j + rand(-0.35, 0.35)) / spokes) * TAU);
+  const reach = theta.map(() => (rnd() < 0.5 ? bands : Math.floor(rand(2, bands))));
+
+  // per ring, per spoke: a wobbled radius and a kinked angle
+  const ringR = radii.map((r, i) => theta.map(() => (i === 0 ? 0 : r * (1 + rand(-0.16, 0.16)))));
+  const kink = radii.map((r, i) => theta.map(() => (i === 0 ? 0 : rand(-0.07, 0.07))));
+
+  /** a point on ring i, between spoke j and the next spoke, at fraction t */
+  const SUB = 3;
+  const at = (i: number, j: number, t: number): [number, number] => {
+    const k = (j + 1) % spokes;
+    const a0 = theta[j] + kink[i][j];
+    let a1 = theta[k] + kink[i][k];
+    if (a1 < a0) a1 += TAU;
+    const a = a0 + (a1 - a0) * t;
+    const r = ringR[i][j] + (ringR[i][k] - ringR[i][j]) * t;
+    return [hitX * aspect + Math.cos(a) * r, hitY + Math.sin(a) * r];
+  };
+  /** ring i traced from spoke a round to spoke b (b after a) */
+  const arc = (i: number, a: number, b: number) => {
+    const out: Array<[number, number]> = [];
+    for (let j = a; j !== b; j = (j + 1) % spokes)
+      for (let s = 0; s < SUB; s++) out.push(at(i, j, s / SUB));
+    out.push(at(i, b, 0));
+    return out;
+  };
+
+  const shards: ImpactShard[] = [];
+  for (let i = 0; i < bands; i++) {
+    const live = theta.map((_, j) => j).filter((j) => reach[j] > i);
+    if (live.length < 2) continue;
+    for (let n = 0; n < live.length; n++) {
+      const a = live[n];
+      const b = live[(n + 1) % live.length];
+      const inner = i === 0 ? [at(0, a, 0)] : arc(i, a, b);
+      const outer = arc(i + 1, a, b).reverse();
+      const poly = [...inner, ...outer];
+
+      // centroid, then every vertex pushed out from it so joined edges overlap
+      const mx = poly.reduce((s, p) => s + p[0], 0) / poly.length;
+      const my = poly.reduce((s, p) => s + p[1], 0) / poly.length;
+      const out = poly.map(
+        ([x, y]) => [(mx + (x - mx) * 1.012) / aspect, my + (y - my) * 1.012] as [number, number],
+      );
+      const cx = mx / aspect;
+      const cy = my;
+
+      const xs = out.map((p) => p[0]);
+      const ys = out.map((p) => p[1]);
+      const x0 = Math.min(...xs);
+      const x1 = Math.max(...xs);
+      const y0 = Math.min(...ys);
+      const y1 = Math.max(...ys);
+      const padX = (x1 - x0) * 0.04 + 0.08;
+      const padY = (y1 - y0) * 0.04 + 0.08;
+      const bx = x0 - padX;
+      const by = y0 - padY;
+      const bw = x1 - x0 + padX * 2;
+      const bh = y1 - y0 + padY * 2;
+
+      const outline = out.map(([x, y]) => [((x - bx) / bw) * 100, ((y - by) / bh) * 100] as [number, number]);
+      const vx = mx - hitX * aspect;
+      const vy = my - hitY;
+      const dist = Math.hypot(vx, vy) || 0.001;
+
+      shards.push({
+        pts: out,
+        outline,
+        clip: `polygon(${outline.map(([x, y]) => `${x.toFixed(2)}% ${y.toFixed(2)}%`).join(', ')})`,
+        origin: `${(((cx - bx) / bw) * 100).toFixed(2)}% ${(((cy - by) / bh) * 100).toFixed(2)}%`,
+        cx,
+        cy,
+        dist,
+        ux: vx / dist,
+        uy: vy / dist,
+        bx,
+        by,
+        bw,
+        bh,
+        ox: (-bx / bw) * 100,
+        oy: (-by / bh) * 100,
+        sw: 10000 / bw,
+        sh: 10000 / bh,
+      });
+    }
+  }
+  return shards;
+}

@@ -1,0 +1,153 @@
+---
+/**
+ * A full-bleed photograph that opens a section of a long page, with the
+ * section's heading laid over its foot. It breaks out of the 70ch `.prose`
+ * column it sits in (body clips the overflow).
+ *
+ * The photo settles from a slight zoom as it scrolls in, driven by the scroll
+ * timeline, not script: transform only, and browsers without scroll-driven
+ * animations simply show it still.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** the section heading, set over the photo */
+  heading?: string;
+  kicker?: string;
+  /** object-position for the crop, e.g. "50% 30%" */
+  focus?: string;
+  /** opens a page or section: taller, no gap above */
+  first?: boolean;
+  /** above the fold, so don't lazy-load it */
+  eager?: boolean;
+}
+const { src, alt, heading, kicker, focus = '50% 50%', first = false, eager = false } =
+  Astro.props;
+---
+
+<figure class:list={['scene', { 'scene--first': first }]}>
+  <div class="scene__frame">
+    <Image
+      class="scene__img"
+      src={src}
+      alt={alt}
+      widths={[640, 1024, 1600, 2400].filter((w) => w <= src.width * 2)}
+      sizes="100vw"
+      format="webp"
+      quality={74}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      style={`object-position:${focus}`}
+    />
+  </div>
+  <div class="scene__scrim" aria-hidden="true"></div>
+  {
+    heading && (
+      <figcaption class="scene__caption">
+        {kicker && <p class="scene__kicker">{kicker}</p>}
+        <h2 class="scene__heading">{heading}</h2>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .scene {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: min(78svh, 860px);
+    /* out of the column to the viewport edges */
+    margin: clamp(4rem, 12vh, 7rem) calc(50% - 50vw) clamp(2rem, 6vh, 3.4rem);
+    overflow: hidden;
+    background: var(--color-wtp-ink);
+  }
+  .scene--first {
+    min-height: min(88svh, 960px);
+    margin-top: 0;
+  }
+  .scene__frame {
+    position: absolute;
+    inset: 0;
+  }
+  .scene__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* the page's ground bleeds into the top and bottom so the photo sits in it,
+     and the foot darkens enough for white type */
+  .scene__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        var(--color-wtp-night) 0%,
+        rgba(5, 12, 7, 0.72) 26%,
+        rgba(5, 12, 7, 0.12) 60%,
+        rgba(5, 12, 7, 0.45) 100%
+      );
+  }
+  .scene__caption {
+    position: relative;
+    width: min(70ch, 100%);
+    margin-inline: auto;
+    padding: 0 1.5rem clamp(1.5rem, 5vh, 3rem);
+  }
+  .scene__kicker {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.34em;
+    font-size: 0.78rem;
+    color: var(--color-wtp-dawn);
+  }
+  .scene__heading {
+    margin: 0;
+    max-width: 18ch;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 6.4vw, 5rem);
+    line-height: 0.98;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .scene__img {
+        animation: scene-settle linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 55%;
+      }
+      .scene__caption {
+        animation: scene-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+  @keyframes scene-settle {
+    from {
+      transform: scale(1.1);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes scene-rise {
+    from {
+      opacity: 0;
+      transform: translateY(1.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

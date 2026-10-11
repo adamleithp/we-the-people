@@ -1,0 +1,207 @@
+---
+// Part 2 — copy from "Copy update 28 Sept" (docs/), one 70ch column. Each of
+// the doc's section breaks opens on a full-bleed <Scene>; the photographs are
+// from Unsplash (credits in src/assets/story/README.md).
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Scene from '../components/Scene.astro';
+import ReadProgress from '../components/ReadProgress.astro';
+import crossing from '../assets/story/hope-01-dover-from-the-sea.jpg';
+import vigil from '../assets/story/hope-02-candles.jpg';
+import council from '../assets/story/hope-03-council-discussion.jpg';
+import listening from '../assets/story/hope-04-listening-tea.jpg';
+import assembly from '../assets/story/hope-05-hand-raised.jpg';
+import young from '../assets/story/hope-06-westminster.jpg';
+---
+
+<Layout title="Our Real Hope — We The People" introLines={['Our Real', 'Hope']}>
+  <PageHero lines={['Our Real', 'Hope']}>
+    <p class="hero__kicker fade-up">Part 02</p>
+  </PageHero>
+
+  <ReadProgress />
+  <article class="prose">
+    <p class="lead">
+      We believe the work starts with the issue that most urgently threatens our collective
+      life.
+    </p>
+
+    <Scene
+      src={crossing}
+      alt="The white cliffs of Dover seen from the Channel, a ferry crossing beneath them"
+      heading="Immigration"
+    />
+    <p>On nothing else are our divisions as deep or as dangerous.</p>
+    <p>If we cannot leave it to politicians to resolve, then where do we turn?</p>
+
+    <Scene
+      src={vigil}
+      alt="A crowd of people of all ages holding candles together at night"
+      heading="The answer is us. We The People ourselves."
+    />
+    <p>
+      We are the ones who must work this out, not our compromised, ego-driven political
+      class.
+    </p>
+    <p>Only then will the decisions and policies we choose feel legitimate to us all.</p>
+    <p>
+      For that to happen, we must rediscover our ability to speak openly and deeply listen
+      to one another's perspective, despite the depth of our differences.
+    </p>
+    <p>
+      To see our opponents as human. To allow them to change our perspective. To seek
+      compromises we can all live with.
+    </p>
+    <p>That is real democracy.</p>
+    <p>In these polarised times, it probably seems impossible.</p>
+    <p>We The People offers a practical mechanism to make it happen.</p>
+
+    <Scene
+      src={council}
+      alt="A mixed group of people sitting close together in discussion, one woman speaking"
+      kicker="We call it"
+      heading="A Council of the People"
+      focus="50% 40%"
+    />
+    <p>
+      From two people to ten, from community level to nationwide, a Council of the People
+      is a way for us to talk to each other again with honesty and respect, to find a way
+      through our deep divides.
+    </p>
+    <p>
+      Whatever the scale, the principles are the same: everyone is welcome and every point
+      of view can be spoken and heard, without fear of censure.
+    </p>
+    <p>
+      For smaller groups, we offer a clear step-by-step process, principles and resources
+      to do it yourself.
+    </p>
+    <p>
+      In larger groups, we provide impartial facilitation to support the process, creating
+      room for understanding, respect — even empathy.
+    </p>
+    <p>
+      (More details on the different models can be found in
+      <a href="/be-part-of-it">Part 3 – Be Part of It</a>.)
+    </p>
+
+    <Scene
+      src={listening}
+      alt="An older woman smiling as she talks over a cup of tea, listened to across the table"
+      heading="Truth & Reconciliation"
+      focus="50% 30%"
+    />
+    <p>
+      Whatever your perspective, in Council you will likely hear things you don't agree
+      with, which might make you furious or upset. And that will be hard.
+    </p>
+    <p>
+      But this is the heart of the process, the leap we're asking everyone to make: if you
+      want your story and your perspective to be honoured, you must honour others when it's
+      their turn.
+    </p>
+    <p>
+      Through the rollout of our mechanism, we will seek to spark a movement of national
+      reconnection and reconciliation, culminating in a major cultural event: a National
+      Council of the People on Immigration.
+    </p>
+    <p>
+      The first time in which we the people ourselves will write our own policy on
+      immigration, instead of politicians.
+    </p>
+
+    <Scene
+      src={assembly}
+      alt="A man in a packed room raising his hand to speak"
+      heading="Drawing on new and ancient foundations"
+      focus="65% 30%"
+    />
+    <p>
+      Councils of the People are inspired by a modern democratic model: a Citizens'
+      Assembly.
+    </p>
+    <p>
+      It is a 21st century version of an age-old democratic structure, with roots in
+      ancient Greece and the moots once held on these islands a thousand years ago.
+    </p>
+    <p>
+      In simple terms a Citizens' Assembly applies the principles of jury service to
+      politics.
+    </p>
+    <p>
+      A group of 100 or more everyday people are selected by lottery to reflect the
+      population as a whole by factors like class, age, gender, race etc.
+    </p>
+    <p>
+      They are given a difficult problem to face, like immigration. They listen to experts
+      and witnesses from all sides of the debate and then talk among themselves to forge
+      policy approaches that everyone can accept.
+    </p>
+    <p>In the last decade, Assemblies have been held all over the world.</p>
+    <p>
+      In Ireland, one helped people navigate the question of abortion. In France, on
+      assisted dying. We even had one in the UK on climate change that led to rare
+      agreement between left and right.
+    </p>
+
+    <h2>Why it works</h2>
+    <p>
+      Crucially, Citizens' Assemblies enshrine the idea that everyday people should make
+      the decisions that affect our lives, not a political elite.
+    </p>
+    <p>
+      That free from the pressures to win votes, funding or influence, our decisions have
+      greater legitimacy too.
+    </p>
+    <p>
+      Most importantly, that in the right circumstances, with impartial facilitation and
+      expert witness testimony, we can dialogue with intelligence and civility and agree a
+      more nuanced approach than any politician ever could.
+    </p>
+
+    <Scene
+      src={young}
+      alt="The Houses of Parliament and Westminster Bridge across the Thames under a bright sky"
+      heading="We start to believe in “us” again"
+    />
+    <p>
+      Of course, there will be hard compromises. Undoubtedly everyone will find some part
+      hard to stomach.
+    </p>
+    <p>
+      Yet we believe it will lead to the first ever policy approach that most people would
+      accept.
+    </p>
+    <p>
+      This is a practical path for us to stop being a collection of tribes and start
+      becoming a people again, capable of forging a shared vision for our future.
+    </p>
+    <p>
+      If it works, we will know there is a powerful new way to do politics. One where we
+      take the lead.
+    </p>
+    <p>This is how our system could be transformed.</p>
+
+    <p class="pull">This is how we turn things around.</p>
+
+    <a class="back" href="/be-part-of-it">Be Part of It →</a>
+  </article>
+</Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    var back = document.querySelector('article.prose .back');
+    if (!back) return;
+    var fired = false;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !fired) {
+          fired = true;
+          window.posthog?.capture('hope_article_read');
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(back);
+  });
+</script>

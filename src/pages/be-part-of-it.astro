@@ -1,0 +1,644 @@
+---
+// Part 3 — copy from "Copy update 28 Sept" (docs/). Three choices, one per level
+// of the movement; hovering one widens it and brings up its photograph. Each
+// opens its section below: a 70ch column broken up by full-bleed <Scene>s. The
+// photographs are unlicensed placeholders (src/assets/story/README.md).
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Scene from '../components/Scene.astro';
+import ReadProgress from '../components/ReadProgress.astro';
+import tea from '../assets/story/you-01-tea-hands.jpeg';
+import spread from '../assets/story/you-02-spread-the-word.jpg';
+import plan from '../assets/story/you-03-the-plan.jpg';
+import community from '../assets/story/community-06-we-the-people-of.jpg';
+import chamber from '../assets/story/country-01-chamber.png';
+import stage from '../assets/story/country-02-stage.png';
+import following from '../assets/story/country-03-shadow.png';
+import festival from '../assets/story/country-04-festival.png';
+import child from '../assets/story/country-05-child.png';
+import celebration from '../assets/story/country-06-celebration.png';
+// the level panels' photos: royalty-free from Unsplash
+import communityPanel from '../assets/story/level-community.jpg';
+import countryPanel from '../assets/story/level-country.jpg';
+
+const LEVELS = [
+  {
+    id: 'you',
+    n: 'I',
+    lines: ['You'],
+    teaser: 'Start with a 10-minute cup of tea.',
+    image: tea,
+  },
+  {
+    id: 'community',
+    n: 'II',
+    lines: ['Your', 'Community'],
+    teaser: 'Hold a Council of the People where you live.',
+    image: communityPanel,
+    focus: '50% 25%',
+  },
+  {
+    id: 'country',
+    n: 'III',
+    lines: ['Our', 'Country'],
+    teaser: 'A National Council of the People on Immigration.',
+    image: countryPanel,
+    focus: '50% 40%',
+  },
+];
+
+---
+
+<Layout title="Be Part of It — We The People" introLines={['Be Part', 'of It']}>
+  <PageHero lines={['Be Part', 'of It']}>
+    <p class="hero__kicker fade-up">Part 03</p>
+  </PageHero>
+
+  <ReadProgress />
+  <main>
+    <p class="levels__intro">
+      Here are ways to help make it happen by yourself, in your community and for our
+      country.
+    </p>
+
+    <nav class="levels" aria-label="Ways to be part of it">
+      {
+        LEVELS.map((l) => (
+          <a class="level" href={`#${l.id}`} data-level={l.id}>
+            <Image
+              class="level__img"
+              src={l.image}
+              alt=""
+              style={l.focus && `object-position:${l.focus}`}
+              widths={[480, 960]}
+              sizes="(max-width: 720px) 100vw, 50vw"
+              format="webp"
+              quality={70}
+            />
+            <span class="level__n">{l.n}</span>
+            <span class="level__title">
+              {l.lines.map((line, i) => (
+                <>
+                  {i > 0 && <br />}
+                  {line}
+                </>
+              ))}
+            </span>
+            <span class="level__teaser">{l.teaser}</span>
+            <span class="level__cta" aria-hidden="true">
+              ↓
+            </span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <!-- I: YOU ------------------------------------------------------------- -->
+    <article class="prose level-section" id="you">
+      <Scene first src={tea} alt="Two pairs of hands around mugs of tea on a table" kicker="I · You" heading="Can you #AgreeOnTea?" />
+
+      <p class="lead">
+        Even in these divided times, there is surely one last thing we Brits can agree on…
+      </p>
+      <p class="pull">Tea.</p>
+      <p>
+        Could you have a 10-minute cuppa with someone from a different political tribe to talk
+        about a difficult topic?
+      </p>
+      <ul>
+        <li>Perhaps with the family member that you've given up talking politics with.</li>
+        <li>Your next-door neighbour who votes for that political party.</li>
+        <li>Your workmate who doesn't see the world your way at all.</li>
+        <li>
+          Or even that person you avoid in the street because they look like they belong to
+          the other side.
+        </li>
+      </ul>
+      <p>
+        If you do, then in the time it takes your tea to cool down, maybe you'll cool down the
+        country a little too.
+      </p>
+      <p>
+        When We The People choose to talk and listen to each other with respect, we challenge
+        the perception of our insurmountable division.
+      </p>
+      <p>
+        And we might discover there's more humanity and nuance among us than the algorithm or
+        our politicians and media want us to believe.
+      </p>
+      <p>And that means we can come back together to find a way through our problems after all.</p>
+
+      <h2>The Idea</h2>
+      <p>The idea is to hold a respectful, honest conversation across our tribal lines.</p>
+      <p>Where both sides are free to speak and be heard; where any perspective can be expressed.</p>
+      <p>Of course, it's going to take courage. It's going to take backbone.</p>
+      <p>Even more so, because the topic for this tea is one of the most difficult we face:</p>
+      <p class="pull">What do you think about immigration and how this country might approach it?</p>
+
+      <Scene src={plan} alt="A quiet lane running straight ahead through a tunnel of trees towards the light" heading="The Plan" focus="50% 60%" />
+      <p>Here's how we suggest you go about it:</p>
+
+      <section class="stage" aria-labelledby="stage-brew">
+        <p class="stage__when">The Beginning</p>
+        <h3 id="stage-brew">Gentle Brew</h3>
+        <p>
+          This first step is the most important. While you wait for the tea to brew, and add
+          milk and sugar, make sure you check in as human beings first. How are you, what's on
+          your mind or going on in your life right now?
+        </p>
+        <p>
+          Since so many of us have passionate views about immigration, it's good to connect as
+          people before you dive in!
+        </p>
+      </section>
+
+      <!-- the middle is the game itself: the rules as a card you could hold -->
+      <section class="game-card" aria-labelledby="stage-dialogue">
+        <header class="game-card__head">
+          <p class="stage__when">The Middle</p>
+          <h3 id="stage-dialogue">Dialogue</h3>
+          <p class="game-card__meta">
+            <span>2 players</span><span>3 rounds or more</span><span>90 seconds each</span>
+          </p>
+        </header>
+        <p>It's simple: each person has at least 3 rounds of 90 seconds each to speak.</p>
+        <ol class="game-card__rules">
+          <li>When one person speaks, the other must listen. No interruptions.</li>
+          <li>
+            When it's your turn to speak, you give your honest and heartfelt point of view. No
+            sugar-coating.
+          </li>
+          <li>
+            When it's your turn to listen, you really listen – rather than just thinking about
+            what you're going to say next.
+          </li>
+          <li>
+            It's best to use an alarm for timings so that you're free to engage with the other
+            person, not your phone.
+          </li>
+        </ol>
+        <p class="game-card__golden">
+          <strong>The golden rule:</strong> be sure to avoid insults. Treat the other person how
+          you would like to be treated in turn.
+        </p>
+        <p class="game-card__go">And if you want to do more than 3 rounds, go for it!</p>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-reflect">
+        <p class="stage__when">The End</p>
+        <h3 id="stage-reflect">A Minute to Reflect</h3>
+        <p>Once you both feel done, take one last minute to reflect on the process with each other.</p>
+        <p>
+          Don't feel disheartened about how much you disagreed. It's unlikely a single tea would
+          change anyone's minds!
+        </p>
+        <p>Rather consider if there was even a moment of empathy for the other's point of view?</p>
+        <p>
+          Did you find even a single square inch of shared ground or catch a glimpse, no matter
+          how brief, of the human beyond the divide?
+        </p>
+        <p>If the journey to come back together is 10,000 miles, then that would be a first step.</p>
+      </section>
+
+      <Scene src={spread} alt="Two women talking close on a city street at night, lights blurred behind them" heading="Spread the Word" focus="50% 40%" />
+      <p>
+        The most important thing is that the conversation happens at all. So if you want to keep
+        it entirely private, that's totally fine.
+      </p>
+      <p>
+        Or just share a photo of your two hands, your cups or your mugs, tagging #AgreeOnTea and
+        @WeThePeopleGather.
+      </p>
+      <p>
+        Of course, you can go further and share audio or video of the whole or part of the
+        conversation.
+      </p>
+      <p>
+        If others hear that you two did #AgreeOnTea, it might inspire them to do the same –
+        perhaps even create a wave of reconnection across the country.
+      </p>
+      <p>In this way, we can all do our bit to show a more united, hopeful future is possible.</p>
+    </article>
+
+    <!-- II: YOUR COMMUNITY ------------------------------------------------- -->
+    <article class="prose level-section" id="community">
+      <Scene first src={community} alt="A woman laughing with her hands over her mouth, talking with friends at a table" kicker="II · Your Community" heading="We The People of…" focus="50% 40%" />
+
+      <p class="lead">Dover. Brixton. Edinburgh. Piddington. York. Cardiff. Hastings — and more.</p>
+      <p>
+        The issue of immigration has touched many of our communities, both for good and for
+        ill.
+      </p>
+      <p>
+        The divisions we see in the country find their way into our day-to-day lives and the
+        places we call home. Even our family tables.
+      </p>
+      <!-- a solid green band, out to the viewport edges like a <Scene>, carrying
+           the turn from the problem to the two paths below -->
+      <p class="paths-banner">
+        So we offer two paths to hold a Council of the People for your community, whatever
+        its size.
+      </p>
+
+      <h2>Download our toolkit</h2>
+      <p>
+        Access our free toolkit (coming soon) for a clear step-by-step process, principles
+        and resources to hold a gathering yourself.
+      </p>
+      <p>We can also connect you with a network of expert facilitators in your area, if required.</p>
+
+      <h2>Let Us Help</h2>
+      <p>
+        Please <a href="mailto:hello@wethepeoplegather.com">get in touch</a> if you would
+        like our direct support in holding a Council of the People in your community.
+      </p>
+      <p>
+        We can provide bespoke guidance on setting up a Council and also offer impartial
+        facilitation for the Council itself.
+      </p>
+      <p>
+        If we do not have capacity for our team to attend on the day, we will endeavour to
+        connect you with a facilitator team in your area that can do the same job.
+      </p>
+      <p>
+        Though it is up to you to source an appropriate venue, provide refreshments and
+        advertise, we offer our services at no cost.
+      </p>
+
+      <p class="pull">
+        The dream: to inspire a wave of reconnection and reconciliation in communities
+        across the country.
+      </p>
+    </article>
+
+    <!-- III: OUR COUNTRY --------------------------------------------------- -->
+    <article class="prose level-section" id="country">
+      <Scene first src={chamber} alt="A circular debating chamber seen from above" kicker="III · Our Country" heading="A National Council of the People" />
+
+      <p class="lead">
+        Starting with you, through your community, we hope that the wave of reconnection and
+        reconciliation will culminate in a major cultural event: a National Council of the
+        People on Immigration.
+      </p>
+      <p>
+        Using the Citizens' Assembly approach (see <a href="/hope">Our Real Hope</a>), we
+        will select a group of 100 or more everyday people to discuss
+      </p>
+      <p class="pull">How might we approach immigration as a country?</p>
+      <p>
+        Lasting for up to two weeks, the Council will hear testimony from experts on
+        immigration as well as personal stories of those whose lives have been affected by
+        the issue.
+      </p>
+      <p>
+        These could include positive stories of the beauty of British culture or
+        contributions made by refugees. Or they could be negative stories of racist attacks
+        or violence perpetrated by immigrants.
+      </p>
+      <p>
+        It will be a place where all sides can speak without fear of judgment. Where ghosts
+        from the past can be faced. Where we can express anger, grief, even shed tears.
+      </p>
+      <p>
+        An opportunity for the communities of this island to share their stories at last, in
+        search of a more united, hopeful future.
+      </p>
+
+      <Scene src={stage} alt="A performer on stage in a Union Jack vest, lit from behind" heading="A Moment of National Cultural Impact" focus="50% 30%" />
+      <p>
+        In that way, the national Council of the People aims to have a positive impact
+        across our society.
+      </p>
+      <p>
+        To that end, we will aim to engage as many people as possible by making the Council
+        exciting, emotional — even entertaining.
+      </p>
+      <p>
+        We will involve high profile cultural figures from across the arts, music, film &amp;
+        TV both to drive public awareness and of course share their perspectives too.
+      </p>
+
+      <Scene src={following} alt="A shadow cast on a sunlit wall" heading="With The People" />
+      <p>
+        We will also create a broad media ecosystem for people to engage whoever and
+        wherever they are in the country.
+      </p>
+      <ul>
+        <li>Social as well as legacy media to reach every generation</li>
+        <li>Newsworthy viral events</li>
+        <li>Live streams of Council sessions</li>
+        <li>Daily highlight shows on a range of platforms</li>
+        <li>
+          An app where users can follow proceedings, post comments and interact through
+          polls on policy ideas
+        </li>
+        <li>A documentary to tell the Council's story</li>
+        <li>
+          A portal for people to submit their own stories building an archive of our
+          national memory on immigration
+        </li>
+      </ul>
+      <Scene src={festival} alt="A festival site at sunset, crowds among the trees" />
+      <p>
+        The site itself will be accessible with music, food, exhibitions and relevant events
+        to draw audiences to attend in person.
+      </p>
+      <p>
+        The goal of it all: to show people that there is another way for our democracy to
+        function, where their contributions are valued and counted, rather than ignored or
+        overruled.
+      </p>
+      <p>The prototype on which we can build a new political system fit for whatever the future may hold.</p>
+
+      <Scene src={child} alt="A child on an escalator, looking up into the light" heading="To the Future, With Hope" />
+      <p>Immigration is only the start.</p>
+      <p>
+        We will go on to apply our Councils of the People to other issues tearing us apart,
+        from cost of living to taxation to the NHS, even to our international relationships
+        or the regulation of AI.
+      </p>
+      <p>
+        While it may sound absurdly ambitious, we believe We The People speaks to a gap in
+        the market – a message of hope, unity and empowerment that will strike a chord with
+        millions across the country.
+      </p>
+      <p>If that happens, anything is possible.</p>
+      <p>
+        And with each step, we build a vision of what we want for our future, written by us –
+        a People's Manifesto – while growing a Movement with the political force to make it
+        happen.
+      </p>
+      <p>
+        We will make this a better country. More peaceful, more united, more democratic. Fit
+        for the challenges of the 21st century. A country our children will be glad to
+        inherit.
+      </p>
+    </article>
+
+    <!-- the doc ends on something triumphal: many of us, together -->
+    <Scene
+      src={celebration}
+      alt="A huge crowd waving Union flags at a national celebration"
+      heading="Be part of hope"
+    />
+  </main>
+</Layout>
+
+<style>
+  .levels__intro {
+    max-width: 46ch;
+    margin: 0 auto;
+    padding: clamp(3rem, 10vh, 6rem) 1.5rem clamp(2.5rem, 7vh, 4rem);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.6;
+    text-align: center;
+    text-wrap: balance;
+    color: rgba(246, 244, 238, 0.86);
+  }
+
+  /* --- the three levels ---------------------------------------------------- */
+  .levels {
+    display: flex;
+    border-block: 1px solid var(--color-wtp-bramble);
+  }
+  .level {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    min-height: 58vh;
+    padding: clamp(2rem, 4vw, 3rem);
+    text-decoration: none;
+    color: inherit;
+    border-right: 1px solid var(--color-wtp-bramble);
+    transition:
+      flex-grow 450ms var(--ease-out),
+      background-color 300ms ease;
+  }
+  .level:last-child {
+    border-right: 0;
+  }
+  /* the photograph sits under a scrim, and comes up as the panel is chosen */
+  .level__img {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.22;
+    transition: opacity 450ms var(--ease-out);
+  }
+  .level__n {
+    font-family: var(--font-wordmark);
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    color: var(--color-wtp-dawn);
+  }
+  .level__title {
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    line-height: 0.95;
+    color: #fff;
+  }
+  .level__teaser {
+    max-width: 26ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(246, 244, 238, 0.78);
+  }
+  .level__cta {
+    margin-top: auto;
+    font-size: 1.4rem;
+    color: var(--color-wtp-dawn);
+  }
+  .level:focus-visible {
+    outline: 2px solid var(--color-wtp-dawn);
+    outline-offset: -4px;
+  }
+
+  /* Hover widens the chosen level and brings its line in. Touch devices get
+     every line up front — there is no hover to reveal it. */
+  @media (hover: hover) and (pointer: fine) {
+    .level__teaser {
+      opacity: 0;
+      translate: 0 8px;
+      transition:
+        opacity 300ms var(--ease-out),
+        translate 300ms var(--ease-out);
+    }
+    .level:hover,
+    .level:focus-visible {
+      flex-grow: 2;
+    }
+    .level:hover .level__img,
+    .level:focus-visible .level__img {
+      opacity: 0.5;
+    }
+    .level:hover .level__teaser,
+    .level:focus-visible .level__teaser {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 120ms;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .levels {
+      flex-direction: column;
+    }
+    .level {
+      min-height: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--color-wtp-bramble);
+    }
+    .level:last-child {
+      border-bottom: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .level,
+    .level__teaser {
+      transition: none;
+    }
+  }
+
+  /* --- sections ------------------------------------------------------------ */
+  .level-section {
+    scroll-margin-top: 0; /* each opens on its photograph, under the header */
+    padding-top: 0;
+  }
+  .prose a {
+    color: var(--color-wtp-dawn);
+  }
+
+  /* the two-paths banner: solid green, out to the viewport edges like a
+     <Scene>, its words kept in the column */
+  .prose .paths-banner {
+    margin: 3rem calc(50% - 50vw);
+    padding: clamp(3rem, 9vw, 5.5rem) calc(50vw - 50%);
+    background: var(--color-wtp-green);
+    color: #fff;
+    font-size: clamp(1.3rem, 3vw, 1.75rem);
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+
+  /* Rules of the Game — paper card, ink type, like the back of a board game */
+  .game-card {
+    margin: 3.4rem 0;
+    padding: clamp(1.6rem, 5vw, 2.6rem);
+    border-radius: 1.1rem;
+    background: var(--color-wtp-paper);
+    color: var(--color-wtp-ink);
+    box-shadow: 0 0 0 6px var(--color-wtp-night), 0 0 0 8px var(--color-wtp-dawn);
+  }
+  .game-card__head {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px dashed rgba(0, 22, 12, 0.25);
+  }
+  .game-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .game-card__meta span {
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    background: var(--color-wtp-green);
+    color: var(--color-wtp-paper);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .game-card__rules {
+    display: grid;
+    gap: 0.8rem;
+    margin: 1.2rem 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: rule;
+  }
+  .game-card__rules li {
+    counter-increment: rule;
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.6rem;
+    margin: 0;
+  }
+  .game-card__rules li::before {
+    content: counter(rule);
+    position: static;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--color-wtp-dawn);
+    color: var(--color-wtp-ink);
+    font-family: var(--font-wordmark);
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .game-card__golden {
+    padding: 0.9rem 1.1rem;
+    border-radius: 0.6rem;
+    background: rgba(22, 48, 31, 0.08);
+  }
+  .game-card__golden strong {
+    color: var(--color-wtp-green);
+  }
+  .game-card__go {
+    margin: 1.2rem 0 0 !important;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
+    color: var(--color-wtp-green);
+  }
+
+  /* the plan's three stages: a small dawn label over the stage's name */
+  .stage {
+    margin: 2.6rem 0;
+  }
+  .stage__when {
+    margin: 0 0 0.3rem !important;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-wtp-dawn);
+  }
+  .stage h3,
+  .game-card h3 {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    line-height: 1;
+    color: #fff;
+  }
+  .game-card .stage__when {
+    color: var(--color-wtp-green);
+  }
+  .game-card h3 {
+    color: var(--color-wtp-green);
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-level]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        window.posthog?.capture('be_part_level_clicked', { level: el.dataset.level });
+      });
+    });
+  });
+</script>

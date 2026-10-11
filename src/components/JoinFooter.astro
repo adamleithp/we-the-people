@@ -1,7 +1,4 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import PageHero from '../components/PageHero.astro';
-
 // Mirrors the fields on wethepeoplegather.com's sign-up form.
 const CONTRIBUTIONS = [
   'Democracy theory',
@@ -16,89 +13,134 @@ const CONTRIBUTIONS = [
 ];
 ---
 
-<Layout title="Join Us — We The People" introLines={['Join Us']}>
-  <PageHero lines={['Join Us']}>
-    <p class="hero__kicker fade-up">Be part of hope</p>
-  </PageHero>
+<!-- I'M IN: the sign-up, at the foot of every page. The pill stays in reach
+     while you read and steps aside once the form itself is on screen. -->
+<!-- .fade-up's animation holds opacity, so the pill's own hide/show sits one level in -->
+<div class="im-in-dock fade-up" style="--fade-delay:0.36s">
+  <a class="im-in-pill" href="#im-in" data-im-in-pill>I'm In</a>
+</div>
 
-  <main class="join-page">
-    <p class="lede">
-      We would love you to build this movement of peace, unity and democratic revolution
-      with us.
-    </p>
-    <p class="lede">
-      We know you will have questions, ideas, doubts. We want to hear them all.
-    </p>
-    <p class="lede">
-      We only ask that, at some point, you might be willing to pledge to hold your own
-      personal political affiliations secondary to a higher cause:
-    </p>
-    <p class="pledge">
-      To heal our divisions<br />
-      Reclaim our power &amp;<br />
-      See our democracy reborn
-    </p>
-    <p class="lede">
-      Sign up below or email
-      <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
-    </p>
-    <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
-         Right now the only record of a sign-up is the PostHog person profile. -->
-    <form class="signup" data-signup novalidate>
-      <div class="field">
-        <label for="name">Your name</label>
-        <input id="name" type="text" name="name" autocomplete="name" required />
-      </div>
-
-      <div class="field">
-        <label for="email">Your email</label>
-        <input id="email" type="email" name="email" autocomplete="email" required />
-      </div>
-
-      <div class="field">
-        <label for="contribution">How you can contribute</label>
-        <select id="contribution" name="contribution">
-          <option value="">Choose one…</option>
-          {CONTRIBUTIONS.map((c) => <option value={c}>{c}</option>)}
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="message">Anything else you'd like to tell us</label>
-        <textarea id="message" name="message" rows="4"></textarea>
-      </div>
-
-      <button type="submit">Join Us</button>
-    </form>
-    <a class="back" href="/">← Back to home</a>
-  </main>
-
-  <!-- Shown once the sign-up event has been captured. Esc or the ✕ closes it. -->
-  <div class="thanks" data-thanks hidden>
-    <div class="thanks__backdrop" data-thanks-dismiss></div>
-    <div class="thanks__panel" role="dialog" aria-modal="true" aria-labelledby="thanks-text">
-      <p class="thanks__text" id="thanks-text">
-        Thank you for joining us, we'll send over more information as soon as possible.
-      </p>
-      <button class="thanks__close" type="button" data-thanks-dismiss aria-label="Close">
-        <span aria-hidden="true">✕</span>
-      </button>
-    </div>
+<footer class="join" id="im-in" aria-labelledby="im-in-title">
+  <div class="join__copy">
+  <h2 class="join__title" id="im-in-title">I'm In</h2>
+  <p class="lede">
+    Thank you for your interest in taking an active part in our We The People movement.
+  </p>
+  <p class="lede">
+    The challenges ahead may be significant, but nothing is impossible if we all work
+    together.
+  </p>
+  <p class="lede">
+    There are many opportunities to actively contribute: organising, outreach, fundraising
+    or even just spreading the word in your circles that a new approach for our country and
+    our future exists.
+  </p>
+  <p class="lede">We know you will have questions, ideas, doubts. We want to hear them all.</p>
+  <p class="lede">
+    Our only request is that in signing <span class="where where--below">below</span><span class="where where--side">on the right</span> you pledge to lay your personal political
+    affiliations aside – just for now – in service to the objectives of this movement.
+  </p>
+  <p class="pledge">
+    Overcome our division<br />
+    Reclaim our power<br />
+    Transform our system
+  </p>
+  <p class="lede">
+    Sign up or email
+    <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
+  </p>
   </div>
-</Layout>
+  <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
+       Right now the only record of a sign-up is the PostHog person profile. -->
+  <form class="signup" data-signup novalidate>
+    <div class="field">
+      <label for="name">Your name</label>
+      <input id="name" type="text" name="name" autocomplete="name" required />
+    </div>
+
+    <div class="field">
+      <label for="email">Your email</label>
+      <input id="email" type="email" name="email" autocomplete="email" required />
+    </div>
+
+    <div class="field">
+      <label for="contribution">How you can contribute</label>
+      <select id="contribution" name="contribution">
+        <option value="">Choose one…</option>
+        {CONTRIBUTIONS.map((c) => <option value={c}>{c}</option>)}
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="message">Anything else you'd like to tell us</label>
+      <textarea id="message" name="message" rows="4"></textarea>
+    </div>
+
+    <button type="submit">I'm In</button>
+  </form>
+</footer>
+
+<!-- Shown once the sign-up event has been captured. Esc or the ✕ closes it. -->
+<div class="thanks" data-thanks hidden>
+  <div class="thanks__backdrop" data-thanks-dismiss></div>
+  <div class="thanks__panel" role="dialog" aria-modal="true" aria-labelledby="thanks-text">
+    <p class="thanks__text" id="thanks-text">
+      Thank you for joining us, we'll send over more information as soon as possible.
+    </p>
+    <button class="thanks__close" type="button" data-thanks-dismiss aria-label="Close">
+      <span aria-hidden="true">✕</span>
+    </button>
+  </div>
+</div>
 
 <style>
-  .join-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+  /* "in signing on the right" beside the form, "below" once it stacks under the words */
+  .where--side {
+    display: none;
+  }
+  @media (min-width: 900px) {
+    .where--side {
+      display: inline;
+    }
+    .where--below {
+      display: none;
+    }
+  }
+  /* copy left, form right; stacked on narrow screens. Sits on the page ground,
+     set off by a hairline, with the form on a raised green card. */
+  .join {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    max-width: 76rem;
+    margin-inline: auto;
+    padding: clamp(4rem, 12vh, 7rem) clamp(1.5rem, 5vw, 3.4rem) clamp(6rem, 16vh, 9rem);
+    border-top: 1px solid var(--color-wtp-bramble);
+    scroll-margin-top: 3rem;
+  }
+  @media (min-width: 900px) {
+    .join {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    }
+  }
+  .join__copy {
+    display: grid;
     gap: 1.1rem;
-    padding: 2rem 6vw clamp(6rem, 16vh, 10rem);
-    text-align: center;
+    justify-items: start;
+  }
+  .join__title {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    font-size: clamp(3rem, 10vw, 6rem);
+    line-height: 0.9;
+    color: #fff;
   }
   .lede {
     margin: 0;
-    max-width: 34rem;
+    max-width: 36rem;
     font-size: clamp(1rem, 2.6vw, 1.2rem);
     line-height: 1.55;
     opacity: 0.9;
@@ -112,14 +154,26 @@ const CONTRIBUTIONS = [
     text-transform: uppercase;
     font-size: clamp(1.3rem, 3.4vw, 1.9rem);
     line-height: 1.2;
-    color: #fff;
+    color: var(--color-wtp-dawn);
   }
+  /* the form card is a neutral near-black, not green, so the fields read as
+     a tool on the page rather than another panel of it */
   .signup {
+    --card: #151716;
+    --field: #0b0c0c;
+    --line: rgba(255, 255, 255, 0.1);
     display: grid;
     gap: 1.1rem;
-    width: min(28rem, 100%);
-    margin-top: 1.4rem;
-    text-align: left;
+    padding: clamp(1.5rem, 4vw, 2.4rem);
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+  @media (min-width: 900px) {
+    .signup {
+      position: sticky;
+      top: 6rem;
+    }
   }
   .field {
     display: grid;
@@ -136,9 +190,9 @@ const CONTRIBUTIONS = [
   .signup textarea {
     width: 100%;
     padding: 0.8rem 1rem;
-    border: 1px solid rgba(246, 244, 238, 0.28);
+    border: 1px solid var(--line);
     border-radius: 0.5rem;
-    background: rgba(246, 244, 238, 0.06);
+    background: var(--field);
     color: var(--color-wtp-paper, #f6f4ee);
     font-family: inherit;
     font-size: 1rem;
@@ -162,7 +216,7 @@ const CONTRIBUTIONS = [
     padding-right: 2.4rem;
   }
   .signup option {
-    background: var(--color-wtp-night);
+    background: var(--field);
     color: var(--color-wtp-paper);
   }
   .signup input:focus-visible,
@@ -180,8 +234,8 @@ const CONTRIBUTIONS = [
     padding: 0.85rem 2.4rem;
     border: 0;
     border-radius: 999px;
-    background: var(--color-wtp-paper, #f6f4ee);
-    color: var(--color-wtp-green, #004225);
+    background: var(--color-wtp-dawn);
+    color: var(--color-wtp-ink);
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -208,7 +262,7 @@ const CONTRIBUTIONS = [
   .thanks__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(5, 5, 5, 0.72);
+    background: rgba(5, 12, 7, 0.8);
     opacity: 0;
     transition: opacity 200ms var(--ease-out);
   }
@@ -285,28 +339,70 @@ const CONTRIBUTIONS = [
       transform: none;
     }
   }
-  .back {
-    margin-top: 1.6rem;
-    color: rgba(246, 244, 238, 0.7);
-    text-decoration: none;
+
+  /* --- the pill ----------------------------------------------------------- */
+  .im-in-dock {
+    position: fixed;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    z-index: 40;
+  }
+  .im-in-pill {
+    display: block;
+    padding: 0.85rem 1.7rem;
+    border-radius: 999px;
+    background: var(--color-wtp-dawn);
+    color: var(--color-wtp-ink);
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
     font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
   }
-  .back:hover {
-    color: var(--color-wtp-paper, #f6f4ee);
+  .im-in-pill:active {
+    transform: scale(0.97);
   }
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+  .im-in-pill:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+  /* the form is on screen — the pill has nothing left to point at */
+  .im-in-pill.is-away {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .im-in-pill {
+      transition: none;
+    }
   }
 </style>
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function () {
-    window.posthog?.capture('join_page_viewed');
+    var footer = document.getElementById('im-in');
+    var pill = document.querySelector('[data-im-in-pill]');
+    var viewed = false;
+    if (footer) {
+      new IntersectionObserver(function (entries) {
+        var visible = entries[0].isIntersecting;
+        if (pill) pill.classList.toggle('is-away', visible);
+        if (visible && !viewed) {
+          viewed = true;
+          window.posthog?.capture('join_footer_viewed');
+        }
+      }, { threshold: 0.15 }).observe(footer);
+    }
+    if (pill) {
+      pill.addEventListener('click', function () {
+        window.posthog?.capture('im_in_pill_clicked', { path: location.pathname });
+      });
+    }
 
     var form = document.querySelector('[data-signup]');
     var emailInput = document.getElementById('email');

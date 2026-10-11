@@ -6,9 +6,9 @@
 <header class="site-header fade-up" style="--fade-delay:0.24s">
   <a class="wordmark" href="/">We the People</a>
   <nav>
-    <a class="action" href="/idea">The Idea</a>
-    <a class="action" href="/practice">In Practice</a>
-    <a class="action action--key" href="/join">Join Us</a>
+    <a class="action" href="/problem"><span class="action__our">Our </span>Problem</a>
+    <a class="action" href="/hope"><span class="action__our">Our </span>Hope</a>
+    <a class="action" href="/be-part-of-it">Be Part of It</a>
   </nav>
 </header>
 
@@ -43,16 +43,20 @@
   .action {
     font-size: clamp(0.72rem, 1.6vw, 0.92rem);
     letter-spacing: 0.14em;
+    white-space: nowrap;
     padding: 0.4rem 0.15rem;
     border-bottom: 2px solid transparent;
     transition: border-color 0.2s ease;
   }
-  .action--key {
-    color: var(--color-wtp-dawn, #f2c14e);
-  }
   .action:hover,
   .action:focus-visible {
     border-color: var(--color-wtp-dawn, #f2c14e);
+  }
+  /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "Our …" doesn't */
+  @media (max-width: 560px) {
+    .action__our {
+      display: none;
+    }
   }
   .site-header a:focus-visible {
     outline: 2px solid var(--color-wtp-dawn, #f2c14e);

@@ -4,6 +4,7 @@ import '../styles/base.css';
 import Header from '../components/Header.astro';
 import GlassIntro from '../components/GlassIntro.astro';
 import PostHog from '../components/posthog.astro';
+import JoinFooter from '../components/JoinFooter.astro';
 
 interface Props {
   title?: string;
@@ -32,9 +33,11 @@ const {
     <PostHog />
   </head>
   <body>
-    <!-- every page opens with its own title in glass; the header is global -->
+    <!-- every page opens with its own title in glass; the header and the
+         I'm In sign-up are global -->
     <GlassIntro lines={introLines} variant={introVariant} />
     <Header />
     <slot />
+    <JoinFooter />
   </body>
 </html>

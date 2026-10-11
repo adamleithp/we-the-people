@@ -4,11 +4,13 @@ The wizard has completed a full PostHog integration for the We The People (WTP) 
 
 | Event name | Description | File |
 |---|---|---|
-| `join_page_viewed` | User lands on the Join Us page — top of the sign-up conversion funnel. | `src/pages/join.astro` |
-| `join_signup_attempted` | User fills in their email address on the sign-up form, indicating intent to join. | `src/pages/join.astro` |
+| `join_footer_viewed` | The I'm In sign-up footer scrolls into view — top of the sign-up conversion funnel. | `src/components/JoinFooter.astro` |
+| `im_in_pill_clicked` | User clicks the fixed I'm In pill (property `path`). | `src/components/JoinFooter.astro` |
+| `join_signup_attempted` | User fills in their email address on the sign-up form, indicating intent to join. | `src/components/JoinFooter.astro` |
 | `homepage_panel_clicked` | User clicks one of the three content panels on the homepage (The Idea, In Practice, or Join Us). Includes `panel_title` property. | `src/pages/index.astro` |
-| `idea_article_read` | User scrolls to the bottom of The Idea article, indicating they read it in full. | `src/pages/idea.astro` |
-| `practice_article_read` | User scrolls to the bottom of the In Practice article, indicating they read it in full. | `src/pages/practice.astro` |
+| `problem_article_read` | User scrolls to the bottom of Our Real Problem, indicating they read it in full. | `src/pages/problem.astro` |
+| `hope_article_read` | User scrolls to the bottom of Our Real Hope, indicating they read it in full. | `src/pages/hope.astro` |
+| `be_part_level_clicked` | User picks a level on Be Part of It (property `level`: you / community / country). | `src/pages/be-part-of-it.astro` |
 
 ## Next steps
 

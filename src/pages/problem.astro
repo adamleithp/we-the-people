@@ -1,0 +1,123 @@
+---
+// Part 1 — copy from "Copy update 28 Sept" (docs/), one 70ch column. Each of
+// the doc's section breaks opens on a full-bleed <Scene>; the photographs are
+// from Unsplash (credits in src/assets/story/README.md).
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Scene from '../components/Scene.astro';
+import ReadProgress from '../components/ReadProgress.astro';
+import crowd from '../assets/story/problem-01-crowd-police.jpg';
+import greenwich from '../assets/story/problem-02-greenwich-flag.jpg';
+import march from '../assets/story/problem-03-march.jpg';
+import armsLinked from '../assets/story/problem-04-arms-linked.jpg';
+---
+
+<Layout title="Our Real Problem — We The People" introLines={['Our Real', 'Problem']}>
+  <PageHero lines={['Our Real', 'Problem']}>
+    <p class="hero__kicker fade-up">Part 01</p>
+  </PageHero>
+
+  <ReadProgress />
+  <article class="prose">
+    <Scene
+      first
+      eager
+      src={crowd}
+      alt="A packed crowd on a British street at dusk, police officers in hi-vis among them"
+      heading="We all know things are going wrong. We all feel it."
+    />
+
+    <p class="lead">
+      Like you, everyone has their own list: cost of living, inequality, immigration, the
+      march to war, the climate, the water, the trains, even potholes…
+    </p>
+    <p>Whatever we care about, effective action is so rarely taken.</p>
+    <p>
+      And we're left feeling disillusioned, angry, afraid and powerless above all.
+    </p>
+
+    <Scene
+      src={greenwich}
+      alt="A Union Jack hanging from the stone colonnades of the Old Royal Naval College, Greenwich"
+      heading="The old way of entrusting politicians isn't working"
+    />
+    <p>
+      It's not clear if any politicians put our interests first – or even if they could,
+      given the swamp of bureaucracy, finance and pressures of the global system with which
+      they contend.
+    </p>
+    <p>
+      The promise of elections tells us that if things are going wrong, we can elect
+      someone different, someone better. Yet how often have we voted with high hopes, only
+      to be let down?
+    </p>
+    <p>No wonder trust in politicians is the lowest it's ever been.</p>
+    <p>And more and more people are losing faith in the system itself.</p>
+
+    <Scene
+      src={march}
+      alt="A vast crowd of marchers with placards filling a city street, police watching from a bridge above"
+      heading="Our real danger"
+    />
+    <p>Plenty of people think this is just an efficiency problem.</p>
+    <p>
+      If politicians delivered, and things worked better, then everything would go back to
+      normal.
+    </p>
+    <p>But something deeper and far more dangerous stands in the way.</p>
+
+    <h2>We are becoming tribal</h2>
+    <p>
+      A perfect storm of social alienation, economic pressure, social and partisan media, is
+      driving us deeply apart.
+    </p>
+    <p>
+      Politicians don't help. Most pitch to one tribe or other in their quest for power.
+    </p>
+    <p>Our current system of democracy is not designed for this.</p>
+    <p>Our elections rely on the losers accepting defeat.</p>
+    <p>
+      But in a tribal society, it is highly unlikely that one side will consent to the rule
+      of the other.
+    </p>
+    <p>
+      This kind of division has ushered in dictatorships or even led to civil war in other
+      places, at other times.
+    </p>
+
+    <Scene
+      src={armsLinked}
+      alt="Two young men at a march, arms round each other, fists raised to a blue sky"
+      focus="50% 30%"
+      heading="But We The People still believe in democracy"
+    />
+    <p>
+      We believe we can rediscover our ability to talk, listen and compromise no matter how
+      difficult it seems right now.
+    </p>
+    <p>It will not happen through politicians, political parties or elections.</p>
+    <p>We need something new.</p>
+
+    <p class="pull">That is what this project is all about.</p>
+
+    <a class="back" href="/hope">Our Real Hope →</a>
+  </article>
+</Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    var back = document.querySelector('article.prose .back');
+    if (!back) return;
+    var fired = false;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !fired) {
+          fired = true;
+          window.posthog?.capture('problem_article_read');
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(back);
+  });
+</script>

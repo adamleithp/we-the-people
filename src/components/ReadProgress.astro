@@ -1,0 +1,32 @@
+---
+// A hairline under the header that fills as you read a long page. Scroll-driven
+// and transform-only; where scroll timelines aren't supported it isn't drawn.
+---
+
+<div class="read-progress" aria-hidden="true"></div>
+
+<style>
+  .read-progress {
+    display: none;
+  }
+  @supports (animation-timeline: scroll()) {
+    .read-progress {
+      display: block;
+      position: fixed;
+      top: 0;
+      inset-inline: 0;
+      z-index: 60;
+      height: 3px;
+      background: var(--color-wtp-dawn);
+      transform-origin: 0 50%;
+      transform: scaleX(0);
+      animation: read-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+  @keyframes read-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>

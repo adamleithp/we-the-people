@@ -1,0 +1,430 @@
+---
+/**
+ * I'm In for the white map pages (/map5): the sign-up form on a faint green
+ * card on the left, the words on the right set like the opening words above,
+ * a thank-you overlay, and the fixed pill that jumps here. The behaviour is
+ * src/scripts/signup.ts.
+ *
+ * Reads the page's --atlas-* colours and type, and --t-cta (when the page's
+ * entrance brings the pill in), from <body>.
+ */
+// mirrors the fields on wethepeoplegather.com's sign-up form, as JoinFooter does
+const CONTRIBUTIONS = [
+  'Democracy theory',
+  'Raising money',
+  'CA delivery',
+  'Media/Communications',
+  'Technology',
+  'Event production',
+  'Connections to cultural figures',
+  'Accounting/Legal',
+  'Other',
+];
+---
+
+<section class="join" id="im-in" aria-labelledby="im-in-title">
+  <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
+       Right now the only record of a sign-up is the PostHog person profile. -->
+  <form class="signup" data-signup novalidate>
+    <div class="field">
+      <label for="name">Your name</label>
+      <input id="name" type="text" name="name" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for="email">Your email</label>
+      <input id="email" type="email" name="email" autocomplete="email" required />
+    </div>
+    <div class="field">
+      <label for="contribution">How you can contribute</label>
+      <select id="contribution" name="contribution">
+        <option value="">Choose one…</option>
+        {CONTRIBUTIONS.map((c) => <option value={c}>{c}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="message">Anything else you'd like to tell us</label>
+      <textarea id="message" name="message" rows="4"></textarea>
+    </div>
+    <button type="submit">I'm In</button>
+  </form>
+
+  <div class="join__copy">
+    <h2 class="join__title" id="im-in-title">I'm In</h2>
+    <p>Thank you for your interest in taking an active part in our We The People movement.</p>
+    <p>The challenges ahead may be significant, but nothing is impossible if we all work together.</p>
+    <p>
+      There are many opportunities to actively contribute: organising, outreach, fundraising
+      or even just spreading the word in your circles that a new approach for our country and
+      our future exists.
+    </p>
+    <p>We know you will have questions, ideas, doubts. We want to hear them all.</p>
+    <p>
+      Our only request is that in signing <span class="where where--below">below</span><span class="where where--side">on the left</span> you pledge to lay your personal political
+      affiliations aside – just for now – in service to the objectives of this movement.
+    </p>
+    <ul class="join__pledge">
+      <li>Overcome our division</li>
+      <li>Reclaim our power</li>
+      <li>Transform our system</li>
+    </ul>
+    <p>
+      Sign up or email
+      <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
+    </p>
+  </div>
+</section>
+
+<!-- Shown once the sign-up event has been captured. Esc or the ✕ closes it. -->
+<div class="thanks" data-thanks hidden>
+  <div class="thanks__backdrop" data-thanks-dismiss></div>
+  <div class="thanks__panel" role="dialog" aria-modal="true" aria-labelledby="thanks-text">
+    <p class="thanks__text" id="thanks-text">
+      Thank you for joining us, we'll send over more information as soon as possible.
+    </p>
+    <button class="thanks__close" type="button" data-thanks-dismiss aria-label="Close">
+      <span aria-hidden="true">✕</span>
+    </button>
+  </div>
+</div>
+
+<!-- the entrance holds the dock's opacity, so the pill's own hide/show sits one level in -->
+<div class="atlas__dock">
+  <a class="atlas__join" href="#im-in" data-im-in-pill>I'm In</a>
+</div>
+
+<script>
+  import { initSignup } from '../scripts/signup';
+  const section = document.getElementById('im-in');
+  if (section) initSignup(section);
+</script>
+
+<style>
+
+  /* "in signing on the left" beside the form, "below" once it stacks under the words */
+  .where--side {
+    display: none;
+  }
+  @media (min-width: 860px) {
+    .where--side {
+      display: inline;
+    }
+    .where--below {
+      display: none;
+    }
+  }
+  .atlas__dock {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    animation: pill-in 0.9s var(--ease-out) var(--t-cta, 0s) both;
+  }
+  .atlas__join {
+    display: block;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    background: var(--color-wtp-dawn);
+    color: var(--color-wtp-ink);
+    font-family: var(--atlas-serif);
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      opacity 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out);
+  }
+  .atlas__join:active {
+    transform: scale(0.97);
+  }
+  /* the form is on screen — the pill has nothing left to point at */
+  .atlas__join.is-away {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+  }
+
+  /* --- I'm In ----------------------------------------------------------------
+     The sign-up, under the map: the form on the left on a faint green card,
+     the words on the right, set like the opening words above. */
+  .join {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: start;
+    width: 100%;
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: clamp(4rem, 12vh, 7rem) 1rem clamp(6rem, 16vh, 9rem);
+    border-top: 1px solid rgb(0 66 37 / 0.12);
+    scroll-margin-top: 1rem;
+    /* over the plates of glass that hang below the map */
+    position: relative;
+    z-index: 1;
+    background: #fff;
+  }
+  @media (min-width: 860px) {
+    .join {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: clamp(3rem, 7vw, 6rem);
+    }
+    .signup {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+  /* narrow screens: the words first, then the form */
+  @media (max-width: 859px) {
+    .join__copy {
+      order: -1;
+    }
+  }
+  .join__copy {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: start;
+    text-align: left;
+    color: var(--atlas-text);
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.7;
+    text-wrap: pretty;
+  }
+  .join__copy p {
+    max-width: 34rem;
+  }
+  .join__copy a {
+    color: var(--atlas-ink);
+    text-decoration-color: var(--color-wtp-dawn);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .join__title {
+    font-family: var(--font-lateef), Georgia, serif;
+    font-weight: 800;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    text-transform: uppercase;
+    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+    line-height: 0.9;
+    letter-spacing: 0.03em;
+    color: var(--atlas-ink);
+    margin-bottom: 0.4rem;
+  }
+  /* the pledge, set like the parts: dawn diamonds and spaced serif caps */
+  .join__pledge {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0.6rem 0;
+    padding: 0;
+    list-style: none;
+  }
+  .join__pledge li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--atlas-serif);
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--atlas-ink);
+  }
+  .join__pledge li::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    flex: none;
+    background: var(--color-wtp-dawn);
+    transform: rotate(45deg);
+  }
+
+  .signup {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 4vw, 2.4rem);
+    border: 1px solid rgb(0 66 37 / 0.14);
+    border-radius: 1rem;
+    background: rgb(0 66 37 / 0.035);
+  }
+  .field {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .field label {
+    font-family: var(--atlas-serif);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--atlas-ink);
+  }
+  .signup input,
+  .signup select,
+  .signup textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgb(0 66 37 / 0.22);
+    border-radius: 0.5rem;
+    background: #fff;
+    color: var(--atlas-text);
+    font: inherit;
+    font-size: 1rem;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .signup textarea {
+    resize: vertical;
+    min-height: 6rem;
+  }
+  .signup select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #5a6b60 50%),
+      linear-gradient(135deg, #5a6b60 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.15rem) 55%,
+      calc(100% - 0.85rem) 55%;
+    background-size:
+      0.32rem 0.32rem,
+      0.32rem 0.32rem;
+    background-repeat: no-repeat;
+    padding-right: 2.4rem;
+  }
+  .signup input:focus-visible,
+  .signup select:focus-visible,
+  .signup textarea:focus-visible {
+    outline: none;
+    border-color: var(--color-wtp-dawn);
+    box-shadow: 0 0 0 3px rgb(242 193 78 / 0.35);
+  }
+  .signup input:user-invalid,
+  .signup select:user-invalid {
+    border-color: #c4554f;
+  }
+  .signup button {
+    justify-self: start;
+    padding: 0.8rem 1.6rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-wtp-dawn);
+    color: var(--color-wtp-ink);
+    font-family: var(--atlas-serif);
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .signup button:active {
+    transform: scale(0.97);
+  }
+  .signup button:focus-visible {
+    outline: 2px solid var(--atlas-ink);
+    outline-offset: 3px;
+  }
+
+  /* --- thank-you overlay ---------------------------------------------------- */
+  .thanks {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    padding: 6vw;
+  }
+  .thanks[hidden] {
+    display: none;
+  }
+  .thanks__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(5 12 7 / 0.45);
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .thanks__panel {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.8rem;
+    max-width: 30rem;
+    padding: clamp(2rem, 6vw, 3rem);
+    border-radius: 1rem;
+    background: #fff;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+  .thanks.is-open .thanks__backdrop,
+  .thanks.is-open .thanks__panel {
+    opacity: 1;
+  }
+  .thanks.is-open .thanks__panel {
+    transform: none;
+  }
+  .thanks.is-closing .thanks__backdrop,
+  .thanks.is-closing .thanks__panel {
+    transition-duration: 150ms;
+  }
+  .thanks__text {
+    font-size: clamp(1.05rem, 3vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--atlas-text);
+  }
+  .thanks__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgb(0 66 37 / 0.25);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--atlas-ink);
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      transform 160ms var(--ease-out);
+  }
+  .thanks__close:active {
+    transform: scale(0.94);
+  }
+  .thanks__close:focus-visible {
+    outline: 2px solid var(--color-wtp-dawn);
+    outline-offset: 3px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .thanks__close:hover {
+      background-color: rgb(0 66 37 / 0.06);
+    }
+  }
+
+  @keyframes pill-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .atlas__dock {
+      animation: none;
+    }
+    .thanks__backdrop,
+    .thanks__panel,
+    .signup button,
+    .atlas__join {
+      transition: none;
+    }
+    .thanks__panel {
+      transform: none;
+    }
+  }
+</style>

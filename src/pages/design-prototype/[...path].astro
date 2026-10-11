@@ -1,0 +1,10 @@
+---
+import markup from '../../prototypes/homepage.html?raw';
+
+// This temporary route is available only in the development server.
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { path: undefined } }] : [];
+}
+---
+
+<Fragment set:html={markup} />
