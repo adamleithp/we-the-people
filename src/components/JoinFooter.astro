@@ -45,7 +45,7 @@ const { collapsed = false } = Astro.props;
     </li>
     <li>
       <span class="steps__title">Stay informed</span>
-      Receive important updates directly by email and SMS.
+      Receive important updates directly by email.
     </li>
     <li>
       <span class="steps__title">Get involved</span>
@@ -90,13 +90,13 @@ const { collapsed = false } = Astro.props;
       />
     </div>
 
-    <!-- TODO: link the privacy policy once it has a page -->
     <label class="consent">
       <input type="checkbox" name="consent" required />
       <span>
-        Yes — register me with We The People. I confirm that I consent to receiving
+        Yes — register me with <strong>We The People</strong>. I confirm that I consent to receiving
         occasional updates and news about meetings, events and ways to get involved by email.
-        I understand that I can unsubscribe at any time.
+        I understand that I can unsubscribe at any time. Read our
+        <a href="/privacy">privacy policy</a>.
       </span>
     </label>
 
@@ -168,9 +168,6 @@ const { collapsed = false } = Astro.props;
     font-size: var(--type-lg);
     line-height: 1.55;
     opacity: 0.9;
-  }
-  .lede a {
-    color: var(--color-wtp-dawn);
   }
   .lede strong {
     color: #fff;
@@ -302,8 +299,9 @@ const { collapsed = false } = Astro.props;
     padding: 0.85rem 2.4rem;
     border: 0;
     border-radius: 999px;
-    background: var(--color-wtp-dawn);
-    color: var(--color-wtp-ink);
+    /* the green the hero sets up (26 Oct doc: buttons match it) */
+    background: var(--color-wtp-green-500);
+    color: var(--color-wtp-paper);
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -419,8 +417,8 @@ const { collapsed = false } = Astro.props;
     display: block;
     padding: 0.85rem 1.7rem;
     border-radius: 999px;
-    background: var(--color-wtp-dawn);
-    color: var(--color-wtp-ink);
+    background: var(--color-wtp-green-500);
+    color: var(--color-wtp-paper);
     font-family: var(--font-wordmark);
     text-transform: uppercase;
     letter-spacing: 0.14em;

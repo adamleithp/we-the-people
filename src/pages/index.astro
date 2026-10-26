@@ -155,7 +155,7 @@ const SECTIONS = [
     font-size: var(--type-display-sm);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(246, 244, 238, 0.9);
+    color: var(--color-wtp-green-100);
   }
   /* --- the manifesto ------------------------------------------------------- */
   /* --- the first screen ------------------------------------------------- */
@@ -200,12 +200,6 @@ const SECTIONS = [
     .opening__line {
       animation: line-in 0.8s var(--ease-out) var(--at) both;
     }
-    /* the problem steps back once the answer arrives */
-    .opening__line:not(.opening__line--turn) {
-      animation:
-        line-in 0.8s var(--ease-out) var(--at) both,
-        line-recede 0.6s ease-in-out 3s forwards;
-    }
     .opening__cue {
       transform-origin: top;
       animation: cue-in 0.9s var(--ease-out) 3.4s both;
@@ -217,11 +211,6 @@ const SECTIONS = [
       transform: translateY(12px);
     }
   }
-  @keyframes line-recede {
-    to {
-      opacity: 0.4;
-    }
-  }
   @keyframes cue-in {
     from {
       opacity: 0;
@@ -229,14 +218,10 @@ const SECTIONS = [
     }
   }
 
-  /* --- the title: smaller than the cinematic intro size it was built for --- */
+  /* --- the title: the size every page title shares, not the cinematic
+     intro size `.pane--hero` was built for --- */
   :global(.pane--hero) {
-    --wordmark-size: min(clamp(2.8rem, 9vw, 7.5rem), 16vh);
-  }
-  @media (max-width: 640px) {
-    :global(.pane--hero) {
-      --wordmark-size: min(16vw, 18vh);
-    }
+    --wordmark-size: var(--wordmark-title);
   }
 
   /* a dawn hairline joining each step to the next */
@@ -262,7 +247,7 @@ const SECTIONS = [
     letter-spacing: 0.08em;
     font-size: var(--type-display-md);
     line-height: 1;
-    color: #fff;
+    color: var(--color-wtp-green-100);
   }
   .creed__body {
     margin: 0 0 clamp(2.6rem, 6vh, 3.6rem);

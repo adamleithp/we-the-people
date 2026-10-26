@@ -104,11 +104,31 @@
     border: 0;
   }
 
+  /* Links in running text read as the text they sit in, underlined with a
+     hairline of the same colour. Anything with a class (nav, buttons, cards,
+     pills) styles itself; page styles are unlayered, so they win anyway. */
+  :where(p, li, figcaption) a:not([class]) {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+
   /* The pane: the box a title is centred in. The glass intro and the page hero
      BOTH use it with the same modifier, which is what makes the assembled
      wordmark hand off to the real title without moving a pixel.
      `--lines` (set inline per title) sizes the min-height floor, so squat
      viewports never let out-of-flow content below spill onto the next section. */
+  /* The one size every page title shares — the homepage's WE THE PEOPLE and
+     each section's title alike. (`.pane--hero` keeps its larger cinematic size
+     for the video capture; the homepage sets it back to this.) */
+  :root {
+    --wordmark-title: min(clamp(2.8rem, 10vw, 8rem), 18vh);
+  }
+  @media (max-width: 640px) {
+    :root {
+      --wordmark-title: min(15vw, 18vh);
+    }
+  }
   .pane {
     height: var(--pane-h);
     min-height: calc(var(--wordmark-block) + var(--pane-slack));
@@ -129,15 +149,12 @@
   .pane--page {
     --pane-h: 56dvh;
     --pane-slack: 7rem;
-    --wordmark-size: min(clamp(2.6rem, 11vw, 8.5rem), 20vh);
+    --wordmark-size: var(--wordmark-title);
   }
   /* fill the width on phones — the lockup should feel like a poster */
   @media (max-width: 640px) {
     .pane--hero {
       --wordmark-size: min(21vw, 24vh);
-    }
-    .pane--page {
-      --wordmark-size: min(15vw, 20vh);
     }
   }
 
@@ -267,9 +284,6 @@
     margin-top: 3rem;
     font-size: var(--type-sm);
     color: rgba(246, 244, 238, 0.5);
-  }
-  .prose .footnote a {
-    color: inherit;
   }
   .prose .back {
     display: inline-block;

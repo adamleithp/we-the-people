@@ -23,6 +23,12 @@
     justify-content: space-between;
     padding: 1.35rem clamp(1.2rem, 4vw, 2.6rem);
     pointer-events: none; /* let the hero receive events; links re-enable below */
+    /* night, frosted: page titles and photographs pass underneath without the
+       nav sitting on top of them. Static, so the blur costs nothing per frame. */
+    background: rgba(5, 12, 7, 0.72);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   .site-header a {
     pointer-events: auto;

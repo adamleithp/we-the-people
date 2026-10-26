@@ -1,0 +1,121 @@
+---
+// Privacy policy — the client's draft (Oct 2026, Google Doc) corrected to how
+// the site actually works: what the I'm In form collects, PostHog (EU) for
+// analytics and the mailing list, GitHub Pages for hosting, no cookies.
+// If the form, analytics or hosting change, this page has to change with them.
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+---
+
+<Layout title="Privacy Policy — We The People" introLines={['Privacy', 'Policy']} joinCollapsed>
+  <PageHero lines={['Privacy', 'Policy']}>
+    <p class="hero__kicker fade-up">Last updated: October 2026</p>
+  </PageHero>
+
+  <article class="prose">
+    <h2>1. Who we are</h2>
+    <p>
+      This website, wethepeoplegather.com, is run by Edward Scarlett-Watts on behalf of the
+      <strong>We The People</strong> movement. Edward is responsible for how your personal data
+      is handled (the "data controller") and is the person to contact about data protection.
+    </p>
+    <p>If you have any questions about this policy or about your data, contact us at:</p>
+    <ul>
+      <li>Email: <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a></li>
+      <li>Post: Board Room, 8 Lansdown, Stroud GL5 1BD</li>
+    </ul>
+
+    <h2>2. What we collect</h2>
+    <p>When you sign up through the "I'm In" form, we collect:</p>
+    <ul>
+      <li>Your name and email address.</li>
+      <li>Your village, town or city, and your county.</li>
+      <li>
+        A record of your consent: that you ticked the consent box, and the date and time you did.
+      </li>
+    </ul>
+    <p>When you visit the site, whether or not you sign up, we also collect usage data:</p>
+    <ul>
+      <li>The pages you view and the links and buttons you click.</li>
+      <li>Your type of device and browser, and the site that referred you.</li>
+      <li>
+        Your approximate location (town or region), worked out from your IP address. We do not
+        keep your IP address itself.
+      </li>
+    </ul>
+
+    <h2>3. How we use it, and why we're allowed to</h2>
+    <p>
+      We use your sign-up details only to send you the updates, news about meetings and events,
+      and ways to get involved that you asked for, and to understand roughly where our
+      supporters are in the country. Under the UK General Data Protection Regulation (UK
+      GDPR), our lawful basis for this is your consent (Article 6(1)(a)).
+    </p>
+    <p>
+      We use the usage data to see how the site is used and to improve it. Our lawful basis
+      for this is our legitimate interest in running a website that works for everyone
+      (Article 6(1)(f)). It is never used to advertise to you.
+    </p>
+    <p>We will never sell, rent or trade your personal information.</p>
+
+    <h2>4. Cookies</h2>
+    <p>
+      This site does not set cookies, and does not store anything else in your browser to
+      recognise you on a later visit. That is why you won't see a cookie banner.
+    </p>
+
+    <h2>5. Who handles your data for us</h2>
+    <p>We use a small number of service providers, who only process your data on our behalf:</p>
+    <ul>
+      <li>
+        PostHog, for site analytics and our mailing list: your sign-up details and usage data
+        are stored in PostHog's EU data centre in Frankfurt, Germany, and our emails are sent
+        through it.
+      </li>
+      <li>Amazon Web Services (Amazon SES), which delivers those emails.</li>
+      <li>GitHub (GitHub Pages), which hosts the website.</li>
+      <li>
+        Our team inbox, hello@wethepeoplegather.com, which receives a copy of each new sign-up
+        so we can welcome you.
+      </li>
+    </ul>
+    <p>
+      Some of these companies are based in the United States. Where your data is transferred
+      outside the UK, it is protected by safeguards approved under UK data protection law,
+      such as the UK International Data Transfer Addendum or the UK–US data bridge.
+    </p>
+
+    <h2>6. How long we keep it</h2>
+    <p>
+      We keep your sign-up details for as long as you remain signed up. If you unsubscribe or
+      ask us to delete your data, we will remove your details from our mailing list and
+      analytics within 30 days. Usage data that isn't linked to a sign-up is deleted
+      automatically after a set period.
+    </p>
+
+    <h2>7. Your rights</h2>
+    <p>Under data protection law, you have rights over your personal information, including:</p>
+    <ul>
+      <li>
+        The right to withdraw consent: you can stop our emails at any time with the
+        "Unsubscribe" link at the bottom of every email we send, or by emailing us.
+      </li>
+      <li>The right of access: you can ask for a copy of the personal data we hold about you.</li>
+      <li>The right to rectification: you can ask us to correct anything that's wrong.</li>
+      <li>The right to erasure: you can ask us to delete your personal data at any time.</li>
+      <li>The right to object to our use of usage data.</li>
+    </ul>
+    <p>
+      To use any of these rights, email us at
+      <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
+    </p>
+
+    <h2>8. How to complain</h2>
+    <p>
+      If you have concerns about how we collect or use your data, please contact us first
+      using the details in section 1, so we can put it right. You also have the right to
+      complain to the UK Information Commissioner's Office (ICO) at
+      <a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>.
+    </p>
+  </article>
+</Layout>

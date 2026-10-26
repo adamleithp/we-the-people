@@ -23,6 +23,15 @@ if (!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN && process.env.CI) {
       // app itself is still eu.posthog.com — without ui_host, replay and toolbar
       // links would point at the proxy, which serves no app.
       ui_host: 'https://eu.posthog.com',
+      // No cookies and no browser storage: the visitor's ID lives in memory
+      // for the page view only, so the site needs no cookie banner (see
+      // /privacy). The proxy above doesn't do this — it only changes where
+      // events are sent. A sign-up still lands on the right person, because
+      // identify() runs on the same page as the form. The cost: visits aren't
+      // linked across page loads. (`cookieless_mode: 'always'` would keep that
+      // linking, but it drops every event unless "Cookieless server hash mode"
+      // is switched on in the project settings first.)
+      persistence: 'memory',
       defaults: '2026-01-30'
     });
     window.addEventListener('error', function(e) {

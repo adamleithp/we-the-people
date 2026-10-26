@@ -11,9 +11,9 @@ Legend: ✅ done in this pass · ⏳ blocked / needs an answer · 💤 not final
 |---|---|---|
 | Principle | Whole idea should make sense from the homepage alone | ✅ (creed + panels + banners) |
 | Hero image | Client's pick is a misty green valley at sunrise (Drive `1AQbbw8…`). Wants Adam's view | ✅ `src/assets/hero/misty-valley-2026-10-26.jpg` (2000px, sent in chat; source/licence to confirm) |
-| Tagline | "Reunite the Country · Transform the System" too small | ✅ bigger, brighter |
+| Tagline | "Reunite the Country · Transform the System" too small | ✅ bigger, in pale green |
 | Nav | "Our Problem" → "The Problem" | ✅ |
-| Creed | "Britain is in crisis…" → three blocks: COME BACK TOGETHER / RECLAIM COMMON SENSE / TRANSFORM OUR SYSTEM, centred. Animation optional — too many words, so centred text | ✅ centred, no line-by-line animation |
+| Creed | "Britain is in crisis…" → three blocks: COME BACK TOGETHER / RECLAIM COMMON SENSE / TRANSFORM OUR SYSTEM, centred. Animation optional | ✅ three blocks, centred, rise in on scroll. **Deviation (Adam's call):** "Britain is in crisis…" is kept, not replaced — it's the first screen, landing line by line, and WE THE PEOPLE assembles from glass as you scroll down to it |
 | Panels | Delete 01/02/03 numbers | ✅ |
 | Problem panel | Title "The Real Problem"; blurb "We won't fix anything until we fix this - the depth of our divisions."; CTA "Dive deeper →" in green; image = two-sided protest (Drive `1_gnyN9…`) | ✅ |
 | Hope panel | Blurb "A way for us to come back together and reclaim our power."; CTA "Find out how →"; image = candles (iStock-1345688597) | ✅ |
@@ -22,10 +22,10 @@ Legend: ✅ done in this pass · ⏳ blocked / needs an answer · 💤 not final
 | I'm In copy | Short version + 1. Register / 2. Stay informed / 3. Get involved | ✅ (global component) |
 | I'm In form | Name, email, village/town/city, county. Drops "how you can contribute" + "anything else" | ✅ ⚠ PostHog person props change — check Welcome Email workflow doesn't use `contribution` |
 | GDPR consent | Required consent checkbox above the button with the client's wording | ✅ |
-| Privacy policy | Needs a link — separate page? Draft in Google Doc with questions for Adam | ⏳ no page yet; not linked |
+| Privacy policy | Needs a link — separate page? Draft in Google Doc with questions for Adam | ⏳ no page yet; not linked. Needs the policy finalised (and Adam's answers to its questions) |
 | Socials banner | FOLLOW THE MOVEMENT / "Follow the story of We The People." + YouTube @edscarlettwatts, X @watts_edward | ✅ |
 | Final banner | WE THE PEOPLE / TO THE FUTURE. WITH HOPE. in hero font | ✅ |
-| Button/subheading colour | Switch I'm In button + subheadings to green once the new hero sets a green colour space | ⏳ waits on hero image (CTA links already green) |
+| Button/subheading colour | Switch I'm In button + subheadings to green once the new hero sets a green colour space | ✅ I'm In pill + form button green; tagline and the three step headings pale green; panel links green |
 
 ## The Real Problem
 
@@ -33,8 +33,8 @@ Legend: ✅ done in this pass · ⏳ blocked / needs an answer · 💤 not final
 |---|---|---|
 | Page title | Delete "01" kicker (title now "The Real Problem" to match nav/panel) | ✅ |
 | We All Know… | Image = burning flats (iStock-477835648); keep the larger type size throughout; new copy | ✅ |
-| The Old Way | Image = Westminster at dusk (iStock-475453539); heading "We can't trust politicians to fix anything."; new copy, keep line spacing | ✅ |
-| Our Real Danger | Image = two-sided protest (same as panel); delete the "efficiency problem" block; new copy with SO WE FEEL MORE DIVIDED THAN EVER caps header | ✅ |
+| The Old Way | Image = Westminster at dusk (iStock-475453539); heading "We can't trust politicians to fix anything."; new copy, keep line spacing | ✅ (one paragraph per line of the doc) |
+| Our Real Danger | Image = two-sided protest (same as panel); delete the "efficiency problem" block; new copy with SO WE FEEL MORE DIVIDED THAN EVER caps header | ✅ (doc typo "work them out though the system" set as "through") |
 | But We The People Still Believe… | Image = Union flags crowd (iStock-1131336465) | ✅ |
 | I'm In | Remove, sticky CTA only | ✅ |
 
@@ -52,4 +52,4 @@ Legend: ✅ done in this pass · ⏳ blocked / needs an answer · 💤 not final
 
 ## Sitewide 💤
 
-- Bold **We The People** wherever it appears in running text (applied on Home + Real Problem now).
+- Bold **We The People** wherever it appears in running text (applied on Home, The Real Problem and I'm In, including the consent line; not yet on Hope / Be Part of It).

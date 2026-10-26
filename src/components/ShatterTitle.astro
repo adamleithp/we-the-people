@@ -173,14 +173,18 @@ const fold = shards.map(() => ({
   .stitle__base {
     grid-area: 1 / 1;
   }
-  /* the shard stack sits exactly on the heading: same box, same centring.
-     `visibility: hidden` (not just opacity: 0) so an idle title paints nothing
-     at all — the stack is a few dozen clipped photo plates. */
+  /* The shard stack is centred on the heading, like it, but bleeds past its
+     box on every side. Anton's caps rise ~0.02em above a 0.84 line box, so a
+     stack cut to the heading's own box sliced the tops off the letters; the
+     bleed is equal all round, so the centred copies still land on the same
+     pixels. `visibility: hidden` (not just opacity: 0) so an idle title
+     paints nothing at all — the stack is a few dozen clipped photo plates. */
+  .stitle__glass,
+  .stitle__flight {
+    position: absolute;
+    inset: calc(var(--wordmark-size, 1em) * -0.12);
+  }
   .stitle__glass {
-    grid-area: 1 / 1;
-    position: relative;
-    width: 100%;
-    height: 100%;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -244,11 +248,15 @@ const fold = shards.map(() => ({
 
   /* Desktop pointers only: the whole effect is a pointer field. */
   @media (hover: hover) and (pointer: fine) {
-    /* the swap is instant and pixel-identical, so it reads as nothing happening */
-    .stitle.is-live .stitle__base {
+    /* The swap waits for the first piece to actually move (`is-broken`), not
+       for the pointer to come near (`is-live`, which only arms the layers).
+       Promoted, perspective-projected copies never rasterise quite like the
+       flat heading — a fraction of a pixel off, a touch softer — and swapping
+       on approach showed that on a title that hadn't moved yet. */
+    .stitle.is-broken .stitle__base {
       visibility: hidden;
     }
-    .stitle.is-live .stitle__glass {
+    .stitle.is-broken .stitle__glass {
       opacity: 1;
       visibility: visible;
     }
@@ -283,10 +291,6 @@ const fold = shards.map(() => ({
     @media (prefers-reduced-motion: no-preference) {
       .stitle__flight {
         display: block;
-        grid-area: 1 / 1;
-        position: relative;
-        width: 100%;
-        height: 100%;
         pointer-events: none;
         perspective: 1200px;
         animation: flight-done step-end both;
@@ -370,38 +374,46 @@ const fold = shards.map(() => ({
     };
     type Field = {
       root: HTMLElement;
+      /** the shard stack: piece centroids are fractions of its box, not the title's */
+      stage: HTMLElement;
       pieces: Piece[];
       box: DOMRect;
       armed: boolean;
       live: boolean;
+      broken: boolean;
     };
 
     const num = (el: HTMLElement, key: string) => Number(el.dataset[key]) || 0;
 
     const fields: Field[] = [
       ...document.querySelectorAll<HTMLElement>('[data-shatter-title]'),
-    ].map((root) => ({
-      root,
-      box: root.getBoundingClientRect(),
-      armed: false,
-      live: false,
-      pieces: [...root.querySelectorAll<HTMLElement>('.sshard')].map((el) => ({
-        el,
-        ink: el.querySelector<HTMLElement>('.sshard__ink'),
-        cut: el.querySelector<HTMLElement>('.sshard__cut'),
-        face: el.querySelector<HTMLElement>('.sshard__face'),
-        cx: num(el, 'cx') / 100,
-        cy: num(el, 'cy') / 100,
-        push: num(el, 'push'),
-        dz: num(el, 'dz'),
-        tilt: num(el, 'tilt'),
-        spin: num(el, 'spin'),
-        shrink: num(el, 'shrink'),
-        dim: num(el, 'dim'),
-        k: 0,
-        on: false,
-      })),
-    }));
+    ].map((root) => {
+      const stage = root.querySelector<HTMLElement>('.stitle__glass') ?? root;
+      return {
+        root,
+        stage,
+        box: stage.getBoundingClientRect(),
+        armed: false,
+        live: false,
+        broken: false,
+        pieces: [...root.querySelectorAll<HTMLElement>('.sshard')].map((el) => ({
+          el,
+          ink: el.querySelector<HTMLElement>('.sshard__ink'),
+          cut: el.querySelector<HTMLElement>('.sshard__cut'),
+          face: el.querySelector<HTMLElement>('.sshard__face'),
+          cx: num(el, 'cx') / 100,
+          cy: num(el, 'cy') / 100,
+          push: num(el, 'push'),
+          dz: num(el, 'dz'),
+          tilt: num(el, 'tilt'),
+          spin: num(el, 'spin'),
+          shrink: num(el, 'shrink'),
+          dim: num(el, 'dim'),
+          k: 0,
+          on: false,
+        })),
+      };
+    });
 
     if (fields.length) {
       let px = -1e5;
@@ -424,7 +436,7 @@ const fold = shards.map(() => ({
 
       const frame = () => {
         if (boxesDirty) {
-          for (const field of fields) field.box = field.root.getBoundingClientRect();
+          for (const field of fields) field.box = field.stage.getBoundingClientRect();
           boxesDirty = false;
         }
 
@@ -491,11 +503,16 @@ const fold = shards.map(() => ({
             if (p.face) p.face.style.opacity = (k * p.dim).toFixed(3);
           }
 
-          // the glass stack is only shown while something is actually folded
+          // layers are armed as the pointer nears; the glass is only shown
+          // while something is actually folded
           const live = folded || near;
           if (live !== field.live) {
             field.live = live;
             field.root.classList.toggle('is-live', live);
+          }
+          if (folded !== field.broken) {
+            field.broken = folded;
+            field.root.classList.toggle('is-broken', folded);
           }
           if (live) busy = true;
         }
