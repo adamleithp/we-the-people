@@ -13,16 +13,21 @@ interface Props {
   /** the title, one entry per line */
   lines: string[];
   variant?: 'hero' | 'page';
+  /** assemble the title from glass as the hero scrolls in (no load-time intro) */
+  assemble?: boolean;
 }
-const { lines, variant = 'page' } = Astro.props;
+const { lines, variant = 'page', assemble = false } = Astro.props;
 const hasBelow = Astro.slots.has('default');
 const hasBackdrop = Astro.slots.has('backdrop');
 ---
 
-<section class={`pane pane--${variant} hero`} style={`--lines:${lines.length}`}>
+<section
+  class:list={['pane', `pane--${variant}`, 'hero', { 'hero--assemble': assemble }]}
+  style={`--lines:${lines.length}`}
+>
   {hasBackdrop && <slot name="backdrop" />}
   <div class="hero__inner">
-    <ShatterTitle lines={lines} cols={variant === 'hero' ? 8 : 7} rows={3} />
+    <ShatterTitle lines={lines} cols={variant === 'hero' ? 8 : 7} rows={3} assemble={assemble} />
     {
       hasBelow && (
         <div class="hero__below">
@@ -36,6 +41,8 @@ const hasBackdrop = Astro.slots.has('backdrop');
 <style>
   .hero {
     position: relative; /* the backdrop slot is absolutely filled to this box */
+    /* the scroll timeline the assembling title and the backdrop share */
+    view-timeline: --hero block;
     text-align: center;
     align-content: center;
   }

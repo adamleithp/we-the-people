@@ -11,17 +11,24 @@ interface Props {
   /** the page's own title for the glass intro, one entry per line */
   introLines?: string[];
   introVariant?: 'hero' | 'page';
+  /** false: no load-time glass overlay (the homepage builds its title on scroll) */
+  intro?: boolean;
+  /** keep I'm In folded away until the pill opens it */
+  joinCollapsed?: boolean;
 }
 
 const {
   title = 'We The People',
   introLines = ['We The', 'People'],
   introVariant = 'page',
+  intro = true,
+  joinCollapsed = false,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en-GB">
+<!-- without the overlay nothing clears the page to arrive, so it starts cleared -->
+<html lang="en-GB" class={intro ? undefined : 'intro-done'}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -35,9 +42,9 @@ const {
   <body>
     <!-- every page opens with its own title in glass; the header and the
          I'm In sign-up are global -->
-    <GlassIntro lines={introLines} variant={introVariant} />
+    {intro && <GlassIntro lines={introLines} variant={introVariant} />}
     <Header />
     <slot />
-    <JoinFooter />
+    <JoinFooter collapsed={joinCollapsed} />
   </body>
 </html>

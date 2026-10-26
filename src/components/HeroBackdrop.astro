@@ -6,9 +6,9 @@
  * The other candidates live in `src/assets/hero/`; <ShatterTitle> uses them as
  * its portrait fallback until `src/assets/faces/` has images.
  *
- * The source is 2560px wide — the largest size this ever paints — and goes
- * through `<Picture>` rather than `public/`, so a phone downloads a ~9 kB
- * 640px plate instead of the desktop one. The masters stay out of `public/`
+ * The source is the client's pick from 26 Oct, 2000px wide — the largest size
+ * this paints — and goes through `<Picture>` rather than `public/`, so a phone
+ * downloads a small 640px plate instead of the desktop one. The masters stay out of `public/`
  * for the same reason: it ships files untouched.
  *
  * WebP only, deliberately. AVIF was measured on this photo and lost at every
@@ -17,7 +17,7 @@
  * AVIF first hands most browsers the heavier file.
  */
 import { Picture } from 'astro:assets';
-import source from '../assets/hero/istock-1246131595-dawn-mist.jpg';
+import source from '../assets/hero/misty-valley-2026-10-26.jpg';
 ---
 
 <div class="backdrop" aria-hidden="true">
@@ -25,7 +25,7 @@ import source from '../assets/hero/istock-1246131595-dawn-mist.jpg';
     class="backdrop__img"
     src={source}
     alt=""
-    widths={[640, 1280, 1920, 2560]}
+    widths={[640, 1280, 2000]}
     sizes="100vw"
     formats={['webp']}
     quality={72}
@@ -34,6 +34,7 @@ import source from '../assets/hero/istock-1246131595-dawn-mist.jpg';
     decoding="async"
   />
   <div class="backdrop__scrim"></div>
+  <div class="backdrop__veil"></div>
 </div>
 
 <style>
@@ -47,24 +48,82 @@ import source from '../assets/hero/istock-1246131595-dawn-mist.jpg';
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* the sun sits just above the midline — bias the crop so it survives on
-       tall phone viewports, where a centred crop cuts it out of frame */
-    object-position: center 40%;
+    /* the bright band of mist sits just above the midline — bias the crop so
+       it survives on tall phone viewports */
+    object-position: center 45%;
     /* the photo is atmosphere, not the subject */
     opacity: 0.8;
   }
-  /* darkens top and bottom so the header and the wordmark stay legible */
+  /* night at top and bottom: the land rises out of the opening screen's dark
+     and sinks back into the page below */
   .backdrop__scrim {
     position: absolute;
     inset: 0;
     background:
       linear-gradient(
         to bottom,
-        rgba(5, 12, 7, 0.45),
-        rgba(5, 12, 7, 0.1) 38%,
+        var(--color-wtp-night, #050c07),
+        rgba(5, 12, 7, 0.1) 32%,
         rgba(5, 12, 7, 0.35) 78%,
         var(--color-wtp-night, #050c07)
       ),
       radial-gradient(120% 80% at 50% 45%, transparent 30%, rgba(5, 12, 7, 0.3));
+  }
+  /* night closing over the land as you scroll on into the words */
+  .backdrop__veil {
+    position: absolute;
+    inset: 0;
+    background: var(--color-wtp-night, #050c07);
+    opacity: 0;
+  }
+
+  /* On the hero's own scroll timeline (`--hero`, set by <PageHero>): the land
+     drifts slower than the page the whole way through (it is further off);
+     night lifts off it as it comes in — dawn, as the title assembles — and
+     settles back as it leaves. Transform/opacity only. Without scroll
+     timelines, or with reduced motion, the hero simply stays still. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .backdrop__img {
+        /* pre-scaled so the drift never shows an edge */
+        transform: scale(1.1);
+        animation: backdrop-drift linear both;
+        animation-timeline: --hero;
+        animation-range: cover 0% cover 100%;
+      }
+      .backdrop__veil {
+        animation:
+          backdrop-dawn ease-out both,
+          backdrop-dusk linear forwards;
+        animation-timeline: --hero, --hero;
+        animation-range:
+          entry 0% entry 100%,
+          exit 0% exit 100%;
+      }
+    }
+  }
+  @keyframes backdrop-drift {
+    from {
+      transform: scale(1.1) translateY(-3%);
+    }
+    to {
+      transform: scale(1.1) translateY(4%);
+    }
+  }
+  @keyframes backdrop-dawn {
+    from {
+      opacity: 0.85;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes backdrop-dusk {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.6;
+    }
   }
 </style>

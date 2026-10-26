@@ -391,7 +391,7 @@ const LEVELS = [
     max-width: 46ch;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 6rem) 1.5rem clamp(2.5rem, 7vh, 4rem);
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-size: var(--type-lg);
     line-height: 1.6;
     text-align: center;
     text-wrap: balance;
@@ -437,20 +437,20 @@ const LEVELS = [
   }
   .level__n {
     font-family: var(--font-wordmark);
-    font-size: 0.85rem;
+    font-size: var(--type-xs);
     letter-spacing: 0.28em;
     color: var(--color-wtp-dawn);
   }
   .level__title {
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    font-size: var(--type-display-lg);
     line-height: 0.95;
     color: #fff;
   }
   .level__teaser {
     max-width: 26ch;
-    font-size: 1rem;
+    font-size: var(--type-base);
     line-height: 1.55;
     color: rgba(246, 244, 238, 0.78);
   }
@@ -526,7 +526,7 @@ const LEVELS = [
     padding: clamp(3rem, 9vw, 5.5rem) calc(50vw - 50%);
     background: var(--color-wtp-green);
     color: #fff;
-    font-size: clamp(1.3rem, 3vw, 1.75rem);
+    font-size: var(--type-xl);
     line-height: 1.4;
     text-wrap: balance;
   }
@@ -556,7 +556,7 @@ const LEVELS = [
     border-radius: 999px;
     background: var(--color-wtp-green);
     color: var(--color-wtp-paper);
-    font-size: 0.72rem;
+    font-size: var(--type-xs);
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
@@ -601,7 +601,7 @@ const LEVELS = [
     margin: 1.2rem 0 0 !important;
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: 1.15rem;
+    font-size: var(--type-display-sm);
     letter-spacing: 0.04em;
     color: var(--color-wtp-green);
   }
@@ -612,7 +612,7 @@ const LEVELS = [
   }
   .stage__when {
     margin: 0 0 0.3rem !important;
-    font-size: 0.75rem;
+    font-size: var(--type-xs);
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--color-wtp-dawn);
@@ -622,7 +622,7 @@ const LEVELS = [
     margin: 0 0 0.8rem;
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-size: var(--type-display-md);
     line-height: 1;
     color: #fff;
   }

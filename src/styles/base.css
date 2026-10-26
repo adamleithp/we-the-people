@@ -76,6 +76,32 @@
   :root {
     /* strong ease-out — the built-in curves are too weak to read as intentional */
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* The type scale. Every font size on the site is one of these; nothing else.
+       Text steps run ~1.125 apart, display (Anton) steps ~1.5. Each is fluid
+       between a phone and a wide desktop, so nothing needs its own clamp().
+       The wordmark is the one exception: its size is the `.pane` contract. */
+    --type-xs: 0.78rem; /* tracked caps: kickers, labels, nav, link CTAs */
+    --type-sm: 0.875rem; /* small print: consent, footnotes, buttons */
+    --type-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem); /* body */
+    --type-lg: clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem); /* intros, ledes */
+    --type-xl: clamp(1.1875rem, 1.05rem + 0.6vw, 1.4rem); /* lead lines, statements */
+    --type-display-sm: clamp(1.15rem, 1rem + 0.6vw, 1.4rem); /* small caps headings */
+    --type-display-md: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem); /* section headings */
+    --type-display-lg: clamp(2rem, 1.5rem + 2.4vw, 3rem); /* card and band titles */
+    --type-display-xl: clamp(2.6rem, 1.8rem + 4vw, 4.5rem); /* photo headings, sign-offs */
+  }
+  /* read by screen readers, never seen */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* The pane: the box a title is centred in. The glass intro and the page hero
@@ -164,7 +190,7 @@
     font-family: var(--font-wordmark);
     text-transform: uppercase;
     letter-spacing: 0.3em;
-    font-size: 0.78rem;
+    font-size: var(--type-xs);
     color: var(--color-wtp-dawn);
   }
 
@@ -173,21 +199,21 @@
     max-width: 70ch;
     margin-inline: auto;
     padding: 1rem 1.5rem clamp(6rem, 16vh, 10rem);
-    font-size: clamp(1.02rem, 1.1rem, 1.15rem);
+    font-size: var(--type-base);
     line-height: 1.7;
     color: rgba(246, 244, 238, 0.86);
   }
   /* the page's opening statement — the title itself lives in <PageHero> */
   .prose .prose__opener {
     margin: 0 0 2.2rem;
-    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    font-size: var(--type-display-lg);
     line-height: 1;
   }
   .prose h2 {
     margin: 3.4rem 0 1rem;
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(1.45rem, 4vw, 2.1rem);
+    font-size: var(--type-display-md);
     line-height: 1.05;
     letter-spacing: 0.02em;
     color: #fff;
@@ -218,11 +244,11 @@
     font-family: var(--font-wordmark);
     text-transform: uppercase;
     letter-spacing: 0.34em;
-    font-size: 0.78rem;
+    font-size: var(--type-xs);
     color: var(--color-wtp-dawn);
   }
   .prose .lead {
-    font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+    font-size: var(--type-xl);
     line-height: 1.5;
     color: #fff;
     margin-bottom: 2rem;
@@ -233,13 +259,13 @@
     border-left: 2px solid var(--color-wtp-dawn);
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+    font-size: var(--type-display-md);
     line-height: 1.15;
     color: #fff;
   }
   .prose .footnote {
     margin-top: 3rem;
-    font-size: 0.85rem;
+    font-size: var(--type-sm);
     color: rgba(246, 244, 238, 0.5);
   }
   .prose .footnote a {
@@ -252,7 +278,7 @@
     text-decoration: none;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-size: 0.82rem;
+    font-size: var(--type-xs);
   }
   .prose .back:hover {
     color: #fff;

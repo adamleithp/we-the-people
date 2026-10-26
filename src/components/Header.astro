@@ -6,7 +6,7 @@
 <header class="site-header fade-up" style="--fade-delay:0.24s">
   <a class="wordmark" href="/">We the People</a>
   <nav>
-    <a class="action" href="/problem"><span class="action__our">Our </span>Problem</a>
+    <a class="action" href="/problem"><span class="action__our">The </span>Problem</a>
     <a class="action" href="/hope"><span class="action__our">Our </span>Hope</a>
     <a class="action" href="/be-part-of-it">Be Part of It</a>
   </nav>
@@ -32,7 +32,7 @@
     color: var(--color-wtp-paper, #f6f4ee);
   }
   .wordmark {
-    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    font-size: var(--type-display-sm);
     letter-spacing: 0.06em;
     line-height: 1;
   }
@@ -41,18 +41,30 @@
     gap: clamp(0.9rem, 3vw, 2rem);
   }
   .action {
-    font-size: clamp(0.72rem, 1.6vw, 0.92rem);
+    font-size: var(--type-xs);
     letter-spacing: 0.14em;
     white-space: nowrap;
     padding: 0.4rem 0.15rem;
     border-bottom: 2px solid transparent;
     transition: border-color 0.2s ease;
   }
-  .action:hover,
+  @media (hover: hover) and (pointer: fine) {
+    .action:hover {
+      border-color: var(--color-wtp-dawn, #f2c14e);
+    }
+  }
   .action:focus-visible {
     border-color: var(--color-wtp-dawn, #f2c14e);
   }
-  /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "Our …" doesn't */
+  /* fingers need 44px; the type stays small, the hit area grows */
+  @media (pointer: coarse) {
+    .action {
+      display: grid;
+      align-items: center;
+      min-height: 2.75rem;
+    }
+  }
+  /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "The/Our …" doesn't */
   @media (max-width: 560px) {
     .action__our {
       display: none;

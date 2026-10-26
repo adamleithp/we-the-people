@@ -49,6 +49,7 @@
  */
 import { getImage } from 'astro:assets';
 import { shatter, mulberry32 } from '../lib/shards';
+import { INTRO, INTRO_SEED } from '../lib/intro';
 
 interface Props {
   /** the title, one entry per line */
@@ -56,8 +57,11 @@ interface Props {
   /** grid the title is broken on — cols × rows × 2 triangles */
   cols?: number;
   rows?: number;
+  /** fly the title together from glass as its hero (`--hero`) scrolls in —
+   *  the intro's shatter, on the scroll timeline instead of the clock */
+  assemble?: boolean;
 }
-const { lines, cols = 6, rows = 3 } = Astro.props;
+const { lines, cols = 6, rows = 3, assemble = false } = Astro.props;
 
 /* Both folders are globbed at build time; dropping a file into `faces/` is
    still the whole job. Sorted so rebuilds stay byte-stable. */
@@ -86,6 +90,9 @@ const faces = await Promise.all(
 );
 
 const shards = shatter(cols, rows, 20260804);
+// the intro's own pieces and throw, so it reads as the same glass
+const flight = assemble ? shatter(INTRO.hero.cols, INTRO.hero.rows, INTRO_SEED) : [];
+const maxDelay = Math.max(0.001, ...flight.map((s) => s.delay));
 const html = lines.join('<br />');
 
 /**
@@ -105,8 +112,27 @@ const fold = shards.map(() => ({
 }));
 ---
 
-<div class="stitle" data-shatter-title>
+<div class:list={['stitle', { 'stitle--assemble': assemble }]} data-shatter-title>
   <h1 class="wtp-wordmark stitle__base" set:html={html} />
+  {
+    assemble && (
+      <div class="stitle__flight" aria-hidden="true">
+        {flight.map((s) => (
+          <div
+            class="fshard"
+            style={`left:${s.bx.toFixed(4)}%;top:${s.by.toFixed(4)}%;width:${s.bw.toFixed(4)}%;height:${s.bh.toFixed(4)}%;clip-path:${s.clip};transform-origin:${s.origin};--tx:${s.tx.toFixed(1)}vw;--ty:${s.ty.toFixed(1)}vh;--rz:${s.rz.toFixed(1)}deg;--rx:${s.rx.toFixed(1)}deg;--ry:${s.ry.toFixed(1)}deg;--sc:${s.sc.toFixed(2)};--dn:${(s.delay / maxDelay).toFixed(3)}`}
+          >
+            <div
+              class="sshard__in"
+              style={`left:${s.ox.toFixed(4)}%;top:${s.oy.toFixed(4)}%;width:${s.sw.toFixed(4)}%;height:${s.sh.toFixed(4)}%;`}
+            >
+              <p class="wtp-wordmark" set:html={html} />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
   <div class="stitle__glass" aria-hidden="true">
     {
       shards.map((s, i) => (
@@ -240,6 +266,74 @@ const fold = shards.map(() => ({
   @media (prefers-reduced-motion: reduce) {
     .stitle__glass {
       display: none;
+    }
+  }
+
+  /* --- assembling on scroll ------------------------------------------------ */
+  /* The intro's `shard-assemble`, driven by the hero scrolling in rather than
+     by the clock. Each piece's stagger becomes a later start on the scroll
+     range (`--dn`, 0–1). The real heading stays hidden until the last piece is
+     home, then the two swap in one step — pixel-identical, so no seam and no
+     crossfade. Scrolling back up breaks it again. Without scroll timelines, or
+     with reduced motion, there is no flight layer: the heading just sits. */
+  .stitle__flight {
+    display: none;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .stitle__flight {
+        display: block;
+        grid-area: 1 / 1;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        perspective: 1200px;
+        animation: flight-done step-end both;
+        animation-timeline: --hero;
+        animation-range: entry 0% entry 100%;
+      }
+      .stitle--assemble .stitle__base {
+        animation: base-land step-end both;
+        animation-timeline: --hero;
+        animation-range: entry 0% entry 100%;
+      }
+      .fshard {
+        position: absolute;
+        overflow: hidden;
+        backface-visibility: hidden;
+        will-change: transform, opacity;
+        animation: shard-assemble cubic-bezier(0.16, 1, 0.3, 1) both;
+        animation-timeline: --hero;
+        animation-range: entry calc(5% + var(--dn) * 25%) entry calc(70% + var(--dn) * 30%);
+      }
+    }
+  }
+  @keyframes flight-done {
+    to {
+      visibility: hidden;
+    }
+  }
+  @keyframes base-land {
+    from {
+      opacity: 0;
+    }
+  }
+  /* same keyframes as GlassIntro's — keep the two in step */
+  @keyframes shard-assemble {
+    0% {
+      opacity: 0;
+      transform: translate3d(var(--tx), var(--ty), 0) rotate3d(1, 0, 0, var(--rx))
+        rotate3d(0, 1, 0, var(--ry)) rotate(var(--rz)) scale(var(--sc));
+    }
+    10% {
+      opacity: 1;
+      transform: translate3d(var(--tx), var(--ty), 0) rotate3d(1, 0, 0, var(--rx))
+        rotate3d(0, 1, 0, var(--ry)) rotate(var(--rz)) scale(var(--sc));
+    }
+    100% {
+      opacity: 1;
+      transform: none;
     }
   }
 </style>

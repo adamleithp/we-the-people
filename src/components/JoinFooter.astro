@@ -1,80 +1,104 @@
 ---
-// Mirrors the fields on wethepeoplegather.com's sign-up form.
-const CONTRIBUTIONS = [
-  'Democracy theory',
-  'Raising money',
-  'CA delivery',
-  'Media/Communications',
-  'Technology',
-  'Event production',
-  'Connections to cultural figures',
-  'Accounting/Legal',
-  'Other',
-];
+interface Props {
+  /** folded away until the pill (or a #im-in link) opens it */
+  collapsed?: boolean;
+}
+const { collapsed = false } = Astro.props;
 ---
 
 <!-- I'M IN: the sign-up, at the foot of every page. The pill stays in reach
-     while you read and steps aside once the form itself is on screen. -->
+     while you read and steps aside once the form itself is on screen. Where
+     `collapsed`, the form stays hidden until the pill asks for it, so people
+     learn what the project is before being asked to sign up. -->
 <!-- .fade-up's animation holds opacity, so the pill's own hide/show sits one level in -->
 <div class="im-in-dock fade-up" style="--fade-delay:0.36s">
-  <a class="im-in-pill" href="#im-in" data-im-in-pill>I'm In</a>
+  <a
+    class="im-in-pill"
+    href="#im-in"
+    data-im-in-pill
+    aria-controls={collapsed ? 'im-in' : undefined}
+    aria-expanded={collapsed ? 'false' : undefined}>I'm In</a
+  >
 </div>
 
-<footer class="join" id="im-in" aria-labelledby="im-in-title">
+<footer
+  class="join"
+  id="im-in"
+  aria-labelledby="im-in-title"
+  data-collapsible={collapsed ? '' : undefined}
+  hidden={collapsed}
+>
   <div class="join__copy">
-  <h2 class="join__title" id="im-in-title">I'm In</h2>
+  <h2 class="join__title" id="im-in-title" tabindex="-1">I'm In</h2>
   <p class="lede">
-    Thank you for your interest in taking an active part in our We The People movement.
-  </p>
-  <p class="lede">
-    The challenges ahead may be significant, but nothing is impossible if we all work
-    together.
+    The challenges ahead may be significant, but nothing is impossible if
+    <strong>We The People</strong> work together.
   </p>
   <p class="lede">
-    There are many opportunities to actively contribute: organising, outreach, fundraising
-    or even just spreading the word in your circles that a new approach for our country and
-    our future exists.
+    Sign up <span class="where where--below">below</span><span class="where where--side">here</span>
+    or email <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
   </p>
-  <p class="lede">We know you will have questions, ideas, doubts. We want to hear them all.</p>
-  <p class="lede">
-    Our only request is that in signing <span class="where where--below">below</span><span class="where where--side">on the right</span> you pledge to lay your personal political
-    affiliations aside – just for now – in service to the objectives of this movement.
-  </p>
-  <p class="pledge">
-    Overcome our division<br />
-    Reclaim our power<br />
-    Transform our system
-  </p>
-  <p class="lede">
-    Sign up or email
-    <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
-  </p>
+  <ol class="steps">
+    <li>
+      <span class="steps__title">Register</span>
+      Tell us who you are and where you are based.
+    </li>
+    <li>
+      <span class="steps__title">Stay informed</span>
+      Receive important updates directly by email and SMS.
+    </li>
+    <li>
+      <span class="steps__title">Get involved</span>
+      Be ready for conversations, events and opportunities to take action.
+    </li>
+  </ol>
   </div>
   <!-- TODO: also wire to a real list provider (Mailchimp / Action Network / …).
        Right now the only record of a sign-up is the PostHog person profile. -->
   <form class="signup" data-signup novalidate>
     <div class="field">
-      <label for="name">Your name</label>
-      <input id="name" type="text" name="name" autocomplete="name" required />
+      <label for="name">Name</label>
+      <input id="name" type="text" name="name" autocomplete="name" spellcheck="false" required />
     </div>
 
     <div class="field">
-      <label for="email">Your email</label>
+      <label for="email">Email address</label>
       <input id="email" type="email" name="email" autocomplete="email" required />
     </div>
 
     <div class="field">
-      <label for="contribution">How you can contribute</label>
-      <select id="contribution" name="contribution">
-        <option value="">Choose one…</option>
-        {CONTRIBUTIONS.map((c) => <option value={c}>{c}</option>)}
-      </select>
+      <label for="town">Village, town or city</label>
+      <input
+        id="town"
+        type="text"
+        name="town"
+        autocomplete="address-level2"
+        spellcheck="false"
+        required
+      />
     </div>
 
     <div class="field">
-      <label for="message">Anything else you'd like to tell us</label>
-      <textarea id="message" name="message" rows="4"></textarea>
+      <label for="county">County</label>
+      <input
+        id="county"
+        type="text"
+        name="county"
+        autocomplete="address-level1"
+        spellcheck="false"
+        required
+      />
     </div>
+
+    <!-- TODO: link the privacy policy once it has a page -->
+    <label class="consent">
+      <input type="checkbox" name="consent" required />
+      <span>
+        Yes — register me with We The People. I confirm that I consent to receiving
+        occasional updates and news about meetings, events and ways to get involved by email.
+        I understand that I can unsubscribe at any time.
+      </span>
+    </label>
 
     <button type="submit">I'm In</button>
   </form>
@@ -134,27 +158,72 @@ const CONTRIBUTIONS = [
     margin: 0 0 0.8rem;
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(3rem, 10vw, 6rem);
+    font-size: var(--type-display-xl);
     line-height: 0.9;
     color: #fff;
   }
   .lede {
     margin: 0;
     max-width: 36rem;
-    font-size: clamp(1rem, 2.6vw, 1.2rem);
+    font-size: var(--type-lg);
     line-height: 1.55;
     opacity: 0.9;
   }
   .lede a {
     color: var(--color-wtp-dawn);
   }
-  .pledge {
-    margin: 0.8rem 0;
+  .lede strong {
+    color: #fff;
+  }
+  .steps {
+    display: grid;
+    gap: 1.2rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps li {
+    position: relative;
+    max-width: 36rem;
+    padding-left: 2.6rem;
+    font-size: var(--type-base);
+    line-height: 1.5;
+    opacity: 0.9;
+    counter-increment: step;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    font-family: var(--font-wordmark);
+    font-size: var(--type-display-md);
+    line-height: 1;
+    color: var(--color-wtp-dawn);
+  }
+  .steps__title {
+    display: block;
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(1.3rem, 3.4vw, 1.9rem);
-    line-height: 1.2;
-    color: var(--color-wtp-dawn);
+    letter-spacing: 0.06em;
+    font-size: var(--type-display-sm);
+    color: #fff;
+  }
+  /* a collapsed footer opening on the pill's click */
+  .join.is-opening {
+    animation: join-open 0.5s var(--ease-out) both;
+  }
+  @keyframes join-open {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .join.is-opening {
+      animation: none;
+    }
   }
   /* the form card is a neutral near-black, not green, so the fields read as
      a tool on the page rather than another panel of it */
@@ -180,14 +249,12 @@ const CONTRIBUTIONS = [
     gap: 0.4rem;
   }
   .field label {
-    font-size: 0.78rem;
+    font-size: var(--type-xs);
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: rgba(246, 244, 238, 0.6);
   }
-  .signup input,
-  .signup select,
-  .signup textarea {
+  .signup input {
     width: 100%;
     padding: 0.8rem 1rem;
     border: 1px solid var(--line);
@@ -195,39 +262,40 @@ const CONTRIBUTIONS = [
     background: var(--field);
     color: var(--color-wtp-paper, #f6f4ee);
     font-family: inherit;
-    font-size: 1rem;
+    font-size: var(--type-base);
     transition: border-color 150ms ease;
   }
-  .signup textarea {
-    resize: vertical;
-    min-height: 6rem;
-  }
-  .signup select {
-    appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, rgba(246, 244, 238, 0.6) 50%),
-      linear-gradient(135deg, rgba(246, 244, 238, 0.6) 50%, transparent 50%);
-    background-position:
-      calc(100% - 1.15rem) 55%,
-      calc(100% - 0.85rem) 55%;
-    background-size:
-      0.32rem 0.32rem,
-      0.32rem 0.32rem;
-    background-repeat: no-repeat;
-    padding-right: 2.4rem;
-  }
-  .signup option {
-    background: var(--field);
-    color: var(--color-wtp-paper);
-  }
-  .signup input:focus-visible,
-  .signup select:focus-visible,
-  .signup textarea:focus-visible {
+  .signup input:focus-visible {
     outline: none;
     border-color: var(--color-wtp-dawn);
   }
-  .signup input:user-invalid,
-  .signup select:user-invalid {
+  .signup input:user-invalid {
     border-color: #e0736d;
+  }
+  .consent {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    font-size: var(--type-sm);
+    line-height: 1.5;
+    color: rgba(246, 244, 238, 0.75);
+    cursor: pointer;
+  }
+  .signup .consent input {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0.15rem 0 0;
+    padding: 0;
+    accent-color: var(--color-wtp-dawn);
+  }
+  /* the field rule above recolours a border a checkbox doesn't draw */
+  .signup .consent input:focus-visible {
+    outline: 2px solid var(--color-wtp-dawn);
+    outline-offset: 2px;
+  }
+  .join__title:focus {
+    outline: none;
   }
   .signup button {
     justify-self: start;
@@ -239,7 +307,7 @@ const CONTRIBUTIONS = [
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-size: 1rem;
+    font-size: var(--type-base);
     cursor: pointer;
     transition: transform 160ms var(--ease-out);
   }
@@ -297,7 +365,7 @@ const CONTRIBUTIONS = [
   }
   .thanks__text {
     margin: 0;
-    font-size: clamp(1.05rem, 3vw, 1.3rem);
+    font-size: var(--type-lg);
     line-height: 1.5;
     color: #fff;
   }
@@ -356,7 +424,7 @@ const CONTRIBUTIONS = [
     font-family: var(--font-wordmark);
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    font-size: 0.95rem;
+    font-size: var(--type-sm);
     text-decoration: none;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     transition:
@@ -398,9 +466,31 @@ const CONTRIBUTIONS = [
         }
       }, { threshold: 0.15 }).observe(footer);
     }
+    // a collapsed footer opens on the pill, or on arriving at #im-in
+    function openJoin() {
+      if (!footer || !footer.hidden) return;
+      footer.hidden = false;
+      footer.classList.add('is-opening');
+      // html glides anchor jumps; this one is the system answering a press, so it's instant
+      footer.scrollIntoView({ block: 'start', behavior: 'instant' });
+      if (pill) pill.setAttribute('aria-expanded', 'true');
+      // a keyboard lands straight in the form; on touch, focusing a field would
+      // throw the on-screen keyboard up before they've read a word
+      var target = matchMedia('(pointer: fine)').matches
+        ? document.getElementById('name')
+        : document.getElementById('im-in-title');
+      if (target) target.focus({ preventScroll: true });
+    }
+    if (footer && footer.hidden && location.hash === '#im-in') openJoin();
+
     if (pill) {
-      pill.addEventListener('click', function () {
+      pill.addEventListener('click', function (e) {
         window.posthog?.capture('im_in_pill_clicked', { path: location.pathname });
+        if (footer && footer.hidden) {
+          e.preventDefault();
+          openJoin();
+          history.replaceState(null, '', '#im-in');
+        }
       });
     }
 
@@ -475,23 +565,23 @@ const CONTRIBUTIONS = [
         var data = new FormData(form);
         var email = String(data.get('email') || '').trim();
         var name = String(data.get('name') || '').trim();
-        var contribution = String(data.get('contribution') || '').trim();
-        var message = String(data.get('message') || '').trim();
+        var town = String(data.get('town') || '').trim();
+        var county = String(data.get('county') || '').trim();
 
-        // PII (email, name, free text) goes on the person profile — PostHog's
-        // rule is PII belongs in identify(), never in capture() properties.
+        // PII (email, name, where they live) goes on the person profile —
+        // PostHog's rule is PII belongs in identify(), never in capture() properties.
+        // The consent timestamp is the GDPR record of the opt-in.
         window.posthog?.identify(email, {
           email: email,
           name: name,
-          contribution: contribution,
-          message: message,
+          town: town,
+          county: county,
+          email_consent: true,
+          email_consent_at: new Date().toISOString(),
         });
         // The event records that a sign-up happened, with only the
         // non-identifying bits as properties so it stays safe to break down on.
-        window.posthog?.capture('join_us_submitted', {
-          contribution: contribution || 'not_specified',
-          has_message: message.length > 0,
-        });
+        window.posthog?.capture('join_us_submitted', { county: county });
 
         form.reset();
         openThanks();

@@ -6,79 +6,71 @@ import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import Scene from '../components/Scene.astro';
 import ReadProgress from '../components/ReadProgress.astro';
-import crowd from '../assets/story/problem-01-crowd-police.jpg';
-import greenwich from '../assets/story/problem-02-greenwich-flag.jpg';
-import march from '../assets/story/problem-03-march.jpg';
-import armsLinked from '../assets/story/problem-04-arms-linked.jpg';
+import fire from '../assets/story/problem-v2-01-fire.jpg';
+import westminster from '../assets/story/problem-v2-02-westminster-dusk.jpg';
+import twoSides from '../assets/story/problem-v2-03-two-sides.jpg';
+import unionFlags from '../assets/story/problem-v2-04-union-flags.jpg';
 ---
 
-<Layout title="Our Real Problem — We The People" introLines={['Our Real', 'Problem']}>
-  <PageHero lines={['Our Real', 'Problem']}>
-    <p class="hero__kicker fade-up">Part 01</p>
-  </PageHero>
+<Layout
+  title="The Real Problem — We The People"
+  introLines={['The Real', 'Problem']}
+  joinCollapsed
+>
+  <PageHero lines={['The Real', 'Problem']} />
 
   <ReadProgress />
   <article class="prose">
     <Scene
       first
       eager
-      src={crowd}
-      alt="A packed crowd on a British street at dusk, police officers in hi-vis among them"
+      src={fire}
+      alt="Smoke and flames pouring from the roof of a block of flats"
       heading="We all know things are going wrong. We all feel it."
     />
 
     <p class="lead">
-      Like you, everyone has their own list: cost of living, inequality, immigration, the
-      march to war, the climate, the water, the trains, even potholes…
+      Like you, everyone has their own list of concerns: cost of living, inequality,
+      immigration, war, the climate, the water, the trains, even potholes…
     </p>
-    <p>Whatever we care about, effective action is so rarely taken.</p>
-    <p>
-      And we're left feeling disillusioned, angry, afraid and powerless above all.
+    <p class="lead">Whatever we care about, so little gets done.</p>
+    <p class="lead">
+      We're left feeling let down, angry, afraid and like we don’t have the power to do
+      anything about it.
     </p>
 
     <Scene
-      src={greenwich}
-      alt="A Union Jack hanging from the stone colonnades of the Old Royal Naval College, Greenwich"
-      heading="The old way of entrusting politicians isn't working"
+      src={westminster}
+      alt="The Houses of Parliament in silhouette against a stormy evening sky"
+      heading="We can’t trust politicians to fix anything."
     />
+    <p>It’s not clear if any politicians put our interests first.</p>
+    <p>Perhaps red-tape, finance and the global system make it near impossible.</p>
     <p>
-      It's not clear if any politicians put our interests first – or even if they could,
-      given the swamp of bureaucracy, finance and pressures of the global system with which
-      they contend.
+      When things go wrong, we’re promised that we can elect someone different, someone
+      better.
     </p>
-    <p>
-      The promise of elections tells us that if things are going wrong, we can elect
-      someone different, someone better. Yet how often have we voted with high hopes, only
-      to be let down?
-    </p>
-    <p>No wonder trust in politicians is the lowest it's ever been.</p>
-    <p>And more and more people are losing faith in the system itself.</p>
+    <p>But how often do we vote with high hopes, only to be let down?</p>
+    <p>It’s no wonder trust in politicians – and our system – is at an all time low.</p>
 
     <Scene
-      src={march}
-      alt="A vast crowd of marchers with placards filling a city street, police watching from a bridge above"
+      src={twoSides}
+      alt="Two protests split down the middle: Stand Up To Racism placards on one side, St George's flags on the other"
       heading="Our real danger"
     />
-    <p>Plenty of people think this is just an efficiency problem.</p>
+    <p>This system failure couldn’t come at a worse time.</p>
     <p>
-      If politicians delivered, and things worked better, then everything would go back to
-      normal.
+      Tech has made us lonelier and more disconnected. Our daily lives are getting tougher.
+      And our media, old and new, profits by pitting us against one another.
     </p>
-    <p>But something deeper and far more dangerous stands in the way.</p>
+    <p>Politicians are the same. They pitch to one side or the other to gain power.</p>
 
-    <h2>We are becoming tribal</h2>
+    <h2>So we feel more divided than ever</h2>
+    <p>Our democracy wasn’t designed for this.</p>
     <p>
-      A perfect storm of social alienation, economic pressure, social and partisan media, is
-      driving us deeply apart.
-    </p>
-    <p>
-      Politicians don't help. Most pitch to one tribe or other in their quest for power.
-    </p>
-    <p>Our current system of democracy is not designed for this.</p>
-    <p>Our elections rely on the losers accepting defeat.</p>
-    <p>
-      But in a tribal society, it is highly unlikely that one side will consent to the rule
-      of the other.
+      Our elections rely on the losers accepting defeat. But when we’re this fractured, we
+      struggle to accept the policies brought in by the other side. Our differences are so
+      deep, we can't work them out through the system any more.
     </p>
     <p>
       This kind of division has ushered in dictatorships or even led to civil war in other
@@ -86,9 +78,8 @@ import armsLinked from '../assets/story/problem-04-arms-linked.jpg';
     </p>
 
     <Scene
-      src={armsLinked}
-      alt="Two young men at a march, arms round each other, fists raised to a blue sky"
-      focus="50% 30%"
+      src={unionFlags}
+      alt="A crowd waving Union flags, arms raised and cheering"
       heading="But We The People still believe in democracy"
     />
     <p>

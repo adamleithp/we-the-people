@@ -33,3 +33,16 @@ wide; Astro resizes them to WebP at build.
 | country-04-festival | The site as a festival. **Replaced:** Unsplash, Alex Vasey (`9H-pUdPxXbk`), Brussels |
 | country-05-child | A child looking into the great unknown. **Replaced:** Unsplash, wang binghua (`7x5De0j7boQ`) |
 | country-06-jubilee | Triumphal, united national celebration. **Replaced:** Unsplash, Sam (`K0fjQrOPKB4`), The Mall, London (Platinum Jubilee) |
+
+## 26 Oct 2026 photo pack (client-supplied iStock, licensed by WTP)
+
+From `we the people - High Res Website Photo pack 26 Oct 2026.zip`, resized to 2400px.
+
+| File | Source | Slot |
+|---|---|---|
+| `problem-v2-01-fire.jpg` | iStock-477835648 | Real Problem: We all know things are going wrong |
+| `problem-v2-02-westminster-dusk.jpg` | iStock-475453539 | Real Problem: We can't trust politicians |
+| `problem-v2-03-two-sides.jpg` | client composite (Google Drive `1_gnyN9…`) | Real Problem: Our real danger + homepage panel |
+| `problem-v2-04-union-flags.jpg` | iStock-1131336465 | Real Problem: We The People still believe in democracy |
+| `home-hope-candles.jpg` | iStock-1345688597 | Homepage: Our Real Hope panel |
+| `home-part-tea.jpg` | iStock-2221195931 | Homepage: Be Part of It panel |

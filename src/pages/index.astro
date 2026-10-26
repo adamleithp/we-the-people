@@ -3,35 +3,38 @@ import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import HeroBackdrop from '../components/HeroBackdrop.astro';
 import { Image } from 'astro:assets';
-import problemImg from '../assets/our-real-problem-jonny-gios-8iq0yqemBuU-unsplash.jpg';
-import hopeImg from '../assets/our-real-hope-jonathan-harrison-G4UAlDJeJFk-unsplash.jpg';
-import partImg from '../assets/be-part-of-it-priscilla-du-preez-3gAiajAfjXI-unsplash.jpg';
+import problemImg from '../assets/story/problem-v2-03-two-sides.jpg';
+import hopeImg from '../assets/story/home-hope-candles.jpg';
+import partImg from '../assets/story/home-part-tea.jpg';
+
+// the first screen: the problem, then the turn; the title answers it below
+const OPENING = [
+  'Britain is in crisis.',
+  '<strong>We The People</strong> is a vision for how we can change',
+  'our fortunes and our future together.',
+  'The task is enormous.',
+  'This is how it begins.',
+];
 
 const SECTIONS = [
   {
-    n: '01',
-    title: 'Our Real Problem',
-    blurb:
-      'We all have opinions on what needs to be done. But there is a deeper threat which almost no-one is trying to fix.',
-    cta: 'See the problem',
+    title: 'The Real Problem',
+    blurb: 'We won’t fix anything until we fix this – the depth of our divisions.',
+    cta: 'Dive deeper',
     href: '/problem',
     image: problemImg,
   },
   {
-    n: '02',
     title: 'Our Real Hope',
-    blurb:
-      'Both ancient and new, a practical plan for how we overcome our divisions and start to turn things around.',
-    cta: 'See the hope',
+    blurb: 'A way for us to come back together and reclaim our power.',
+    cta: 'Find out how',
     href: '/hope',
     image: hopeImg,
   },
   {
-    n: '03',
     title: 'Be Part of It',
-    blurb:
-      'Here are ways to help make it happen by yourself, in your community and for our country.',
-    cta: 'Find your part',
+    blurb: 'How to make it happen: in your life, your community and our country.',
+    cta: 'What you can do',
     href: '/be-part-of-it',
     image: partImg,
   },
@@ -41,27 +44,61 @@ const SECTIONS = [
 <Layout
   title="We The People — Reunite the Country, Transform the System"
   introLines={['We The', 'People']}
-  introVariant="hero"
+  intro={false}
+  joinCollapsed
 >
   <main>
-    <!-- the intro's pane matches this one, so the assembled wordmark lands here -->
-    <PageHero lines={['We The', 'People']} variant="hero">
+    <!-- the first screen: the words land one by one as the page opens -->
+    <section class="opening">
+      <p>
+        {
+          OPENING.map((line, i) => (
+            <span
+              class:list={['opening__line', { 'opening__line--turn': i === OPENING.length - 1 }]}
+              style={`--at:${[0.25, 0.9, 1.25, 1.95, 2.75][i]}s`}
+              set:html={line}
+            />
+          ))
+        }
+      </p>
+      <span class="opening__cue" aria-hidden="true"></span>
+    </section>
+
+    <!-- the answer: the title flies together from glass as this scrolls in -->
+    <PageHero lines={['We The', 'People']} variant="hero" assemble>
       <HeroBackdrop slot="backdrop" />
-      <!-- the tagline starts as the glass lifts -->
-      <p class="hero__tagline fade-up">Reunite the Country · Transform the System</p>
+      <p class="hero__tagline">Reunite the Country · Transform the System</p>
     </PageHero>
 
     <section class="creed">
-      <p class="creed__body">
-        Britain is in crisis. We The People is a vision of how we can change our
-        fortunes – and our future – together. The task is enormous. This is how it begins.
+      <span class="thread" aria-hidden="true"></span>
+      <h2 class="creed__head reveal">Come back together</h2>
+      <p class="creed__body reveal">
+        In a moment when Britain feels so fractured, <strong>We The People</strong> aims to
+        inspire a wave of national reconnection and reconciliation over the issue that most
+        divides us: immigration.
       </p>
+      <span class="thread" aria-hidden="true"></span>
+      <h2 class="creed__head reveal">Reclaim common sense</h2>
+      <p class="creed__body reveal">
+        By giving power to everyday people, we will learn to trust each other again,
+        rebuilding our country’s age-old capacity for common sense: both practical wisdom and
+        a sense of shared understanding.
+      </p>
+      <span class="thread" aria-hidden="true"></span>
+      <h2 class="creed__head reveal">Transform our system</h2>
+      <p class="creed__body reveal">
+        In that way, we’ll showcase a new people-powered way for our system to work – where
+        we make the decisions on the issues that most affect our lives. A system far better
+        suited to the complex challenges we face.
+      </p>
+      <span class="thread thread--long" aria-hidden="true"></span>
     </section>
 
     <section class="panels" id="sections">
       {
-        SECTIONS.map((s) => (
-          <a class="panel" href={s.href}>
+        SECTIONS.map((s, i) => (
+          <a class="panel" href={s.href} style={`--i:${i}`}>
             <Image
               class="panel__img"
               src={s.image}
@@ -72,44 +109,176 @@ const SECTIONS = [
               format="webp"
               quality={70}
             />
-            <span class="panel__n">{s.n}</span>
+            <span class="panel__shade" aria-hidden="true" />
             <h2 class="panel__title">{s.title}</h2>
             <p class="panel__blurb">{s.blurb}</p>
             <span class="panel__cta">
-              {s.cta} <span aria-hidden="true">→</span>
+              {s.cta} <span class="panel__arrow" aria-hidden="true">→</span>
             </span>
           </a>
         ))
       }
     </section>
 
+    <section class="socials" aria-labelledby="socials-title">
+      <h2 class="socials__title" id="socials-title">Follow the movement</h2>
+      <p class="socials__body">Follow the story of <strong>We The People</strong>.</p>
+      <ul class="socials__links">
+        <li style="--i:0">
+          <a href="https://www.youtube.com/@edscarlettwatts" rel="noopener" target="_blank"
+            >YouTube<span class="sr-only"> (opens in a new tab)</span></a
+          >
+        </li>
+        <li style="--i:1">
+          <a href="https://x.com/watts_edward" rel="noopener" target="_blank"
+            >X<span class="sr-only"> (formerly Twitter, opens in a new tab)</span></a
+          >
+        </li>
+      </ul>
+    </section>
+
+    <section class="sign-off" aria-label="We The People — to the future, with hope">
+      <p class="sign-off__mark">
+        <span class="sign-off__word" style="--i:0">We</span>
+        <span class="sign-off__word" style="--i:1">The</span>
+        <span class="sign-off__word" style="--i:2">People</span>
+      </p>
+      <p class="sign-off__line">To the future. With hope.</p>
+    </section>
   </main>
 </Layout>
 
 <style>
   .hero__tagline {
     margin: 0;
-    font-size: clamp(0.85rem, 2.2vw, 1.05rem);
-    letter-spacing: 0.28em;
+    font-family: var(--font-wordmark);
+    font-size: var(--type-display-sm);
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(246, 244, 238, 0.62);
+    color: rgba(246, 244, 238, 0.9);
   }
   /* --- the manifesto ------------------------------------------------------- */
+  /* --- the first screen ------------------------------------------------- */
+  .opening {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100svh;
+    padding: 6rem 1.5rem;
+    text-align: center;
+  }
+  .opening p {
+    margin: 0;
+    text-wrap: balance;
+    font-size: var(--type-xl);
+    line-height: 1.7;
+    color: #fff;
+  }
+  /* one line per row, as the doc sets them */
+  .opening__line {
+    display: block;
+  }
+  /* the turn from the problem to the movement */
+  .opening__line--turn {
+    margin-top: 0.6em;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--type-display-md);
+    color: var(--color-wtp-dawn);
+  }
+  /* a hairline at the foot of the screen: there's more, keep going */
+  .opening__cue {
+    position: absolute;
+    bottom: clamp(1.5rem, 5vh, 3rem);
+    left: 50%;
+    width: 1px;
+    height: clamp(2.5rem, 7vh, 4rem);
+    background: linear-gradient(to bottom, transparent, var(--color-wtp-dawn));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .opening__line {
+      animation: line-in 0.8s var(--ease-out) var(--at) both;
+    }
+    /* the problem steps back once the answer arrives */
+    .opening__line:not(.opening__line--turn) {
+      animation:
+        line-in 0.8s var(--ease-out) var(--at) both,
+        line-recede 0.6s ease-in-out 3s forwards;
+    }
+    .opening__cue {
+      transform-origin: top;
+      animation: cue-in 0.9s var(--ease-out) 3.4s both;
+    }
+  }
+  @keyframes line-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @keyframes line-recede {
+    to {
+      opacity: 0.4;
+    }
+  }
+  @keyframes cue-in {
+    from {
+      opacity: 0;
+      transform: scaleY(0);
+    }
+  }
+
+  /* --- the title: smaller than the cinematic intro size it was built for --- */
+  :global(.pane--hero) {
+    --wordmark-size: min(clamp(2.8rem, 9vw, 7.5rem), 16vh);
+  }
+  @media (max-width: 640px) {
+    :global(.pane--hero) {
+      --wordmark-size: min(16vw, 18vh);
+    }
+  }
+
+  /* a dawn hairline joining each step to the next */
+  .thread {
+    display: block;
+    width: 1px;
+    height: clamp(3.5rem, 9vh, 5.5rem);
+    margin: 0 auto clamp(1.8rem, 4vh, 2.6rem);
+    background: linear-gradient(to bottom, var(--color-wtp-bramble), var(--color-wtp-dawn));
+    transform-origin: top;
+  }
   .creed {
-    max-width: 46ch; /* short measure — it should read like a letter, not a page */
+    max-width: 52ch;
     margin-inline: auto;
-    padding: clamp(4rem, 12vh, 8rem) 1.5rem clamp(4rem, 12vh, 7rem);
-    text-align: left;
+    padding: clamp(4rem, 12vh, 8rem) 1.5rem 0;
+    text-align: center;
+  }
+  .creed__head {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--type-display-md);
+    line-height: 1;
+    color: #fff;
   }
   .creed__body {
-    margin: 0;
-    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
-    line-height: 1.85;
+    margin: 0 0 clamp(2.6rem, 6vh, 3.6rem);
+    font-size: var(--type-lg);
+    line-height: 1.8;
     letter-spacing: 0.005em;
-    text-wrap: pretty;
+    text-wrap: balance;
     color: rgba(246, 244, 238, 0.82);
   }
-  .creed__body::first-line {
+  /* the last step runs on down into the three parts */
+  .thread--long {
+    height: clamp(7rem, 22vh, 13rem);
+    margin-bottom: 0;
+  }
+  .creed strong,
+  .socials strong {
     color: #fff;
   }
   /* --- three flexed sections ---------------------------------------------- */
@@ -144,44 +313,162 @@ const SECTIONS = [
     height: 100%;
     object-fit: cover;
     opacity: 0.2;
-    transition: opacity 0.45s var(--ease-out);
+    transition: opacity 250ms ease;
   }
-  .panel:hover .panel__img,
+  /* touch taps fire :hover on the way to navigating — only real pointers get it */
+  @media (hover: hover) and (pointer: fine) {
+    .panel:hover .panel__img {
+      opacity: 0.5;
+    }
+    .panel:hover .panel__arrow {
+      transform: translateX(4px);
+    }
+  }
   .panel:focus-visible .panel__img {
     opacity: 0.5;
+  }
+  /* holds the photograph back until the words are in; it fades rather than
+     the image itself, so the image's own hover transition is left alone */
+  .panel__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-wtp-night);
+    opacity: 0;
+    pointer-events: none;
   }
   .panel:focus-visible {
     outline: 2px solid var(--color-wtp-dawn);
     outline-offset: -4px;
   }
-  .panel__n {
-    font-family: var(--font-wordmark);
-    font-size: 0.85rem;
-    letter-spacing: 0.28em;
-    color: var(--color-wtp-dawn);
-  }
   .panel__title {
     margin: 0;
     font-family: var(--font-wordmark);
     text-transform: uppercase;
-    font-size: clamp(2rem, 5vw, 3.1rem);
+    font-size: var(--type-display-lg);
     line-height: 0.95;
     color: #fff;
   }
   .panel__blurb {
     margin: 0;
     max-width: 34ch;
-    font-size: 1rem;
+    font-size: var(--type-base);
     line-height: 1.6;
     color: rgba(246, 244, 238, 0.72);
   }
   .panel__cta {
     margin-top: auto;
     padding-top: 1.6rem;
-    font-size: 0.8rem;
+    font-size: var(--type-xs);
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    font-weight: 700;
+    color: var(--color-wtp-green-300);
+  }
+  .panel__arrow {
+    display: inline-block;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  /* --- follow the movement ------------------------------------------------ */
+  .socials {
+    position: relative;
+    isolation: isolate;
+    padding: clamp(4rem, 12vh, 7rem) 1.5rem;
+    text-align: center;
+    border-top: 1px solid var(--color-wtp-bramble);
+    background: var(--color-wtp-green);
+  }
+  .socials__title {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: var(--type-display-lg);
+    line-height: 0.95;
+    color: #fff;
+  }
+  .socials__body {
+    margin: 0 0 2rem;
+    font-size: var(--type-lg);
+    color: rgba(246, 244, 238, 0.82);
+  }
+  .socials__links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .socials__links a {
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem; /* 44px tap target */
+    min-width: 2.75rem;
+    padding: 0 1.6rem;
+    border: 1px solid rgba(246, 244, 238, 0.35);
+    border-radius: 999px;
+    font-size: var(--type-xs);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
     color: var(--color-wtp-paper);
+    transition:
+      border-color 200ms ease,
+      transform 160ms var(--ease-out);
+  }
+  .socials__links a:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .socials__links a:hover {
+      border-color: var(--color-wtp-paper);
+    }
+  }
+  .socials__links a:focus-visible {
+    border-color: var(--color-wtp-paper);
+    outline: 2px solid var(--color-wtp-dawn);
+    outline-offset: 3px;
+  }
+
+  /* --- sign-off ------------------------------------------------------------ */
+  .sign-off {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(6rem, 18vh, 10rem) 1.5rem;
+    text-align: center;
+    border-top: 1px solid var(--color-wtp-bramble);
+  }
+  /* dawn again, low on the horizon — the page ends where the hero began */
+  .sign-off::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(60% 70% at 50% 100%, rgba(242, 193, 78, 0.22), transparent 70%);
+    pointer-events: none;
+  }
+  .sign-off__word {
+    display: inline-block;
+  }
+  .sign-off p {
+    margin: 0;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    line-height: 0.95;
+  }
+  .sign-off__mark {
+    font-size: var(--type-display-xl);
+    color: #fff;
+  }
+  .sign-off .sign-off__line {
+    margin-top: 0.6rem;
+    font-size: var(--type-display-md);
+    letter-spacing: 0.06em;
+    color: var(--color-wtp-dawn);
   }
 
 
@@ -190,6 +477,166 @@ const SECTIONS = [
       min-height: auto;
       border-right: 0;
       border-bottom: 1px solid var(--color-wtp-bramble);
+    }
+  }
+
+  /* --- arriving on scroll ------------------------------------------------- */
+  /* Each block rises in as it enters the viewport, driven by the scroll
+     timeline, not script: transform and opacity only, and browsers without
+     scroll timelines (or with reduced motion) simply show it. Blocks further
+     down a section start later, so they cascade without a timer. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal var(--ease-out) both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 90%;
+      }
+      /* each step's thread draws down into it */
+      .thread {
+        animation: draw linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 45%;
+      }
+    }
+  }
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  /* The three parts arrive in order: each one's title and words, left to
+     right, then the photographs come up behind them, then the links. Side
+     by side they share the row's timeline; stacked on a phone each piece
+     runs on its own as it scrolls in. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* the tagline follows the title home */
+      .hero__tagline {
+        animation: reveal var(--ease-out) both;
+        animation-timeline: --hero;
+        animation-range: entry 80% entry 100%;
+      }
+      .panel__title,
+      .panel__blurb,
+      .panel__shade,
+      .panel__cta {
+        animation-timeline: view();
+      }
+      .panel__title,
+      .panel__blurb {
+        animation: reveal var(--ease-out) both;
+        animation-range: entry 20% entry 90%;
+      }
+      .panel__shade {
+        animation: unshade ease-out both;
+        animation-range: cover 20% cover 40%;
+      }
+      .panel__cta {
+        animation: reveal var(--ease-out) both;
+        animation-range: cover 30% cover 45%;
+      }
+    }
+    @media (prefers-reduced-motion: no-preference) and (min-width: 641px) {
+      .panels {
+        view-timeline: --panels block;
+      }
+      .panel__title,
+      .panel__blurb,
+      .panel__shade,
+      .panel__cta {
+        animation-timeline: --panels;
+      }
+      .panel__title,
+      .panel__blurb {
+        animation-range: cover calc(4% + var(--i) * 7%) cover calc(18% + var(--i) * 7%);
+      }
+      .panel__shade {
+        animation-range: cover calc(30% + var(--i) * 3%) cover calc(44% + var(--i) * 3%);
+      }
+      .panel__cta {
+        animation-range: cover 42% cover 52%;
+      }
+    }
+  }
+  /* Follow the Movement: the green band rises up from the cards' edge, then
+     its words, then each link. The closing banner: dawn comes back up behind
+     it, WE / THE / PEOPLE land word by word, and the line follows. The page
+     ends here, so its ranges sit inside `entry`, the stretch of scroll that
+     brings it on screen — the reader can always get to the end of them. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .socials {
+        background: none;
+        view-timeline: --socials block;
+      }
+      .socials::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: var(--color-wtp-green);
+        transform-origin: bottom;
+        animation: band-rise var(--ease-out) both;
+        animation-timeline: --socials;
+        animation-range: entry 0% entry 70%;
+      }
+      .socials__title,
+      .socials__body,
+      .socials__links li {
+        animation: reveal var(--ease-out) both;
+        animation-timeline: --socials;
+      }
+      .socials__title {
+        animation-range: entry 35% entry 85%;
+      }
+      .socials__body {
+        animation-range: entry 50% entry 100%;
+      }
+      .socials__links li {
+        animation-range: entry calc(65% + var(--i) * 12%) cover calc(45% + var(--i) * 6%);
+      }
+
+      .sign-off {
+        view-timeline: --sign-off block;
+      }
+      .sign-off::before {
+        animation: sunrise var(--ease-out) both;
+        animation-timeline: --sign-off;
+        animation-range: entry 20% entry 100%;
+      }
+      .sign-off__word {
+        animation: reveal var(--ease-out) both;
+        animation-timeline: --sign-off;
+        animation-range: entry calc(25% + var(--i) * 12%) entry calc(60% + var(--i) * 12%);
+      }
+      .sign-off .sign-off__line {
+        animation: reveal var(--ease-out) both;
+        animation-timeline: --sign-off;
+        animation-range: entry 70% entry 100%;
+      }
+    }
+  }
+  @keyframes band-rise {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes sunrise {
+    from {
+      opacity: 0;
+      transform: translateY(30%);
+    }
+  }
+  @keyframes unshade {
+    from {
+      opacity: 1;
+    }
+  }
+  @keyframes draw {
+    from {
+      transform: scaleY(0);
     }
   }
 </style>
