@@ -57,8 +57,8 @@ interface Props {
   /** grid the title is broken on — cols × rows × 2 triangles */
   cols?: number;
   rows?: number;
-  /** fly the title together from glass as its hero (`--hero`) scrolls in —
-   *  the intro's shatter, on the scroll timeline instead of the clock */
+  /** fly the title together from glass when `data-opening` on <html> says so —
+   *  the intro's shatter, played on demand (the homepage's opening) */
   assemble?: boolean;
 }
 const { lines, cols = 6, rows = 3, assemble = false } = Astro.props;
@@ -277,51 +277,34 @@ const fold = shards.map(() => ({
     }
   }
 
-  /* --- assembling on scroll ------------------------------------------------ */
-  /* The intro's `shard-assemble`, driven by the hero scrolling in rather than
-     by the clock. Each piece's stagger becomes a later start on the scroll
-     range (`--dn`, 0–1). The real heading stays hidden until the last piece is
-     home, then the two swap in one step — pixel-identical, so no seam and no
-     crossfade. Scrolling back up breaks it again. Without scroll timelines, or
-     with reduced motion, there is no flight layer: the heading just sits. */
+  /* --- assembling on demand ------------------------------------------------ */
+  /* `data-opening` on <html> (homepage only). While it is `words` the title
+     waits unseen; `flying` plays the intro's `shard-assemble`; `done` swaps the
+     pieces for the real heading in one step — pixel-identical, so no seam and no
+     crossfade. Without the attribute (no JS, reduced motion) the heading just
+     sits. The fold-on-hover glass stays out of it until the title is home. */
   .stitle__flight {
     display: none;
+    pointer-events: none;
+    perspective: 1200px;
   }
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .stitle__flight {
-        display: block;
-        pointer-events: none;
-        perspective: 1200px;
-        animation: flight-done step-end both;
-        animation-timeline: --hero;
-        animation-range: entry 0% entry 100%;
-      }
-      .stitle--assemble .stitle__base {
-        animation: base-land step-end both;
-        animation-timeline: --hero;
-        animation-range: entry 0% entry 100%;
-      }
-      .fshard {
-        position: absolute;
-        overflow: hidden;
-        backface-visibility: hidden;
-        will-change: transform, opacity;
-        animation: shard-assemble cubic-bezier(0.16, 1, 0.3, 1) both;
-        animation-timeline: --hero;
-        animation-range: entry calc(5% + var(--dn) * 25%) entry calc(70% + var(--dn) * 30%);
-      }
-    }
+  :global(html[data-opening='words']) .stitle--assemble .stitle__base,
+  :global(html[data-opening='flying']) .stitle--assemble .stitle__base {
+    visibility: hidden;
   }
-  @keyframes flight-done {
-    to {
-      visibility: hidden;
-    }
+  :global(html[data-opening='words']) .stitle--assemble .stitle__glass,
+  :global(html[data-opening='flying']) .stitle--assemble .stitle__glass {
+    display: none;
   }
-  @keyframes base-land {
-    from {
-      opacity: 0;
-    }
+  :global(html[data-opening='flying']) .stitle__flight {
+    display: block;
+  }
+  .fshard {
+    position: absolute;
+    overflow: hidden;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+    animation: shard-assemble 1.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--dn) * 0.5s) both;
   }
   /* same keyframes as GlassIntro's — keep the two in step */
   @keyframes shard-assemble {

@@ -119,9 +119,9 @@
      wordmark hand off to the real title without moving a pixel.
      `--lines` (set inline per title) sizes the min-height floor, so squat
      viewports never let out-of-flow content below spill onto the next section. */
-  /* The one size every page title shares — the homepage's WE THE PEOPLE and
-     each section's title alike. (`.pane--hero` keeps its larger cinematic size
-     for the video capture; the homepage sets it back to this.) */
+  /* The one size every section page's title shares. (`.pane--hero` keeps its
+     larger cinematic size for the video capture; the homepage sets its
+     WE THE PEOPLE to 1.5× this.) */
   :root {
     --wordmark-title: min(clamp(2.8rem, 10vw, 8rem), 18vh);
   }

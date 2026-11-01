@@ -7,13 +7,13 @@ import problemImg from '../assets/story/problem-v2-03-two-sides.jpg';
 import hopeImg from '../assets/story/home-hope-candles.jpg';
 import partImg from '../assets/story/home-part-tea.jpg';
 
-// the first screen: the problem, then the turn; the title answers it below
+// the first screen: the problem, then the turn; the title replaces it
 const OPENING = [
-  'Britain is in crisis.',
-  '<strong>We The People</strong> is a vision for how we can change',
-  'our fortunes and our future together.',
-  'The task is enormous.',
-  'This is how it begins.',
+  'Britain is at breaking point.',
+  'Our problems are mounting.',
+  'Our culture is fracturing.',
+  'Our politicians seem helpless.',
+  '<strong>But there is another way.</strong>',
 ];
 
 const SECTIONS = [
@@ -48,27 +48,44 @@ const SECTIONS = [
   joinCollapsed
 >
   <main>
-    <!-- the first screen: the words land one by one as the page opens -->
-    <section class="opening">
-      <p>
-        {
-          OPENING.map((line, i) => (
-            <span
-              class:list={['opening__line', { 'opening__line--turn': i === OPENING.length - 1 }]}
-              style={`--at:${[0.25, 0.9, 1.25, 1.95, 2.75][i]}s`}
-              set:html={line}
-            />
-          ))
-        }
-      </p>
-      <span class="opening__cue" aria-hidden="true"></span>
-    </section>
+    <!-- Sets the opening's state before first paint. Without this (no JS, or
+         reduced motion) the words and the title simply stack and scroll. Coming
+         back to the page, or to an anchor on it, skips straight to the title. -->
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var nav = performance.getEntriesByType('navigation')[0];
+        document.documentElement.dataset.opening =
+          location.hash || (nav && nav.type === 'back_forward') ? 'done' : 'words';
+      }
+    </script>
 
-    <!-- the answer: the title flies together from glass as this scrolls in -->
-    <PageHero lines={['We The', 'People']} variant="hero" assemble>
-      <HeroBackdrop slot="backdrop" />
-      <p class="hero__tagline">Reunite the Country · Transform the System</p>
-    </PageHero>
+    <div class="arrival">
+      <!-- the first screen: the words land one by one as the page opens -->
+      <section class="opening">
+        <p>
+          {
+            OPENING.map((line, i) => (
+              <span
+                class:list={['opening__line', { 'opening__line--turn': i === OPENING.length - 1 }]}
+                style={`--at:${[0.25, 0.9, 1.55, 2.2, 3][i]}s`}
+                set:html={line}
+              />
+            ))
+          }
+        </p>
+        <span class="opening__cue" aria-hidden="true"></span>
+      </section>
+
+      <!-- the answer: the title flies together from glass over the words -->
+      <PageHero lines={['We The', 'People']} variant="hero" assemble>
+        <HeroBackdrop slot="backdrop" />
+        <p class="hero__tagline">
+          <span>Reunite the Country</span>
+          <span class="hero__dot" aria-hidden="true">·</span>
+          <span>Transform the System</span>
+        </p>
+      </PageHero>
+    </div>
 
     <section class="creed">
       <span class="thread" aria-hidden="true"></span>
@@ -157,6 +174,22 @@ const SECTIONS = [
     text-transform: uppercase;
     color: var(--color-wtp-green-100);
   }
+  /* two phrases that break between them, never inside one: side by side, or
+     stacked on a phone, where the dot has nothing left to separate */
+  .hero__tagline span {
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    .hero__tagline {
+      line-height: 1.35;
+    }
+    .hero__tagline span {
+      display: block;
+    }
+    .hero__tagline .hero__dot {
+      display: none;
+    }
+  }
   /* --- the manifesto ------------------------------------------------------- */
   /* --- the first screen ------------------------------------------------- */
   .opening {
@@ -167,25 +200,24 @@ const SECTIONS = [
     padding: 6rem 1.5rem;
     text-align: center;
   }
+  /* Justified: the block is as wide as its longest line and every line,
+     being the last of its own box, is stretched to that width. */
   .opening p {
+    width: fit-content;
+    max-width: 100%;
     margin: 0;
-    text-wrap: balance;
+    text-align: justify;
     font-size: var(--type-xl);
     line-height: 1.7;
     color: #fff;
   }
-  /* one line per row, as the doc sets them */
   .opening__line {
     display: block;
+    text-align-last: justify;
   }
   /* the turn from the problem to the movement */
   .opening__line--turn {
-    margin-top: 0.6em;
-    font-family: var(--font-wordmark);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: var(--type-display-md);
-    color: var(--color-wtp-dawn);
+    margin-top: 1.7em;
   }
   /* a hairline at the foot of the screen: there's more, keep going */
   .opening__cue {
@@ -202,7 +234,7 @@ const SECTIONS = [
     }
     .opening__cue {
       transform-origin: top;
-      animation: cue-in 0.9s var(--ease-out) 3.4s both;
+      animation: cue-in 0.9s var(--ease-out) 3.7s both;
     }
   }
   @keyframes line-in {
@@ -217,30 +249,82 @@ const SECTIONS = [
       transform: scaleY(0);
     }
   }
+  @keyframes cue-out {
+    to {
+      opacity: 0;
+    }
+  }
 
-  /* --- the title: the size every page title shares, not the cinematic
-     intro size `.pane--hero` was built for --- */
+  /* --- the words give way to the title ------------------------------------ */
+  /* `data-opening` on <html>: words → flying → done, moved on by the script
+     below. The words lie over the hero, whose title and photograph wait hidden. */
+  .arrival {
+    position: relative;
+  }
+  :global(html[data-opening]) .opening {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 2;
+  }
+  :global(html[data-opening]) :global(.pane--hero) {
+    --pane-h: 100svh;
+  }
+  :global(html[data-opening='flying']) .opening,
+  :global(html[data-opening='done']) .opening {
+    pointer-events: none;
+  }
+  :global(html[data-opening='flying']) .opening p {
+    opacity: 0;
+    transition: opacity 400ms var(--ease-out);
+  }
+  /* the cue goes with the words: from here the creed's first thread takes over */
+  :global(html[data-opening='flying']) .opening__cue {
+    animation: cue-out 400ms var(--ease-out) both;
+  }
+  :global(html[data-opening='done']) .opening p,
+  :global(html[data-opening='done']) .opening__cue {
+    visibility: hidden;
+  }
+  /* the land comes up behind the letters, the tagline once they are home */
+  :global(html[data-opening='words']) :global(.backdrop) {
+    opacity: 0;
+  }
+  :global(html[data-opening='flying']) :global(.backdrop) {
+    transition: opacity 1.8s ease-out 0.3s;
+  }
+  :global(html[data-opening='words']) .hero__tagline {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  :global(html[data-opening='flying']) .hero__tagline {
+    transition:
+      opacity 0.6s var(--ease-out) 1.5s,
+      transform 0.6s var(--ease-out) 1.5s;
+  }
+
+  /* --- the title: a step up from the size the section pages share, short of
+     the cinematic intro size `.pane--hero` was built for --- */
   :global(.pane--hero) {
-    --wordmark-size: var(--wordmark-title);
+    --wordmark-size: calc(var(--wordmark-title) * 1.5);
   }
 
   /* a dawn hairline joining each step to the next */
   .thread {
     display: block;
     width: 1px;
-    height: clamp(3.5rem, 9vh, 5.5rem);
-    margin: 0 auto clamp(1.8rem, 4vh, 2.6rem);
+    height: clamp(2.5rem, 6vh, 3.75rem);
+    margin: 0 auto clamp(1.2rem, 2.8vh, 1.8rem);
     background: linear-gradient(to bottom, var(--color-wtp-bramble), var(--color-wtp-dawn));
     transform-origin: top;
   }
   .creed {
     max-width: 52ch;
     margin-inline: auto;
-    padding: clamp(4rem, 12vh, 8rem) 1.5rem 0;
+    padding: 0 1.5rem;
     text-align: center;
   }
   .creed__head {
-    margin: 0 0 0.9rem;
+    margin: 0 0 0.7rem;
     font-family: var(--font-wordmark);
     font-weight: 400;
     text-transform: uppercase;
@@ -250,9 +334,9 @@ const SECTIONS = [
     color: var(--color-wtp-green-100);
   }
   .creed__body {
-    margin: 0 0 clamp(2.6rem, 6vh, 3.6rem);
+    margin: 0 0 clamp(1.8rem, 4vh, 2.6rem);
     font-size: var(--type-lg);
-    line-height: 1.8;
+    line-height: 1.55;
     letter-spacing: 0.005em;
     text-wrap: balance;
     color: rgba(246, 244, 238, 0.82);
@@ -497,12 +581,6 @@ const SECTIONS = [
      runs on its own as it scrolls in. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      /* the tagline follows the title home */
-      .hero__tagline {
-        animation: reveal var(--ease-out) both;
-        animation-timeline: --hero;
-        animation-range: entry 80% entry 100%;
-      }
       .panel__title,
       .panel__blurb,
       .panel__shade,
@@ -635,4 +713,94 @@ const SECTIONS = [
       });
     });
   });
+</script>
+
+<script>
+  /**
+   * The first two inputs belong to the opening. The first finishes the words if
+   * they are still landing; the next flies the title in over them. Then the page
+   * scrolls as normal. Any real scroll on the way (a scrollbar drag, a tab to a
+   * link further down, the I'm In pill, restored position) ends it on the spot,
+   * so nothing is ever trapped behind it.
+   */
+  const root = document.documentElement;
+
+  if (root.dataset.opening === 'words') {
+    const opening = document.querySelector<HTMLElement>('.opening')!;
+    const flight = document.querySelector<HTMLElement>('.stitle__flight')!;
+    const SWIPE = 24; // px of finger travel that counts as a scroll
+    const WHEEL_GAP = 200; // ms of quiet that separates one wheel gesture from the next
+
+    const finish = () => {
+      root.dataset.opening = 'done';
+      removeEventListener('wheel', onWheel);
+      removeEventListener('touchstart', onTouchStart);
+      removeEventListener('touchmove', onTouchMove);
+      removeEventListener('keydown', onKey);
+      removeEventListener('scroll', onScroll);
+    };
+
+    const advance = () => {
+      if (root.dataset.opening !== 'words') return;
+      const landing = opening
+        .getAnimations({ subtree: true })
+        .filter((a) => a.playState === 'running');
+      if (landing.length) {
+        for (const a of landing) a.updatePlaybackRate(8);
+        return;
+      }
+      root.dataset.opening = 'flying';
+      Promise.all(flight.getAnimations({ subtree: true }).map((a) => a.finished)).then(
+        finish,
+        finish,
+      );
+    };
+
+    // A trackpad swipe is a long stream of wheel events, inertia included, so
+    // only the first after a gap advances. All of them are swallowed.
+    let lastWheel = -Infinity;
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return; // pinch zoom
+      e.preventDefault();
+      const fresh = e.timeStamp - lastWheel > WHEEL_GAP;
+      lastWheel = e.timeStamp;
+      if (fresh && e.deltaY > 0) advance();
+    };
+
+    let touchY = 0;
+    let swiped = false;
+    const onTouchStart = (e: TouchEvent) => {
+      touchY = e.touches[0].clientY;
+      swiped = false;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 1) return; // pinch zoom
+      if (e.cancelable) e.preventDefault();
+      if (!swiped && touchY - e.touches[0].clientY > SWIPE) {
+        swiped = true;
+        advance();
+      }
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (![' ', 'ArrowDown', 'PageDown'].includes(e.key)) return;
+      if ((e.target as Element).closest('a, button, input, select, textarea, summary')) return;
+      e.preventDefault();
+      advance();
+    };
+
+    const onScroll = () => {
+      if (scrollY > 0) finish();
+    };
+
+    // on the overlay itself: iOS doesn't send taps on plain elements up to window
+    opening.addEventListener('click', advance);
+    addEventListener('wheel', onWheel, { passive: false });
+    addEventListener('touchstart', onTouchStart, { passive: true });
+    addEventListener('touchmove', onTouchMove, { passive: false });
+    addEventListener('keydown', onKey);
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
 </script>
