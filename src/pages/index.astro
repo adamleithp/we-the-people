@@ -13,7 +13,16 @@ const OPENING = [
   'Our problems are mounting.',
   'Our culture is fracturing.',
   'Our politicians seem helpless.',
-  '<strong>But there is another way.</strong>',
+  'But there is another way.',
+];
+
+// below the closing banner: what comes after immigration
+const CODA = [
+  'This is only the start.',
+  'When we’ve shown we can come together and find a way forward on immigration, we’ll apply our approach to more of the big questions facing Britain:',
+  'The cost of living, taxes, the NHS, regulation of AI. One day, perhaps, even the biggest decisions a country can make: questions of war and peace.',
+  'With each step, we’ll build a vision of what we want for our future, written by us – a People’s Manifesto – while growing a movement with the political force to make it happen.',
+  'We will make this a better country. More peaceful, more united, more democratic. Fit for the challenges of the 21st century.',
 ];
 
 const SECTIONS = [
@@ -155,12 +164,21 @@ const SECTIONS = [
     </section>
 
     <section class="sign-off" aria-label="We The People — to the future, with hope">
-      <p class="sign-off__mark">
-        <span class="sign-off__word" style="--i:0">We</span>
-        <span class="sign-off__word" style="--i:1">The</span>
-        <span class="sign-off__word" style="--i:2">People</span>
-      </p>
-      <p class="sign-off__line">To the future. With hope.</p>
+      <div class="sign-off__banner">
+        <p class="sign-off__mark">
+          <span class="sign-off__word" style="--i:0">We</span>
+          <span class="sign-off__word" style="--i:1">The</span>
+          <span class="sign-off__word" style="--i:2">People</span>
+        </p>
+        <p class="sign-off__line">To the future. With hope.</p>
+      </div>
+      <div class="coda">
+        {CODA.map((para) => <p class="reveal">{para}</p>)}
+        <p class="coda__close reveal">
+          A country our children will be glad to inherit.<br />
+          A country that belongs to us all.
+        </p>
+      </div>
     </section>
   </main>
 </Layout>
@@ -200,24 +218,24 @@ const SECTIONS = [
     padding: 6rem 1.5rem;
     text-align: center;
   }
-  /* Justified: the block is as wide as its longest line and every line,
-     being the last of its own box, is stretched to that width. */
   .opening p {
-    width: fit-content;
-    max-width: 100%;
     margin: 0;
-    text-align: justify;
     font-size: var(--type-xl);
     line-height: 1.7;
     color: #fff;
   }
   .opening__line {
     display: block;
-    text-align-last: justify;
   }
-  /* the turn from the problem to the movement */
+  /* the turn from the problem to the movement, in dawn caps */
   .opening__line--turn {
-    margin-top: 1.7em;
+    margin-top: 1em;
+    font-family: var(--font-wordmark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--type-display-md);
+    line-height: 1.1;
+    color: var(--color-wtp-dawn);
   }
   /* a hairline at the foot of the screen: there's more, keep going */
   .opening__cue {
@@ -539,6 +557,26 @@ const SECTIONS = [
     letter-spacing: 0.06em;
     color: var(--color-wtp-dawn);
   }
+  /* what comes next: a short, narrow column under the banner, so it reads as
+     a coda rather than another section */
+  .coda {
+    max-width: 44ch;
+    margin: clamp(3rem, 8vh, 4.5rem) auto 0;
+  }
+  .sign-off .coda p {
+    margin: 0 0 1.15rem;
+    font-family: inherit;
+    text-transform: none;
+    font-size: var(--type-base);
+    line-height: 1.7;
+    text-wrap: balance;
+    color: rgba(246, 244, 238, 0.86);
+  }
+  .sign-off .coda .coda__close {
+    margin: 2rem 0 0;
+    font-weight: 700;
+    color: #fff;
+  }
 
 
   @media (max-width: 640px) {
@@ -662,6 +700,9 @@ const SECTIONS = [
       }
 
       .sign-off {
+        timeline-scope: --sign-off;
+      }
+      .sign-off__banner {
         view-timeline: --sign-off block;
       }
       .sign-off::before {
@@ -793,6 +834,14 @@ const SECTIONS = [
     const onScroll = () => {
       if (scrollY > 0) finish();
     };
+
+    // Left alone, the title comes in by itself a moment after the last word
+    // lands; input only hurries it along.
+    const HOLD = 1200; // ms the finished words rest before the title flies
+    Promise.all(opening.getAnimations({ subtree: true }).map((a) => a.finished)).then(
+      () => setTimeout(advance, HOLD),
+      () => {}, // cancelled: the opening was ended some other way
+    );
 
     // on the overlay itself: iOS doesn't send taps on plain elements up to window
     opening.addEventListener('click', advance);
