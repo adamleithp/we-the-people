@@ -15,10 +15,6 @@ import plan from '../assets/story/you-03-the-plan.jpg';
 import community from '../assets/story/community-06-we-the-people-of.jpg';
 import chamber from '../assets/story/country-01-chamber.jpg';
 import stage from '../assets/story/country-02-the-mall.jpg';
-import following from '../assets/story/country-03-following.jpg';
-import festival from '../assets/story/country-04-festival.jpg';
-import child from '../assets/story/country-05-child.jpg';
-import celebration from '../assets/story/country-06-jubilee.jpg';
 // the level panels' photos: royalty-free from Unsplash
 import communityPanel from '../assets/story/level-community.jpg';
 import countryPanel from '../assets/story/level-country.jpg';
@@ -52,15 +48,16 @@ const LEVELS = [
 ---
 
 <Layout title="Be Part of It — We The People" introLines={['Be Part', 'of It']}>
-  <PageHero lines={['Be Part', 'of It']}>
-    <p class="hero__kicker fade-up">Part 03</p>
-  </PageHero>
+  <PageHero lines={['Be Part', 'of It']} />
 
   <ReadProgress />
   <main>
     <p class="levels__intro">
-      Here are ways to help make it happen by yourself, in your community and for our
+      There are three ways to be part of it: in your life, in your community and across the
       country.
+    </p>
+    <p class="levels__intro levels__intro--more">
+      As <strong>We The People</strong> grows, we’ll add more ways to get involved.
     </p>
 
     <nav class="levels" aria-label="Ways to be part of it">
@@ -319,70 +316,8 @@ const LEVELS = [
         We will involve high profile cultural figures from across the arts, music, film &amp;
         TV both to drive public awareness and of course share their perspectives too.
       </p>
-
-      <Scene src={following} alt="Four friends leaning in to watch something on a phone together in a café" heading="With The People" />
-      <p>
-        We will also create a broad media ecosystem for people to engage whoever and
-        wherever they are in the country.
-      </p>
-      <ul>
-        <li>Social as well as legacy media to reach every generation</li>
-        <li>Newsworthy viral events</li>
-        <li>Live streams of Council sessions</li>
-        <li>Daily highlight shows on a range of platforms</li>
-        <li>
-          An app where users can follow proceedings, post comments and interact through
-          polls on policy ideas
-        </li>
-        <li>A documentary to tell the Council's story</li>
-        <li>
-          A portal for people to submit their own stories building an archive of our
-          national memory on immigration
-        </li>
-      </ul>
-      <Scene src={festival} alt="A crowd gathered at golden hour under festival bunting" />
-      <p>
-        The site itself will be accessible with music, food, exhibitions and relevant events
-        to draw audiences to attend in person.
-      </p>
-      <p>
-        The goal of it all: to show people that there is another way for our democracy to
-        function, where their contributions are valued and counted, rather than ignored or
-        overruled.
-      </p>
-      <p>The prototype on which we can build a new political system fit for whatever the future may hold.</p>
-
-      <Scene src={child} alt="A small child standing in a long, light-filled hallway, looking up" heading="To the Future, With Hope" />
-      <p>Immigration is only the start.</p>
-      <p>
-        We will go on to apply our Councils of the People to other issues tearing us apart,
-        from cost of living to taxation to the NHS, even to our international relationships
-        or the regulation of AI.
-      </p>
-      <p>
-        While it may sound absurdly ambitious, we believe We The People speaks to a gap in
-        the market – a message of hope, unity and empowerment that will strike a chord with
-        millions across the country.
-      </p>
-      <p>If that happens, anything is possible.</p>
-      <p>
-        And with each step, we build a vision of what we want for our future, written by us –
-        a People's Manifesto – while growing a Movement with the political force to make it
-        happen.
-      </p>
-      <p>
-        We will make this a better country. More peaceful, more united, more democratic. Fit
-        for the challenges of the 21st century. A country our children will be glad to
-        inherit.
-      </p>
     </article>
 
-    <!-- the doc ends on something triumphal: many of us, together -->
-    <Scene
-      src={celebration}
-      alt="A huge crowd filling The Mall under rows of Union Jacks"
-      heading="Be part of hope"
-    />
   </main>
 </Layout>
 
@@ -396,6 +331,15 @@ const LEVELS = [
     text-align: center;
     text-wrap: balance;
     color: rgba(246, 244, 238, 0.86);
+  }
+  .levels__intro:has(+ .levels__intro--more) {
+    padding-bottom: 0;
+  }
+  .levels__intro--more {
+    padding-top: 1rem;
+  }
+  .levels__intro strong {
+    color: #fff;
   }
 
   /* --- the three levels ---------------------------------------------------- */

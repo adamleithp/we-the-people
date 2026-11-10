@@ -1,6 +1,13 @@
 ---
 // Fixed, transparent header: small wordmark left, the three sections right.
 // Eases in behind the glass intro (`.fade-up` waits on html.intro-done).
+// Be Part of It opens a menu of its three levels on hover or keyboard focus;
+// on touch it is a plain link, since the page opens on the same three panels.
+const LEVELS = [
+  { id: 'you', label: 'You' },
+  { id: 'community', label: 'Your Community' },
+  { id: 'country', label: 'Our Country' },
+];
 ---
 
 <header class="site-header fade-up" style="--fade-delay:0.24s">
@@ -8,7 +15,20 @@
   <nav>
     <a class="action" href="/problem"><span class="action__our">The </span>Problem</a>
     <a class="action" href="/hope"><span class="action__our">Our </span>Hope</a>
-    <a class="action" href="/be-part-of-it">Be Part of It</a>
+    <div class="menu">
+      <a class="action" href="/be-part-of-it">Be Part of It</a>
+      <ul class="menu__list" aria-label="Be Part of It">
+        {
+          LEVELS.map((l) => (
+            <li>
+              <a class="menu__item" href={`/be-part-of-it#${l.id}`}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </nav>
 </header>
 
@@ -73,6 +93,74 @@
   /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "The/Our …" doesn't */
   @media (max-width: 560px) {
     .action__our {
+      display: none;
+    }
+  }
+  /* --- Be Part of It's menu --------------------------------------------- */
+  .menu {
+    position: relative;
+    display: flex;
+  }
+  /* hidden until hover or focus; the top padding bridges the gap under the
+     link so the pointer can travel down into it without it closing */
+  .menu__list {
+    position: absolute;
+    top: 100%;
+    right: -1rem;
+    margin: 0;
+    padding: 0.9rem 0 0;
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition:
+      opacity 150ms var(--ease-out, ease-out),
+      transform 150ms var(--ease-out, ease-out),
+      visibility 0s linear 150ms;
+  }
+  .menu__list li {
+    background: rgba(5, 12, 7, 0.92);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-inline: 1px solid var(--color-wtp-bramble, #2a4a33);
+  }
+  .menu__list li:first-child {
+    border-top: 1px solid var(--color-wtp-bramble, #2a4a33);
+    padding-top: 0.35rem;
+  }
+  .menu__list li:last-child {
+    border-bottom: 1px solid var(--color-wtp-bramble, #2a4a33);
+    padding-bottom: 0.35rem;
+  }
+  .menu__item {
+    display: block;
+    padding: 0.55rem 1rem;
+    font-size: var(--type-xs);
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+    transition: color 150ms ease;
+  }
+  .menu__item:hover,
+  .menu__item:focus-visible {
+    color: var(--color-wtp-dawn, #f2c14e) !important;
+  }
+  .menu:focus-within .menu__list {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .menu:hover .menu__list {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+  }
+  /* touch: no hover to open it, so it stays a plain link */
+  @media not ((hover: hover) and (pointer: fine)) {
+    .menu__list {
       display: none;
     }
   }

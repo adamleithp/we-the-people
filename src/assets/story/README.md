@@ -29,10 +29,6 @@ wide; Astro resizes them to WebP at build.
 | community-06-we-the-people-of | Opens Your Community. **Replaced:** Unsplash, MD Duran (`kBr-A4K67z4`) |
 | country-01-chamber | Circular chamber, national in scale. **Replaced:** Unsplash, Neon Wang (`UpE4KQSZ1dA`), Parliament House, Canberra |
 | country-02-the-mall | Iconic British cultural moment (doc used Stormzy). **Replaced:** Unsplash, Jonny Gios (`csTgUUaSdqI`), The Mall, London |
-| country-03-following | People following the Council wherever they are. **Replaced:** Unsplash, Vitaly Gariev (`QaFcC7GtoJs`) |
-| country-04-festival | The site as a festival. **Replaced:** Unsplash, Alex Vasey (`9H-pUdPxXbk`), Brussels |
-| country-05-child | A child looking into the great unknown. **Replaced:** Unsplash, wang binghua (`7x5De0j7boQ`) |
-| country-06-jubilee | Triumphal, united national celebration. **Replaced:** Unsplash, Sam (`K0fjQrOPKB4`), The Mall, London (Platinum Jubilee) |
 
 ## 26 Oct 2026 photo pack (client-supplied iStock, licensed by WTP)
 
