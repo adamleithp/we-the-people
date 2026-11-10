@@ -15,18 +15,13 @@ import young from '../assets/story/hope-06-westminster.jpg';
 ---
 
 <Layout title="Our Real Hope — We The People" introLines={['Our Real', 'Hope']}>
-  <PageHero lines={['Our Real', 'Hope']}>
-    <p class="hero__kicker fade-up">Part 02</p>
-  </PageHero>
+  <PageHero lines={['Our Real', 'Hope']} />
 
   <ReadProgress />
   <article class="prose">
-    <p class="lead">
-      We believe the work starts with the issue that most urgently threatens our collective
-      life.
-    </p>
-
     <Scene
+      first
+      eager
       src={crossing}
       alt="The white cliffs of Dover seen from the Channel, a ferry crossing beneath them"
       heading="Immigration"
