@@ -100,6 +100,15 @@ const doneAt = sealAt + (hero ? 950 : 550);
   } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     // Motion is unwelcome: straight to the page.
     done();
+  } else if (location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)))) {
+    // Arriving for a section further down (the nav's Be Part of It menu): no
+    // title, straight there. The intro freezes scroll with overflow: hidden,
+    // which cancels the browser's own jump; and that jump would glide down the
+    // whole page under `scroll-behavior: smooth`, so land on it at once.
+    done();
+    document
+      .getElementById(decodeURIComponent(location.hash.slice(1)))!
+      .scrollIntoView({ behavior: 'instant' });
   } else {
     // Plays on every load — a refresh always shows it.
     root.classList.add('intro-running');
