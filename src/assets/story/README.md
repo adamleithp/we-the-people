@@ -16,12 +16,6 @@ wide; Astro resizes them to WebP at build.
 | problem-02-greenwich-flag | Gloomy, foreboding, dark Houses of Parliament. **Replaced:** Unsplash, Lawrence Chismorie (`0QY4O2FSK60`) |
 | problem-03-march | Protests, flags, antifascists vs patriots, riot police. **Replaced:** Unsplash, Alex Radelich (`Evo4wmtRaPI`) |
 | problem-04-arms-linked | Peace across the divide: hugs, handshakes across lines. **Replaced:** Unsplash, Nathan Dumlao (`5frNXb3acHU`) |
-| hope-01-dover-from-the-sea | Boats, lifejackets, white cliffs of Dover. **Replaced:** Unsplash, Bernd Dittrich (`dOIkvA6Vff0`) |
-| hope-02-candles | Vigils, Covid clapping; crowds united, not of one side. **Replaced:** Unsplash, Christian Harb (`B_yFoetuu_0`) |
-| hope-03-council-discussion | People in a circle, not corporate or too hippy. **Replaced:** Unsplash, Antenna (`cw-cj_nFa14`) |
-| hope-04-listening-tea | Truth & Reconciliation. **Replaced:** Unsplash, Age Cymru (`wLXJ1Q-_S88`), taken in Cardiff |
-| hope-05-hand-raised | Assembly in Ireland/France, folkmoots, Althing. **Replaced:** Unsplash, Felicia Buitenwerf (`Qs_Zkak27Jk`) |
-| hope-06-westminster | Young people, Parliament, unity. **Replaced:** Unsplash, Navyorange (`Di2WscisTDs`) |
 | you-01-tea-mugs | Anonymous pair of hands holding tea together. **Replaced:** Unsplash, Sam Hojati (`KxKbXRfrO3I`) |
 | you-02-spread-the-word | Two people talking. **Replaced:** Unsplash, Valentin (`tJlV-Yu_Ps4`) |
 | you-03-the-plan | The road ahead. **Replaced:** Unsplash, Georgii Eletskikh (`WQZouZ6jTj4`) |
@@ -42,3 +36,15 @@ From `we the people - High Res Website Photo pack 26 Oct 2026.zip`, resized to 2
 | `problem-v2-04-union-flags.jpg` | iStock-1131336465 | Real Problem: We The People still believe in democracy |
 | `home-hope-candles.jpg` | iStock-1345688597 | Homepage: Our Real Hope panel |
 | `home-part-tea.jpg` | iStock-2221195931 | Homepage: Be Part of It panel |
+
+## 5 Nov 2026 Linear tickets (client-supplied, Google Drive)
+
+Chosen by the client in the Linear tickets and downloaded from their Google Drive, resized to 2400px. The Unsplash photo carries the credit the client asked for, shown on the photo itself (`credit` on `<Scene>`). The rest came without a source; the client is responsible for their licences.
+
+| File | Drive id | Slot |
+|---|---|---|
+| `hope-v2-01-answer-is-us.jpg` | `1b7jUB3…` — Unsplash, Jonny Gios (`8iq0yqemBuU`), credited on the page | Real Hope: The answer is us (ADA-49) |
+| `hope-v2-02-real-democracy.jpg` | `1cf1qtt…` | Real Hope: That is the power of real democracy (ADA-50) |
+| `hope-v2-03-immigration.jpg` | `1216mM_…` | Real Hope: Immigration (ADA-51) |
+| `hope-v2-04-reconnection.jpg` | `1u5T83R…` | Real Hope: Reconnection & Reconciliation (ADA-52) |
+| `hope-v2-05-believe-in-us.jpg` | `1nRv-j_…` | Real Hope: We start to believe in "us" again (ADA-54) |

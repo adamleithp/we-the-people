@@ -1,17 +1,16 @@
 ---
-// Part 2 — copy from "Copy update 28 Sept" (docs/), one 70ch column. Each of
-// the doc's section breaks opens on a full-bleed <Scene>; the photographs are
-// from Unsplash (credits in src/assets/story/README.md).
+// Part 2 — copy from the 5 Nov Linear tickets (ADA-49 to 54), one 70ch column.
+// Each section opens on a full-bleed <Scene>; the photographs were chosen by the
+// client (credits in src/assets/story/README.md).
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import Scene from '../components/Scene.astro';
 import ReadProgress from '../components/ReadProgress.astro';
-import crossing from '../assets/story/hope-01-dover-from-the-sea.jpg';
-import vigil from '../assets/story/hope-02-candles.jpg';
-import council from '../assets/story/hope-03-council-discussion.jpg';
-import listening from '../assets/story/hope-04-listening-tea.jpg';
-import assembly from '../assets/story/hope-05-hand-raised.jpg';
-import young from '../assets/story/hope-06-westminster.jpg';
+import gathering from '../assets/story/hope-v2-01-answer-is-us.jpg';
+import stands from '../assets/story/hope-v2-02-real-democracy.jpg';
+import cliffs from '../assets/story/hope-v2-03-immigration.jpg';
+import tea from '../assets/story/hope-v2-04-reconnection.jpg';
+import candles from '../assets/story/hope-v2-05-believe-in-us.jpg';
 ---
 
 <Layout title="Our Real Hope — We The People" introLines={['Our Real', 'Hope']}>
@@ -22,160 +21,146 @@ import young from '../assets/story/hope-06-westminster.jpg';
     <Scene
       first
       eager
-      src={crossing}
-      alt="The white cliffs of Dover seen from the Channel, a ferry crossing beneath them"
-      heading="Immigration"
-    />
-    <p>On nothing else are our divisions as deep or as dangerous.</p>
-    <p>If we cannot leave it to politicians to resolve, then where do we turn?</p>
-
-    <Scene
-      src={vigil}
-      alt="A crowd of people of all ages holding candles together at night"
+      src={gathering}
+      alt="A huge crowd of people of all ages filling The Mall under rows of Union flags"
       heading="The answer is us. We The People ourselves."
+      credit={{
+        name: 'Jonny Gios',
+        href: 'https://unsplash.com/@supergios?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText',
+        source: 'Unsplash',
+        sourceHref:
+          'https://unsplash.com/photos/a-large-group-of-people-are-gathered-together-8iq0yqemBuU?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText',
+      }}
     />
     <p>
-      We are the ones who must work this out, not our compromised, ego-driven political
-      class.
-    </p>
-    <p>Only then will the decisions and policies we choose feel legitimate to us all.</p>
-    <p>
-      For that to happen, we must rediscover our ability to speak openly and deeply listen
-      to one another's perspective, despite the depth of our differences.
+      It’s our right to make the big decisions shaping our lives and our country, not
+      compromised politicians with their own agendas.
     </p>
     <p>
-      To see our opponents as human. To allow them to change our perspective. To seek
-      compromises we can all live with.
-    </p>
-    <p>That is real democracy.</p>
-    <p>In these polarised times, it probably seems impossible.</p>
-    <p>We The People offers a practical mechanism to make it happen.</p>
-
-    <Scene
-      src={council}
-      alt="A mixed group of people sitting close together in discussion, one woman speaking"
-      kicker="We call it"
-      heading="A Council of the People"
-      focus="50% 40%"
-    />
-    <p>
-      From two people to ten, from community level to nationwide, a Council of the People
-      is a way for us to talk to each other again with honesty and respect, to find a way
-      through our deep divides.
+      And when everyday people take the lead, something powerful happens: common sense
+      returns. Both practical wisdom and the understanding that there are values that we
+      share.
     </p>
     <p>
-      Whatever the scale, the principles are the same: everyone is welcome and every point
-      of view can be spoken and heard, without fear of censure.
+      We realise that, given the chance, ordinary people are capable of more nuanced
+      conversations than the politicians that claim to represent us.
     </p>
     <p>
-      For smaller groups, we offer a clear step-by-step process, principles and resources
-      to do it yourself.
-    </p>
-    <p>
-      In larger groups, we provide impartial facilitation to support the process, creating
-      room for understanding, respect — even empathy.
-    </p>
-    <p>
-      (More details on the different models can be found in
-      <a href="/be-part-of-it">Part 3 – Be Part of It</a>.)
+      We learn to trust each other again. That means we make fairer decisions that truly
+      reflect who we are.
     </p>
 
     <Scene
-      src={listening}
-      alt="An older woman smiling as she talks over a cup of tea, listened to across the table"
-      heading="Truth & Reconciliation"
-      focus="50% 30%"
+      src={stands}
+      alt="A packed stand of people on their feet, many waving Union flags"
+      heading="That is the power of real democracy"
     />
     <p>
-      Whatever your perspective, in Council you will likely hear things you don't agree
-      with, which might make you furious or upset. And that will be hard.
+      But for that to happen, we have to speak openly with each other.<br />
+      To <em>really</em> listen to other views, despite the depth of our differences.<br />
+      To see the other side as human. To allow them to change our minds.
+    </p>
+    <p>Maybe we’ve always struggled to do this. But right now it is harder than ever.</p>
+    <p>
+      We’ve lost our common ground: both the places we used to meet, as well as the
+      unspoken agreements that guide our conversation.
     </p>
     <p>
-      But this is the heart of the process, the leap we're asking everyone to make: if you
-      want your story and your perspective to be honoured, you must honour others when it's
-      their turn.
-    </p>
-    <p>
-      Through the rollout of our mechanism, we will seek to spark a movement of national
-      reconnection and reconciliation, culminating in a major cultural event: a National
-      Council of the People on Immigration.
-    </p>
-    <p>
-      The first time in which we the people ourselves will write our own policy on
-      immigration, instead of politicians.
+      <strong>We The People</strong> is about finding our way back. And we believe we need
+      to start with the hardest question of all.
     </p>
 
     <Scene
-      src={assembly}
-      alt="A man in a packed room raising his hand to speak"
-      heading="Drawing on new and ancient foundations"
-      focus="65% 30%"
+      src={cliffs}
+      alt="Storm waves breaking below the white chalk cliffs of the south coast"
+      heading="Immigration"
+      focus="40% 50%"
     />
+    <p>Immigration has become the fault line tearing Britain apart.</p>
     <p>
-      Councils of the People are inspired by a modern democratic model: a Citizens'
-      Assembly.
+      You may think it’s the most important issue of our time, or a distraction from what
+      really matters. Either way, nothing else divides us so deeply or so dangerously.
     </p>
+    <p>This is the fire to put out first, before it burns the country down.</p>
     <p>
-      It is a 21st century version of an age-old democratic structure, with roots in
-      ancient Greece and the moots once held on these islands a thousand years ago.
+      So from kitchen tables to community halls to a great national gathering,
+      <strong>We The People</strong> will help the people of Britain to explore the question:
     </p>
-    <p>
-      In simple terms a Citizens' Assembly applies the principles of jury service to
-      politics.
-    </p>
-    <p>
-      A group of 100 or more everyday people are selected by lottery to reflect the
-      population as a whole by factors like class, age, gender, race etc.
-    </p>
-    <p>
-      They are given a difficult problem to face, like immigration. They listen to experts
-      and witnesses from all sides of the debate and then talk among themselves to forge
-      policy approaches that everyone can accept.
-    </p>
-    <p>In the last decade, Assemblies have been held all over the world.</p>
-    <p>
-      In Ireland, one helped people navigate the question of abortion. In France, on
-      assisted dying. We even had one in the UK on climate change that led to rare
-      agreement between left and right.
-    </p>
-
-    <h2>Why it works</h2>
-    <p>
-      Crucially, Citizens' Assemblies enshrine the idea that everyday people should make
-      the decisions that affect our lives, not a political elite.
-    </p>
-    <p>
-      That free from the pressures to win votes, funding or influence, our decisions have
-      greater legitimacy too.
-    </p>
-    <p>
-      Most importantly, that in the right circumstances, with impartial facilitation and
-      expert witness testimony, we can dialogue with intelligence and civility and agree a
-      more nuanced approach than any politician ever could.
-    </p>
+    <p class="pull">What do you think about immigration and how this country might approach it?</p>
 
     <Scene
-      src={young}
-      alt="The Houses of Parliament and Westminster Bridge across the Thames under a bright sky"
+      src={tea}
+      alt="Two women in silhouette talking over cups of tea at a table by a window"
+      heading="Reconnection & Reconciliation"
+    />
+    <p>
+      These conversations may be hard. We’ll hear things we don’t agree with. We might feel
+      angry or upset.
+    </p>
+    <p>
+      <strong>We The People</strong> offers ways to help make it happen without descending
+      into an argument.
+    </p>
+    <p>
+      From our <a href="/be-part-of-it#you">#AgreeOnTea campaign</a>, which gives you
+      everything you need for a one-to-one conversation over a cuppa, to hands-on
+      facilitation for larger gatherings we call
+      <a href="/be-part-of-it#community">Councils of the People</a>.
+    </p>
+    <p>Our ground rules and structures change everything.</p>
+    <p>
+      Instead of shouting over each other, they create the chance for connection, founded on
+      a simple principle that sits at the heart of our movement: to be heard, we have to be
+      willing to listen.
+    </p>
+    <p>And we might be surprised by what we discover.</p>
+    <p>
+      An agreed diagnosis of what’s gone wrong. A story that strikes a chord beyond the
+      noise. A shared fear for the future, despite our different values.
+    </p>
+    <p>
+      Perhaps a recognition that we all care for our country, even if we have different
+      visions for what it needs.
+    </p>
+    <p>We might realise that we aren’t monsters or enemies but fellow human beings.</p>
+
+    <Scene
+      src={candles}
+      alt="A crowd at night, each person holding up a lit candle"
       heading="We start to believe in “us” again"
     />
     <p>
-      Of course, there will be hard compromises. Undoubtedly everyone will find some part
-      hard to stomach.
+      We believe that beyond the stories of our divisions, we may actually be more united
+      than we’re led to believe.
     </p>
     <p>
-      Yet we believe it will lead to the first ever policy approach that most people would
-      accept.
+      Even now, 70% of us still say we trust people in general (ONS 2026). Covid-19 showed
+      us that despite our differences we could still come together and support each other in
+      a crisis. It’s not just wishful thinking.
     </p>
     <p>
-      This is a practical path for us to stop being a collection of tribes and start
-      becoming a people again, capable of forging a shared vision for our future.
+      A fresh collective approach to our problems is possible, if only we are given the
+      chance.
     </p>
     <p>
-      If it works, we will know there is a powerful new way to do politics. One where we
-      take the lead.
+      This is how we reclaim our power, and our right to make the decisions that shape our
+      lives, starting with immigration.
     </p>
-    <p>This is how our system could be transformed.</p>
+    <p>
+      At the peak of our movement, <strong>We The People</strong> will bring the whole
+      country together at a
+      <a href="/be-part-of-it#country">National Council of the People on Immigration</a>,
+      to forge the first approach to this issue written by us, the people, not politicians.
+      A policy in all our names, that we can all accept.
+    </p>
+    <p>
+      This will be a demonstration of a powerful new way to do democracy, inspired by the
+      latest political theory as well as deep democratic tradition (find out more on our
+      Foundations page).
+    </p>
+    <p>
+      One better equipped for the complex challenges we face. One where we take the lead.
+    </p>
 
     <p class="pull">This is how we turn things around.</p>
 

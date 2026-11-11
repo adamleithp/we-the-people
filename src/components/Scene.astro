@@ -23,9 +23,19 @@ interface Props {
   first?: boolean;
   /** above the fold, so don't lazy-load it */
   eager?: boolean;
+  /** photographer credit the licence asks for, set small up the right edge */
+  credit?: { name: string; href: string; source: string; sourceHref: string };
 }
-const { src, alt, heading, kicker, focus = '50% 50%', first = false, eager = false } =
-  Astro.props;
+const {
+  src,
+  alt,
+  heading,
+  kicker,
+  focus = '50% 50%',
+  first = false,
+  eager = false,
+  credit,
+} = Astro.props;
 ---
 
 <figure class:list={['scene', { 'scene--first': first }]}>
@@ -44,6 +54,20 @@ const { src, alt, heading, kicker, focus = '50% 50%', first = false, eager = fal
     />
   </div>
   <div class="scene__scrim" aria-hidden="true"></div>
+  {
+    credit && (
+      <small class="scene__credit">
+        Photo by{' '}
+        <a href={credit.href} rel="noopener" target="_blank">
+          {credit.name}
+        </a>{' '}
+        on{' '}
+        <a href={credit.sourceHref} rel="noopener" target="_blank">
+          {credit.source}
+        </a>
+      </small>
+    )
+  }
   {
     heading && (
       <figcaption class="scene__caption">
@@ -91,6 +115,21 @@ const { src, alt, heading, kicker, focus = '50% 50%', first = false, eager = fal
         rgba(5, 12, 7, 0.12) 60%,
         rgba(5, 12, 7, 0.45) 100%
       );
+  }
+  /* reads bottom to top along the right edge, clear of the heading */
+  .scene__credit {
+    position: absolute;
+    z-index: 1;
+    right: 0.6rem;
+    bottom: 1.5rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: var(--type-xs);
+    letter-spacing: 0.04em;
+    color: rgba(246, 244, 238, 0.6);
+  }
+  .scene__credit a {
+    color: inherit;
   }
   .scene__caption {
     position: relative;
