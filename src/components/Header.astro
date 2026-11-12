@@ -4,21 +4,36 @@
 // Eases in behind the glass intro (`.fade-up` waits on html.intro-done).
 // Be Part of It opens a menu of its three levels on hover or keyboard focus;
 // on touch it is a plain link, since the page opens on the same three panels.
+// The current page's link keeps its underline (aria-current="page").
 const LEVELS = [
   { id: 'you', label: 'You' },
   { id: 'community', label: 'Your Community' },
   { id: 'country', label: 'Our Country' },
 ];
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const current = (href: string) => (here === href ? 'page' : undefined);
 ---
 
 <header class="site-header fade-up" style="--fade-delay:0.24s">
   <a class="wordmark" href="/">We the People</a>
-  <nav>
+  <nav aria-label="Main">
     <div class="nav__row">
-      <a class="action" href="/problem"><span class="action__our">The </span>Problem</a>
-      <a class="action" href="/hope"><span class="action__our">Our </span>Hope</a>
+      <a class="action" href="/problem" aria-current={current('/problem')}
+        ><span class="action__our">The </span>Problem</a
+      >
+      <a class="action" href="/hope" aria-current={current('/hope')}
+        ><span class="action__our">Our </span>Hope</a
+      >
       <div class="menu">
-        <a class="action" href="/be-part-of-it">Be Part of It</a>
+        <a class="action" href="/be-part-of-it" aria-current={current('/be-part-of-it')}
+          >Be Part of It<svg
+            class="menu__caret"
+            viewBox="0 0 10 6"
+            width="10"
+            height="6"
+            aria-hidden="true"><path d="M1 1l4 4 4-4" /></svg
+          ></a
+        >
         <ul class="menu__list" aria-label="Be Part of It">
           {
             LEVELS.map((l) => (
@@ -32,7 +47,11 @@ const LEVELS = [
         </ul>
       </div>
     </div>
-    <a class="action action--under" href="/foundations">Foundations</a>
+    <a
+      class="action action--under"
+      href="/foundations"
+      aria-current={current('/foundations')}>Foundations</a
+    >
   </nav>
 </header>
 
@@ -60,6 +79,7 @@ const LEVELS = [
     font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
     text-transform: uppercase;
     color: var(--color-wtp-paper, #f6f4ee);
+    -webkit-tap-highlight-color: transparent;
   }
   .wordmark {
     font-size: var(--type-display-sm);
@@ -85,28 +105,54 @@ const LEVELS = [
       padding-top: 0.3rem;
     }
   }
+
+  /* --- links ------------------------------------------------------------ */
   .action {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
     font-size: var(--type-xs);
     letter-spacing: 0.14em;
-    white-space: nowrap;
+    white-space: pre; /* keeps "The " as one word with "Problem" */
     padding: 0.4rem 0.15rem;
-    border-bottom: 2px solid transparent;
-    transition: border-color 0.2s ease;
+    transition: transform 120ms var(--ease-out, ease-out);
+  }
+  /* the underline draws out from the middle: transform only, so it stays on
+     the compositor. The current page keeps it. */
+  .action::after {
+    content: '';
+    position: absolute;
+    inset: auto 0.15rem 0;
+    height: 2px;
+    background: var(--color-wtp-dawn, #f2c14e);
+    transform: scaleX(0);
+    opacity: 0;
+    transition:
+      transform 180ms var(--ease-out, ease-out),
+      opacity 180ms var(--ease-out, ease-out);
+  }
+  .action[aria-current='page']::after,
+  .action:focus-visible::after {
+    transform: none;
+    opacity: 1;
   }
   @media (hover: hover) and (pointer: fine) {
-    .action:hover {
-      border-color: var(--color-wtp-dawn, #f2c14e);
+    .action:hover::after {
+      transform: none;
+      opacity: 1;
     }
   }
-  .action:focus-visible {
-    border-color: var(--color-wtp-dawn, #f2c14e);
+  /* the press is felt: a touch smaller while held */
+  .action:active {
+    transform: scale(0.97);
   }
   /* fingers need 44px; the type stays small, the hit area grows */
-  /* padding, not a grid, makes the 44px: a grid stacks "The" over "Problem" */
   @media (pointer: coarse) {
     .action {
-      display: inline-block;
       padding-block: 0.9rem;
+    }
+    .action::after {
+      bottom: 0.55rem;
     }
   }
   /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "The/Our …" doesn't */
@@ -115,13 +161,39 @@ const LEVELS = [
       display: none;
     }
   }
+
   /* --- Be Part of It's menu --------------------------------------------- */
   .menu {
     position: relative;
     display: flex;
   }
-  /* hidden until hover or focus; the top padding bridges the gap under the
-     link so the pointer can travel down into it without it closing */
+  /* a caret says there's more here; it turns over while the menu is open.
+     Touch has no menu, so no caret. */
+  .menu__caret {
+    display: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    margin-left: 0.45em;
+    opacity: 0.7;
+    transition: transform 180ms var(--ease-out, ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .menu__caret {
+      display: block;
+    }
+    .menu:hover .menu__caret {
+      transform: rotate(180deg);
+    }
+  }
+  .menu:focus-within .menu__caret {
+    transform: rotate(180deg);
+  }
+  /* Grows from its corner under the trigger, quickly; closes faster still,
+     after a short grace so a pointer that slips on the way down doesn't lose
+     it. The top padding bridges the gap under the link. */
   .menu__list {
     position: absolute;
     top: 100%;
@@ -129,13 +201,40 @@ const LEVELS = [
     margin: 0;
     padding: 0.9rem 0 0;
     list-style: none;
+    transform-origin: top right;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-4px);
+    transform: translateY(-4px) scale(0.97);
     transition:
-      opacity 150ms var(--ease-out, ease-out),
-      transform 150ms var(--ease-out, ease-out),
-      visibility 0s linear 150ms;
+      opacity 120ms var(--ease-out, ease-out) 100ms,
+      transform 120ms var(--ease-out, ease-out) 100ms,
+      visibility 0s linear 220ms;
+  }
+  .menu:focus-within .menu__list {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 180ms var(--ease-out, ease-out),
+      transform 180ms var(--ease-out, ease-out),
+      visibility 0s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .menu:hover .menu__list {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition:
+        opacity 180ms var(--ease-out, ease-out),
+        transform 180ms var(--ease-out, ease-out),
+        visibility 0s;
+    }
+  }
+  /* touch: no hover to open it, so it stays a plain link */
+  @media not ((hover: hover) and (pointer: fine)) {
+    .menu__list {
+      display: none;
+    }
   }
   .menu__list li {
     background: rgba(5, 12, 7, 0.92);
@@ -151,7 +250,7 @@ const LEVELS = [
     border-bottom: 1px solid var(--color-wtp-bramble, #2a4a33);
     padding-bottom: 0.35rem;
   }
-  .menu__item {
+  .site-header .menu__item {
     display: block;
     padding: 0.55rem 1rem;
     font-size: var(--type-xs);
@@ -159,33 +258,27 @@ const LEVELS = [
     white-space: nowrap;
     transition: color 150ms ease;
   }
-  .menu__item:hover,
-  .menu__item:focus-visible {
-    color: var(--color-wtp-dawn, #f2c14e) !important;
+  .site-header .menu__item:hover,
+  .site-header .menu__item:focus-visible {
+    color: var(--color-wtp-dawn, #f2c14e);
   }
-  .menu:focus-within .menu__list {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition-delay: 0s;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .menu:hover .menu__list {
-      opacity: 1;
-      visibility: visible;
-      transform: none;
-      transition-delay: 0s;
-    }
-  }
-  /* touch: no hover to open it, so it stays a plain link */
-  @media not ((hover: hover) and (pointer: fine)) {
-    .menu__list {
-      display: none;
-    }
-  }
+
   .site-header a:focus-visible {
     outline: 2px solid var(--color-wtp-dawn, #f2c14e);
     outline-offset: 3px;
     border-radius: 2px;
+  }
+
+  /* reduced motion: the fades stay, the movement goes */
+  @media (prefers-reduced-motion: reduce) {
+    .action,
+    .action:active,
+    .menu__caret,
+    .menu__list {
+      transform: none !important;
+    }
+    .action::after {
+      transform: none;
+    }
   }
 </style>
