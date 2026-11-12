@@ -1,6 +1,7 @@
 ---
 // Fixed, transparent header: small wordmark left, the three parts and
-// Foundations right; on phones Foundations sits just under the three (ADA-68).
+// Foundations right (ADA-68). Phones can't fit four links beside the wordmark,
+// so below 640px a Menu button opens them in a panel under the header.
 // Eases in behind the glass intro (`.fade-up` waits on html.intro-done).
 // Be Part of It opens a menu of its three levels on hover or keyboard focus;
 // on touch it is a plain link, since the page opens on the same three panels.
@@ -16,7 +17,11 @@ const current = (href: string) => (here === href ? 'page' : undefined);
 
 <header class="site-header fade-up" style="--fade-delay:0.24s">
   <a class="wordmark" href="/">We the People</a>
-  <nav aria-label="Main">
+  <button class="toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+    <span class="toggle__label">Menu</span>
+    <span class="toggle__icon" aria-hidden="true"><span></span><span></span></span>
+  </button>
+  <nav id="site-nav" aria-label="Main">
     <div class="nav__row">
       <a class="action" href="/problem" aria-current={current('/problem')}
         ><span class="action__our">The </span>Problem</a
@@ -86,24 +91,12 @@ const current = (href: string) => (here === href ? 'page' : undefined);
     letter-spacing: 0.06em;
     line-height: 1;
   }
-  /* one row wherever the four fit. On phones there's no room beside the
-     wordmark, so Foundations tucks in close under the three parts (ADA-68) */
+  /* one row: the three parts, then Foundations (ADA-68) */
   nav,
   .nav__row {
     display: flex;
     align-items: center;
     gap: clamp(0.9rem, 3vw, 2rem);
-  }
-  @media (max-width: 640px) {
-    nav {
-      flex-direction: column;
-      gap: 0;
-    }
-    /* overlaps the row above's tap padding, so it reads as part of the nav */
-    .site-header .action--under {
-      margin-top: -0.7rem;
-      padding-top: 0.3rem;
-    }
   }
 
   /* --- links ------------------------------------------------------------ */
@@ -153,12 +146,6 @@ const current = (href: string) => (here === href ? 'page' : undefined);
     }
     .action::after {
       bottom: 0.55rem;
-    }
-  }
-  /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "The/Our …" doesn't */
-  @media (max-width: 560px) {
-    .action__our {
-      display: none;
     }
   }
 
@@ -269,16 +256,191 @@ const current = (href: string) => (here === href ? 'page' : undefined);
     border-radius: 2px;
   }
 
-  /* reduced motion: the fades stay, the movement goes */
+  /* --- phones: Menu opens the links in a panel under the header ---------- */
+  .toggle {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    .toggle {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-height: 2.75rem;
+      margin-right: -0.4rem;
+      padding: 0 0.4rem;
+      border: 0;
+      background: none;
+      color: var(--color-wtp-paper, #f6f4ee);
+      font-family: var(--font-wordmark), 'Arial Narrow', sans-serif;
+      font-size: var(--type-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 120ms var(--ease-out, ease-out);
+    }
+    .toggle:active {
+      transform: scale(0.97);
+    }
+    .toggle:focus-visible {
+      outline: 2px solid var(--color-wtp-dawn, #f2c14e);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+    /* two bars that turn into a cross */
+    .toggle__icon {
+      position: relative;
+      width: 1.1rem;
+      height: 0.6rem;
+    }
+    .toggle__icon span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      transition: transform 200ms var(--ease-out, ease-out);
+    }
+    .toggle__icon span:first-child {
+      top: 0;
+    }
+    .toggle__icon span:last-child {
+      bottom: 0;
+    }
+    .site-header[data-open] .toggle__icon span:first-child {
+      transform: translateY(0.25rem) rotate(45deg);
+    }
+    .site-header[data-open] .toggle__icon span:last-child {
+      transform: translateY(-0.25rem) rotate(-45deg);
+    }
+
+    /* the panel drops from under the header: in quickly, out quicker */
+    nav {
+      position: absolute;
+      top: 100%;
+      inset-inline: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 0.5rem clamp(1.2rem, 4vw, 2.6rem) 1.4rem;
+      /* solid: a backdrop blur can't work inside the header's own */
+      background: var(--color-wtp-night, #050c07);
+      border-bottom: 1px solid var(--color-wtp-bramble, #2a4a33);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-0.5rem);
+      transition:
+        opacity 150ms var(--ease-out, ease-out),
+        transform 150ms var(--ease-out, ease-out),
+        visibility 0s linear 150ms;
+    }
+    .site-header[data-open] nav {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition:
+        opacity 220ms var(--ease-out, ease-out),
+        transform 220ms var(--ease-out, ease-out),
+        visibility 0s;
+    }
+    .nav__row,
+    .menu {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    .site-header .action {
+      display: flex;
+      padding: 0.85rem 0;
+      font-size: var(--type-display-sm);
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--color-wtp-bramble, #2a4a33);
+    }
+    .site-header .action--under {
+      border-bottom: 0; /* the panel's own edge closes the list */
+    }
+    .action:active {
+      transform: none; /* full-width rows: no shrink */
+    }
+    /* the underline becomes a short dawn mark under the current page */
+    .action::after {
+      inset: auto auto 0.55rem 0;
+      width: 1.5rem;
+      transform-origin: left;
+    }
+    .menu__caret {
+      display: none;
+    }
+    /* Be Part of It's three levels sit open beneath it */
+    .site-header .menu__list,
+    .site-header .menu:hover .menu__list,
+    .site-header .menu:focus-within .menu__list {
+      display: block;
+      position: static;
+      padding: 0.3rem 0 0.6rem;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition: none;
+    }
+    .menu__list li,
+    .menu__list li:first-child,
+    .menu__list li:last-child {
+      padding: 0;
+      border: 0;
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .site-header .menu__item {
+      padding: 0.6rem 0 0.6rem 1rem;
+      color: rgba(246, 244, 238, 0.72);
+    }
+  }
+
+  /* reduced motion: the fades stay, the movement goes. The cross and the
+     turned caret are states, so they still change, just without moving. */
   @media (prefers-reduced-motion: reduce) {
-    .action,
     .action:active,
-    .menu__caret,
-    .menu__list {
+    .menu__list,
+    nav {
       transform: none !important;
     }
     .action::after {
       transform: none;
     }
+    .menu__caret,
+    .toggle__icon span {
+      transition: none;
+    }
   }
 </style>
+
+<script>
+  // Phones: Menu opens the links. Closes on a link, Escape, a tap outside,
+  // or the window growing past the phone layout.
+  const header = document.querySelector<HTMLElement>('.site-header')!;
+  const toggle = header.querySelector<HTMLButtonElement>('.toggle')!;
+  const label = toggle.querySelector('.toggle__label')!;
+  const phone = matchMedia('(max-width: 640px)');
+
+  const set = (open: boolean) => {
+    header.toggleAttribute('data-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    label.textContent = open ? 'Close' : 'Menu';
+  };
+
+  toggle.addEventListener('click', () => set(!header.hasAttribute('data-open')));
+  header.querySelectorAll('nav a').forEach((a) => a.addEventListener('click', () => set(false)));
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header.hasAttribute('data-open')) {
+      set(false);
+      toggle.focus();
+    }
+  });
+  addEventListener('pointerdown', (e) => {
+    if (header.hasAttribute('data-open') && !header.contains(e.target as Node)) set(false);
+  });
+  phone.addEventListener('change', () => set(false));
+</script>
