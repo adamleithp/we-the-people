@@ -1,5 +1,6 @@
 ---
-// Fixed, transparent header: small wordmark left, the three sections right.
+// Fixed, transparent header: small wordmark left, the three sections right,
+// with Foundations on a row of its own beneath them (ADA-68).
 // Eases in behind the glass intro (`.fade-up` waits on html.intro-done).
 // Be Part of It opens a menu of its three levels on hover or keyboard focus;
 // on touch it is a plain link, since the page opens on the same three panels.
@@ -13,22 +14,25 @@ const LEVELS = [
 <header class="site-header fade-up" style="--fade-delay:0.24s">
   <a class="wordmark" href="/">We the People</a>
   <nav>
-    <a class="action" href="/problem"><span class="action__our">The </span>Problem</a>
-    <a class="action" href="/hope"><span class="action__our">Our </span>Hope</a>
-    <div class="menu">
-      <a class="action" href="/be-part-of-it">Be Part of It</a>
-      <ul class="menu__list" aria-label="Be Part of It">
-        {
-          LEVELS.map((l) => (
-            <li>
-              <a class="menu__item" href={`/be-part-of-it#${l.id}`}>
-                {l.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+    <div class="nav__row">
+      <a class="action" href="/problem"><span class="action__our">The </span>Problem</a>
+      <a class="action" href="/hope"><span class="action__our">Our </span>Hope</a>
+      <div class="menu">
+        <a class="action" href="/be-part-of-it">Be Part of It</a>
+        <ul class="menu__list" aria-label="Be Part of It">
+          {
+            LEVELS.map((l) => (
+              <li>
+                <a class="menu__item" href={`/be-part-of-it#${l.id}`}>
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
+    <a class="action action--under" href="/foundations">Foundations</a>
   </nav>
 </header>
 
@@ -62,9 +66,18 @@ const LEVELS = [
     letter-spacing: 0.06em;
     line-height: 1;
   }
+  /* the three parts in a row, Foundations centred beneath them */
   nav {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .nav__row {
+    display: flex;
     gap: clamp(0.9rem, 3vw, 2rem);
+  }
+  .action--under {
+    margin-top: 0.15rem;
   }
   .action {
     font-size: var(--type-xs);

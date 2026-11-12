@@ -1,0 +1,261 @@
+---
+// Old & New Foundations — copy from the 9 Nov Linear ticket (ADA-69), one 70ch
+// column like /problem and /hope. Each section opens on a full-bleed <Scene>;
+// the photographs were chosen by the client (src/assets/story/README.md).
+// Linked from the header, on its own row under the three parts (ADA-68).
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Scene from '../components/Scene.astro';
+import ReadProgress from '../components/ReadProgress.astro';
+import stones from '../assets/story/foundations-01-how-we-gathered.jpg';
+import stage from '../assets/story/foundations-02-democracy-today.jpg';
+import assembly from '../assets/story/foundations-03-assembly-movement.jpg';
+import hands from '../assets/story/foundations-04-global-impact.jpg';
+import valley from '../assets/story/foundations-05-how-we-fit-in.jpg';
+import dawn from '../assets/story/foundations-06-spark.jpg';
+---
+
+<Layout
+  title="Old & New Foundations — We The People"
+  introLines={['Old & New', 'Foundations']}
+>
+  <PageHero lines={['Old & New', 'Foundations']} />
+
+  <ReadProgress />
+  <article class="prose">
+    <p class="lead">
+      <strong>We The People</strong> is founded on a simple premise. We believe in democracy.
+    </p>
+    <ul>
+      <li>We believe people have the right to decide on the matters that affect them all.</li>
+      <li>
+        We trust that, given the right circumstances, ordinary people are more than capable
+        of meeting as equals, talking with respect and making good decisions together.
+      </li>
+    </ul>
+
+    <Scene
+      src={stones}
+      alt="A ring of standing stones on a green field, fells rising behind under a pink evening sky"
+      heading="How we once gathered"
+    />
+    <p>
+      When we think of democracy, we probably think of parliaments, prime ministers and the
+      racket of elections. But its roots go much deeper than that, even beyond ancient Athens,
+      where the word ‘democracy’ was first used.
+    </p>
+    <p>
+      Across countries, cultures and centuries, people have always gathered to decide things
+      together. Some think the custom goes back to the dawn of human culture itself and that
+      it is our most natural way of being. Ordinary people, with no titles or special power,
+      sitting down as equals to settle disputes, share what they know and agree on a way
+      forward for the communities they share.
+    </p>
+    <p>
+      This tradition is deeply rooted in Britain where over a thousand years ago, people
+      would gather under great oaks or on hillsides at “moots” – assemblies where the people
+      governed themselves.
+    </p>
+
+    <Scene
+      src={stage}
+      alt="A man seen from behind with both fists raised, in a spotlight and a shower of confetti"
+      heading="Democracy today"
+      focus="45% 30%"
+    />
+    <p>
+      Democracy at its best means real participation, power, accountability and a deep sense
+      of belonging to a community we create together. But the way we experience it now feels
+      far removed from that promise. Only a quarter of people in this country say they are
+      happy with how democracy is working (Electoral Commission, 2026).
+    </p>
+    <p>
+      Politics has become little more than just another show for us to watch. The cast may
+      change but the real power is backstage, a place we are not allowed to enter or see.
+    </p>
+    <p>
+      We’re given our part to play, casting a vote once every half decade or so, but beyond
+      that we’re just a passive audience and have no meaningful role in shaping the decisions
+      that affect our everyday lives.
+    </p>
+    <p>This is a spectacle of democracy, not the real thing.</p>
+
+    <Scene
+      src={assembly}
+      alt="A large crowd sitting together on the steps of a cathedral, listening"
+      heading="The Assembly movement"
+      focus="50% 60%"
+    />
+    <p>
+      For well over a decade, a growing global movement has set about trying to change this.
+      <strong>We The People</strong> is an initiative born of that movement, honouring what
+      has gone before and building on its lessons.
+    </p>
+    <p>The engine of this movement is a gathering called an Assembly.</p>
+    <p>
+      Assemblies come in many forms, varying in terms of size, purpose and structure. But
+      they all share the same vision: to give ordinary people a greater say in their
+      government.
+    </p>
+    <p>
+      Some are held locally and are open to anyone who wants to turn up and take part. These
+      are often called <strong>People’s Assemblies</strong>.
+    </p>
+    <p>
+      At the biggest scale are <strong>Citizens’ Assemblies</strong>, which focus on questions
+      of national significance and have often been set up to inform the government or
+      parliament.
+    </p>
+    <p>A Citizens’ Assembly applies the principles of jury service to politics.</p>
+    <p>
+      A group of 100 or more everyday people are selected by lottery. The organisers take
+      care to ensure the population is reflected as a whole by factors like class, age,
+      gender, race etc.
+    </p>
+    <p>
+      The group is given a difficult problem to face, like immigration. They listen to experts
+      and witnesses from all sides of the debate. Independent facilitators help to manage the
+      discussion, enabling all views to be heard.
+    </p>
+    <p>
+      The aim is to empower the participants to thoroughly examine an issue, weigh up the
+      complexities, then forge informed policy recommendations that people with very different
+      views can all stand behind.
+    </p>
+    <p>
+      Because they represent the country in their make-up, the idea is that their conclusions
+      also represent the country as a whole, if everyone had the chance to access the same
+      information and discuss it.
+    </p>
+
+    <Scene
+      src={hands}
+      alt="A crowd of raised hands, in black and white"
+      heading="Global impact"
+      focus="45% 40%"
+    />
+    <p>In the last decade, Citizens’ Assemblies have been held all over the world.</p>
+    <p>
+      In Ireland, a citizens’ assembly helped people look at the question of legalising
+      abortion. In France, whether to allow assisted dying. In the UK, a Citizens’ Assembly on
+      climate change led to rare agreement between people from across the left and right of
+      politics.
+    </p>
+    <p>Assemblies work because they feel more like real democracy.</p>
+    <p>
+      Everyday people drive the process so we feel far better represented than by a political
+      elite.
+    </p>
+    <p>The structure and support built into the process make effective dialogue possible.</p>
+    <p>
+      And free from the pressures to win votes, funding or influence, our decisions are more
+      honest and fair, and better reflect what people actually want.
+    </p>
+    <p>
+      The hope is that these agreements are carried forward into government and policy –
+      though so far, it hasn’t always worked that way.
+    </p>
+
+    <Scene
+      src={valley}
+      alt="Mist lying in a green valley at dawn, trees rising out of it"
+      heading="How “We The People” fits in"
+    />
+    <p>
+      Assemblies are powerful but they face 3 significant challenges before they can really
+      deliver on their promise. That’s where <strong>We The People</strong> aims to help.
+    </p>
+    <p>
+      First, almost all large scale Citizens’ Assemblies on issues of national importance are
+      set up by those in power. That means politicians can limit what’s discussed and how, or
+      ignore the conclusions altogether.
+    </p>
+    <p>
+      Those in power don’t give it up easily. That’s why <strong>We The People</strong> aims to
+      build a popular movement so deep and so wide that we become the ones with the power to
+      decide.
+    </p>
+    <p>
+      That brings us to the second problem: our division. When we don’t speak with a coherent,
+      unified voice, politicians can choose who to listen to and who to ignore.
+    </p>
+    <p>
+      Citizens’ Assemblies are already at risk of being sucked into the culture wars. Critics
+      on the right have accused them of serving a left-wing agenda, rather than being truly
+      democratic.
+    </p>
+    <p>
+      That charge may not be baseless. Assemblies are often set up by people who care deeply
+      about a particular issue, and who quietly hope for a particular outcome. However well
+      run, that can shape what gets discussed and how.
+    </p>
+    <p>
+      <strong>We The People</strong> is different. Our primary aim isn’t to reach any
+      particular answer on immigration. Our sole agenda is to bring Britain back together and
+      put power back in the hands of real people.
+    </p>
+    <p>
+      That’s why we call our gatherings “Councils of the People” – and why anyone who’s
+      actively working with us must pledge to hold their other political loyalties, viewpoints
+      and policy positions secondary to achieving real democracy for us all.
+    </p>
+
+    <Scene src={dawn} alt="The sun rising over a valley full of mist, trees casting long rays" />
+    <p>
+      The third problem is that these ideas haven’t yet captured the public imagination.
+      They’re either so small in scale that few people hear about them or confined to academic
+      circles. Until that changes a popular movement can’t take hold.
+    </p>
+    <p><strong>We The People</strong> will light the spark to change that.</p>
+    <p>
+      By starting with immigration, we’re taking on an issue most people in the country have a
+      heartfelt point of view about. They already have a strong motivation to take part in the
+      discussion.
+    </p>
+    <p>
+      And <strong>We The People</strong> is designed to work for everyone. Whether you have 10
+      minutes, 10 hours or 10 months to commit, there are ways for you to contribute to a
+      change that will benefit us all.
+    </p>
+    <p>
+      This isn’t just for people already into politics. We’re bringing in artists,
+      filmmakers, celebrities and influencers to take these ideas to everyone – including
+      those who’ve never given democracy a second thought.
+    </p>
+    <p>
+      By working towards our National Council of the People, we aim to help to create a moment
+      of national cultural impact.
+    </p>
+    <p>
+      More than just a turning point in the immigration debate, it will be the start of a new
+      story about who we are and what we’re capable of.
+    </p>
+    <p>
+      A new vision for our democracy. One that could not only change everything for our
+      country, but even spark change across the world.
+    </p>
+
+    <a class="back" href="/be-part-of-it">Be Part of It →</a>
+  </article>
+</Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    var back = document.querySelector('article.prose .back');
+    if (!back) return;
+    var fired = false;
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !fired) {
+            fired = true;
+            window.posthog?.capture('foundations_article_read');
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
+    observer.observe(back);
+  });
+</script>

@@ -48,3 +48,9 @@ Chosen by the client in the Linear tickets and downloaded from their Google Driv
 | `hope-v2-03-immigration.jpg` | `1216mM_…` | Real Hope: Immigration (ADA-51) |
 | `hope-v2-04-reconnection.jpg` | `1u5T83R…` | Real Hope: Reconnection & Reconciliation (ADA-52) |
 | `hope-v2-05-believe-in-us.jpg` | `1nRv-j_…` | Real Hope: We start to believe in "us" again (ADA-54) |
+| `foundations-01-how-we-gathered.jpg` | `16ge0QQ…` | Foundations: How we once gathered (ADA-69) |
+| `foundations-02-democracy-today.jpg` | `1vp62RE…` | Foundations: Democracy today |
+| `foundations-03-assembly-movement.jpg` | `1w3I5Bc…` | Foundations: The Assembly movement |
+| `foundations-04-global-impact.jpg` | `1TE83cR…` | Foundations: Global impact |
+| `foundations-05-how-we-fit-in.jpg` | `1RrmXQ0…` (the homepage banner, as the ticket asked) | Foundations: How "We The People" fits in |
+| `foundations-06-spark.jpg` | `1aCB9TD…` | Foundations: the photo partway through How "We The People" fits in |
