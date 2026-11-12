@@ -65,5 +65,7 @@ PostHog, **EU cloud** (`https://eu.i.posthog.com`, project 235802 in the We The 
 
 ## Conventions
 
+- **Skills** live in `.claude/skills/`: Emil Kowalski's design-engineering and motion set (`emil-design-eng`, `animate`, `review-animations`, `animation-performance` and the rest, from github.com/emilkowalski/skills, MIT) plus PostHog's `integration-astro-static`. Reach for them on any motion or UI-polish work; see `.claude/skills/README.md` to update them.
+
 - Keep `OVERVIEW.md` as the canonical concept doc; update it (not scattered notes) when the movement's framing changes.
 - Update this file when project structure, tooling, or workflow changes.
