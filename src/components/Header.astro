@@ -1,6 +1,6 @@
 ---
-// Fixed, transparent header: small wordmark left, the three sections right,
-// with Foundations on a row of its own beneath them (ADA-68).
+// Fixed, transparent header: small wordmark left, the three parts and
+// Foundations right; on phones Foundations sits just under the three (ADA-68).
 // Eases in behind the glass intro (`.fade-up` waits on html.intro-done).
 // Be Part of It opens a menu of its three levels on hover or keyboard focus;
 // on touch it is a plain link, since the page opens on the same three panels.
@@ -66,18 +66,24 @@ const LEVELS = [
     letter-spacing: 0.06em;
     line-height: 1;
   }
-  /* the three parts in a row, Foundations centred beneath them */
-  nav {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  /* one row wherever the four fit. On phones there's no room beside the
+     wordmark, so Foundations tucks in close under the three parts (ADA-68) */
+  nav,
   .nav__row {
     display: flex;
+    align-items: center;
     gap: clamp(0.9rem, 3vw, 2rem);
   }
-  .action--under {
-    margin-top: 0.15rem;
+  @media (max-width: 640px) {
+    nav {
+      flex-direction: column;
+      gap: 0;
+    }
+    /* overlaps the row above's tap padding, so it reads as part of the nav */
+    .site-header .action--under {
+      margin-top: -0.7rem;
+      padding-top: 0.3rem;
+    }
   }
   .action {
     font-size: var(--type-xs);
@@ -96,11 +102,11 @@ const LEVELS = [
     border-color: var(--color-wtp-dawn, #f2c14e);
   }
   /* fingers need 44px; the type stays small, the hit area grows */
+  /* padding, not a grid, makes the 44px: a grid stacks "The" over "Problem" */
   @media (pointer: coarse) {
     .action {
-      display: grid;
-      align-items: center;
-      min-height: 2.75rem;
+      display: inline-block;
+      padding-block: 0.9rem;
     }
   }
   /* phones: "Problem · Hope · Be Part of It" fits beside the wordmark, "The/Our …" doesn't */
