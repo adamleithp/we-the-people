@@ -1,23 +1,23 @@
 ---
-// Part 3 — copy from "Copy update 28 Sept" (docs/). Three choices, one per level
-// of the movement; hovering one widens it and brings up its photograph. Each
-// opens its section below: a 70ch column broken up by full-bleed <Scene>s. The
-// photographs are from Unsplash (credits in src/assets/story/README.md); the
-// You section's copy is from the AgreeOnTea campaign doc (docs/).
+// Part 3 — copy from the Linear tickets (ADA-56 to 67). Three choices, one per
+// level of the movement; hovering one widens it and brings up its photograph.
+// Each opens its section below: a 70ch column broken up by full-bleed <Scene>s
+// (credits in src/assets/story/README.md).
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import Scene from '../components/Scene.astro';
 import ReadProgress from '../components/ReadProgress.astro';
-import tea from '../assets/story/you-01-tea-mugs.jpg';
-import spread from '../assets/story/you-02-spread-the-word.jpg';
-import plan from '../assets/story/you-03-the-plan.jpg';
+// You's photo is the licensed iStock already used on the homepage (iStock-2221195931)
+import tea from '../assets/story/home-part-tea.jpg';
 import community from '../assets/story/community-06-we-the-people-of.jpg';
-import chamber from '../assets/story/country-01-chamber.jpg';
-import stage from '../assets/story/country-02-the-mall.jpg';
-// the level panels' photos: royalty-free from Unsplash
-import communityPanel from '../assets/story/level-community.jpg';
-import countryPanel from '../assets/story/level-country.jpg';
+import council from '../assets/story/country-v2-01-council.jpg';
+import councilTalk from '../assets/story/country-v2-02-council-talk.jpg';
+import impact from '../assets/story/country-v2-03-cultural-impact.jpg';
+import policy from '../assets/story/country-v2-04-peoples-policy.jpg';
+// the level panels' photos (ADA-56)
+import communityPanel from '../assets/story/level-v2-community.jpg';
+import countryPanel from '../assets/story/level-v2-country.jpg';
 
 const LEVELS = [
   {
@@ -33,7 +33,7 @@ const LEVELS = [
     lines: ['Your', 'Community'],
     teaser: 'Hold a Council of the People where you live.',
     image: communityPanel,
-    focus: '50% 25%',
+    focus: '50% 55%',
   },
   {
     id: 'country',
@@ -41,7 +41,7 @@ const LEVELS = [
     lines: ['Our', 'Country'],
     teaser: 'A National Council of the People on Immigration.',
     image: countryPanel,
-    focus: '50% 40%',
+    focus: '50% 70%',
   },
 ];
 
@@ -94,60 +94,67 @@ const LEVELS = [
 
     <!-- I: YOU ------------------------------------------------------------- -->
     <article class="prose level-section" id="you">
-      <Scene first src={tea} alt="Two pairs of hands around mugs of milky tea on a wooden table" kicker="I · You" heading="Can you #AgreeOnTea?" />
+      <Scene first src={tea} alt="Two people's hands around cups of tea on a small round table" kicker="I · You" heading="Can you #AgreeOnTea?" />
 
       <p class="lead">
         Even in these divided times, there is surely one last thing we Brits can agree on…
       </p>
       <p class="pull">Tea.</p>
       <p>
-        Could you have a 10-minute cuppa with someone from a different political tribe to talk
-        about a difficult topic?
+        Could you have a 10-minute cuppa with someone from a different political point of view
+        to talk about a difficult topic?
       </p>
       <ul>
-        <li>Perhaps with the family member that you've given up talking politics with.</li>
+        <li>Perhaps with the family member that you’ve given up talking politics with.</li>
         <li>Your next-door neighbour who votes for that political party.</li>
-        <li>Your workmate who doesn't see the world your way at all.</li>
+        <li>Your workmate who doesn’t see the world your way at all.</li>
         <li>
           Or even that person you avoid in the street because they look like they belong to
           the other side.
         </li>
       </ul>
       <p>
-        If you do, then in the time it takes your tea to cool down, maybe you'll cool down the
-        country a little too.
+        If you do, then in the time it takes your tea to cool, you’ll have helped the country
+        cool down a little too.
       </p>
       <p>
-        When We The People choose to talk and listen to each other with respect, we challenge
-        the perception of our insurmountable division.
+        When <strong>We The People</strong> choose to talk and listen to each other with
+        respect, we challenge the idea that our rifts are too wide and deep to bridge.
       </p>
       <p>
-        And we might discover there's more humanity and nuance among us than the algorithm or
-        our politicians and media want us to believe.
+        And we might discover that those on the other side are more human and nuanced than the
+        algorithm or our politicians and media want us to believe.
       </p>
-      <p>And that means we can come back together to find a way through our problems after all.</p>
+      <p>
+        That means there’s hope: we can come back together to find a way through this deeply
+        difficult moment.
+      </p>
 
       <h2>The Idea</h2>
-      <p>The idea is to hold a respectful, honest conversation across our tribal lines.</p>
-      <p>Where both sides are free to speak and be heard; where any perspective can be expressed.</p>
-      <p>Of course, it's going to take courage. It's going to take backbone.</p>
+      <p>
+        The idea is to hold a respectful, honest conversation across the lines that divide us.
+      </p>
+      <p>
+        Where both sides are free to speak and be heard; where any perspective can be
+        expressed. Of course, it’s going to take courage. It’s going to take backbone.
+      </p>
       <p>Even more so, because the topic for this tea is one of the most difficult we face:</p>
       <p class="pull">What do you think about immigration and how this country might approach it?</p>
 
-      <Scene src={plan} alt="A quiet lane running straight ahead through a tunnel of trees towards the light" heading="The Plan" focus="50% 60%" />
-      <p>Here's how we suggest you go about it:</p>
+      <h2>The Plan</h2>
+      <p>Here’s how we suggest you go about it:</p>
 
       <section class="stage" aria-labelledby="stage-brew">
         <p class="stage__when">The Beginning</p>
         <h3 id="stage-brew">Gentle Brew</h3>
         <p>
           This first step is the most important. While you wait for the tea to brew, and add
-          milk and sugar, make sure you check in as human beings first. How are you, what's on
+          milk and sugar, make sure you check in as human beings first. How are you, what’s on
           your mind or going on in your life right now?
         </p>
         <p>
-          Since so many of us have passionate views about immigration, it's good to connect as
-          people before you dive in!
+          Since so many of us have strong views about immigration, it’s good to connect as
+          people before you dive in.
         </p>
       </section>
 
@@ -157,28 +164,28 @@ const LEVELS = [
           <p class="stage__when">The Middle</p>
           <h3 id="stage-dialogue">Dialogue</h3>
           <p class="game-card__meta">
-            <span>2 players</span><span>3 rounds or more</span><span>90 seconds each</span>
+            <span>2 people</span><span>3 rounds or more</span><span>90 seconds each</span>
           </p>
         </header>
-        <p>It's simple: each person has at least 3 rounds of 90 seconds each to speak.</p>
+        <p>It’s simple: each person has at least 3 rounds of 90 seconds each to speak.</p>
         <ol class="game-card__rules">
           <li>When one person speaks, the other must listen. No interruptions.</li>
           <li>
-            When it's your turn to speak, you give your honest and heartfelt point of view. No
+            When it’s your turn to speak, you give your honest and heartfelt point of view. No
             sugar-coating.
           </li>
           <li>
-            When it's your turn to listen, you really listen – rather than just thinking about
-            what you're going to say next.
+            When it’s your turn to listen, you really listen – rather than just thinking about
+            what you’re going to say next.
           </li>
           <li>
-            It's best to use an alarm for timings so that you're free to engage with the other
+            It’s best to use an alarm for timings so that you’re free to engage with the other
             person, not your phone.
           </li>
         </ol>
         <p class="game-card__golden">
-          <strong>The golden rule:</strong> be sure to avoid insults. Treat the other person how
-          you would like to be treated in turn.
+          <strong>The golden rule:</strong> treat the other person as you would want to be
+          treated. Obviously that means be sure to avoid insults.
         </p>
         <p class="game-card__go">And if you want to do more than 3 rounds, go for it!</p>
       </section>
@@ -188,136 +195,303 @@ const LEVELS = [
         <h3 id="stage-reflect">A Minute to Reflect</h3>
         <p>Once you both feel done, take one last minute to reflect on the process with each other.</p>
         <p>
-          Don't feel disheartened about how much you disagreed. It's unlikely a single tea would
-          change anyone's minds!
+          Don’t feel disheartened about how much you disagreed. It’s unlikely a single tea would
+          change anyone’s minds!
         </p>
-        <p>Rather consider if there was even a moment of empathy for the other's point of view?</p>
         <p>
-          Did you find even a single square inch of shared ground or catch a glimpse, no matter
-          how brief, of the human beyond the divide?
+          But did you glimpse a moment where you understood where the other was coming from? A
+          moment when their tough opinion made more sense? Perhaps even an inch of common ground?
         </p>
-        <p>If the journey to come back together is 10,000 miles, then that would be a first step.</p>
+        <p>If the journey to come back together is 10,000 miles, then you just took the first step.</p>
       </section>
 
-      <Scene src={spread} alt="Two women talking close on a city street at night, lights blurred behind them" heading="Spread the Word" focus="50% 40%" />
+      <h2>Spread the Word</h2>
       <p>
-        The most important thing is that the conversation happens at all. So if you want to keep
-        it entirely private, that's totally fine.
+        If you feel comfortable, share a photo of your two hands, your cups or your mugs,
+        tagging #AgreeOnTea and @WeThePeopleGather.
       </p>
       <p>
-        Or just share a photo of your two hands, your cups or your mugs, tagging #AgreeOnTea and
-        @WeThePeopleGather.
+        If you want to go further you could share audio or video of the whole or part of the
+        conversation. Make sure both parties are happy to do this before posting.
       </p>
       <p>
-        Of course, you can go further and share audio or video of the whole or part of the
-        conversation.
+        If you want to keep it entirely private, that’s totally fine. The most important thing
+        is that the conversation happens at all.
       </p>
       <p>
-        If others hear that you two did #AgreeOnTea, it might inspire them to do the same –
-        perhaps even create a wave of reconnection across the country.
+        But when others hear you did #AgreeOnTea, it might inspire them to do the same – and
+        that’s how a bigger movement begins.
       </p>
-      <p>In this way, we can all do our bit to show a more united, hopeful future is possible.</p>
+      <p>
+        By taking part in the conversation and spreading the message further we can all do our
+        bit to show a more united, hopeful future is possible.
+      </p>
+
+      <!-- Other Ways (ADA-59). A green band until the client sends a licensed copy
+           of its photograph (the one in the ticket is an iStock preview). -->
+      <h2 class="band" id="other-ways">Other Ways</h2>
+      <p class="lead">
+        There are so many ways we as individuals can contribute to <strong>We The People</strong>
+        in everyday life.
+      </p>
+
+      <h3 class="subhead">Through your work or local group</h3>
+      <p>
+        <strong>We The People</strong> know that the best way for us to reunite our country and
+        transform our system is to collaborate with as many organisations and people as
+        possible.
+      </p>
+      <p>
+        That’s why we’re asking groups and organisations across Britain, big and small, to take
+        a public stand with us and declare:
+      </p>
+      <ul class="pledge">
+        <li>We are concerned that our country is deeply divided.</li>
+        <li>We believe we can come back together.</li>
+        <li>We commit to the principles: listening, respect and finding common ground.</li>
+      </ul>
+      <p>
+        This isn’t just for charities or advocacy groups but football clubs, book groups, your
+        local church, your children’s school or GP surgery.
+      </p>
+      <p>
+        Think about the groups and places where you belong and ask them to make a public pledge
+        of support. Ask if they’d encourage members to #AgreeOnTea or consider starting a
+        Council of the People.
+      </p>
+      <p>
+        There might also be opportunities for stronger collaboration as the movement builds. If
+        that interests your group, get in touch.
+      </p>
+
+      <h3 class="subhead">Get in touch &amp; spread the word</h3>
+      <p>Have another idea for how you could help? Get in touch.</p>
+      <p>
+        We need people for organising, outreach, fundraising and, above all, for spreading the
+        word.
+      </p>
+      <p>
+        So share this website with three people in your life, and let them know a new approach
+        for our country and our future is emerging.
+      </p>
+      <p>
+        We know that this is an ambitious project that challenges our core beliefs about who we
+        are, what we are capable of and how the world works.
+      </p>
+      <p>
+        It’s bound to raise questions, doubts and disagreements, and we want to hear them all.
+        The more voices that shape this movement, the stronger it will be.
+      </p>
+      <p>
+        So get in touch and tell us what you think at
+        <a href="mailto:hello@wethepeoplegather.com">hello@wethepeoplegather.com</a>.
+      </p>
+
+      <h3 class="subhead">Be the change</h3>
+      <blockquote class="quote">
+        <p>“Be the change you want to see in the world”</p>
+        <footer>Mahatma Gandhi</footer>
+      </blockquote>
+      <p>
+        At the most basic level, if all of us who believe in the ideas of this movement could
+        embody its principles a little more in daily life, we would start to lower the
+        temperature in our country.
+      </p>
+      <p>
+        There are an almost infinite number of ways we could do this. Just being kinder, more
+        open and less confrontational would be a great start.
+      </p>
+      <p>You could try to listen better to the people in your own life. Your children, parents or colleagues.</p>
+      <p>
+        Be curious about other perspectives, rather than reducing people to labels. When you
+        hear a point of view that you disagree with, try asking “What can they see that I’m not
+        seeing?”
+      </p>
+      <p>
+        Even just work on getting hold of your temper. See the person who bumped into you in the
+        street or cut in front of you in the traffic as a human being, not an opponent.
+      </p>
+      <p>
+        Of course, we’re only human, doing our best amid the pressures of modern life. We’re not
+        asking you to become a saint.
+      </p>
+      <p>
+        But every time you choose to listen instead of shout back, when you don’t rush to judge
+        or condemn someone and instead treat them as a human worthy of respect, you do your bit
+        to help Britain find its way back together.
+      </p>
     </article>
 
     <!-- II: YOUR COMMUNITY ------------------------------------------------- -->
     <article class="prose level-section" id="community">
-      <Scene first src={community} alt="A woman laughing with her hands over her mouth, talking with friends at a table" kicker="II · Your Community" heading="We The People of…" focus="50% 40%" />
+      <Scene first src={community} alt="A woman laughing with her hands over her mouth, talking with friends at a table" kicker="II · Your Community" heading="We The People of…" headingMore="Dover. Brixton. Edinburgh. Piddington. York. Cardiff. Hastings — and more." focus="50% 40%" />
 
-      <p class="lead">Dover. Brixton. Edinburgh. Piddington. York. Cardiff. Hastings — and more.</p>
       <p>
-        The issue of immigration has touched many of our communities, both for good and for
-        ill.
+        The issue of immigration has touched many of our communities, for better or worse. Our
+        political rifts find their way into our day-to-day lives and the places we call home.
       </p>
       <p>
-        The divisions we see in the country find their way into our day-to-day lives and the
-        places we call home. Even our family tables.
+        As our movement grows, <strong>We The People</strong> will hold gatherings in villages,
+        towns and cities for larger groups of people (from 20–100) to help whole communities
+        talk to each other again with honesty and respect and to find a way through our deep
+        divides.
       </p>
+      <p>We call these gatherings a <strong>Council of the People</strong>.</p>
+      <p>
+        In essence, the Councils are expanded versions of the one-on-one conversations and based
+        on the same principles: everyone is welcome and every point of view can be spoken and
+        heard freely, without fear.
+      </p>
+      <p>The central question remains:</p>
+      <p class="pull">What do you think about immigration and how this country might approach it?</p>
+
       <!-- a solid green band, out to the viewport edges like a <Scene>, carrying
-           the turn from the problem to the two paths below -->
+           the turn to the two paths below -->
       <p class="paths-banner">
-        So we offer two paths to hold a Council of the People for your community, whatever
-        its size.
+        We offer two paths to hold a Council of the People for your community, whatever its
+        size.
       </p>
 
-      <h2>Download our toolkit</h2>
+      <h2><span class="path-n">1.</span> Let us do it</h2>
       <p>
-        Access our free toolkit (coming soon) for a clear step-by-step process, principles
-        and resources to hold a gathering yourself.
+        We can do it for you, creating a bespoke programme and approach tailored to your
+        community and the unique ways in which questions around immigration have affected it.
       </p>
-      <p>We can also connect you with a network of expert facilitators in your area, if required.</p>
+      <p>
+        We also offer impartial facilitation for the Council itself. That means trained members
+        of our team will be present in person to support the conversation and ensure the
+        <strong>We The People</strong> principles are honoured: that all voices and perspectives
+        are heard and treated with respect.
+      </p>
+      <p>
+        If we do not have a team available for your Council, we will try to connect you with a
+        trusted local facilitation team. Everyone we recommend has been vetted to ensure they
+        share our commitment to impartiality.
+      </p>
+      <p>
+        Our support is free but you’ll need to find an appropriate venue, provide refreshments
+        and take the lead in promoting the event locally.
+      </p>
 
-      <h2>Let Us Help</h2>
+      <h2><span class="path-n">2.</span> Do it yourself</h2>
       <p>
-        Please <a href="mailto:hello@wethepeoplegather.com">get in touch</a> if you would
-        like our direct support in holding a Council of the People in your community.
+        If demand means we cannot provide direct support, or if you prefer to run the event
+        yourself, we’ll soon have a free toolkit available for download which offers a clear
+        step-by-step process, principles and resources to hold a gathering yourself.
       </p>
       <p>
-        We can provide bespoke guidance on setting up a Council and also offer impartial
-        facilitation for the Council itself.
-      </p>
-      <p>
-        If we do not have capacity for our team to attend on the day, we will endeavour to
-        connect you with a facilitator team in your area that can do the same job.
-      </p>
-      <p>
-        Though it is up to you to source an appropriate venue, provide refreshments and
-        advertise, we offer our services at no cost.
+        If no-one in your group feels comfortable running the event, we can connect you with a
+        vetted facilitator in your area for in-person support on the day.
+        <a href="mailto:hello@wethepeoplegather.com">Get in touch</a> for more information.
       </p>
 
       <p class="pull">
-        The dream: to inspire a wave of reconnection and reconciliation in communities
-        across the country.
+        The dream: to inspire a wave of reconnection and reconciliation in communities across
+        the country.
       </p>
     </article>
 
     <!-- III: OUR COUNTRY --------------------------------------------------- -->
     <article class="prose level-section" id="country">
-      <Scene first src={chamber} alt="An empty horseshoe-shaped debating chamber, rows of seats facing the centre" kicker="III · Our Country" heading="A National Council of the People" />
+      <Scene first src={council} alt="A large circular debating chamber, rows of blue seats rising round a central floor" kicker="III · Our Country" heading="A National Council of the People" />
 
       <p class="lead">
-        Starting with you, through your community, we hope that the wave of reconnection and
-        reconciliation will culminate in a major cultural event: a National Council of the
-        People on Immigration.
+        Our individual conversations and community work will build towards a major cultural
+        event: a National Council of the People on Immigration.
       </p>
       <p>
-        Using the Citizens' Assembly approach (see <a href="/hope">Our Real Hope</a>), we
-        will select a group of 100 or more everyday people to discuss
-      </p>
-      <p class="pull">How might we approach immigration as a country?</p>
-      <p>
-        Lasting for up to two weeks, the Council will hear testimony from experts on
-        immigration as well as personal stories of those whose lives have been affected by
-        the issue.
+        Since we can’t gather the whole country, we will use a lottery-based model to pick
+        participants. A group of 100 to 150 everyday people will be selected. We’ll ensure the
+        group reflects the population as a whole based on factors like class, age, gender, race
+        and political perspective.
       </p>
       <p>
-        These could include positive stories of the beauty of British culture or
-        contributions made by refugees. Or they could be negative stories of racist attacks
-        or violence perpetrated by immigrants.
-      </p>
-      <p>
-        It will be a place where all sides can speak without fear of judgment. Where ghosts
-        from the past can be faced. Where we can express anger, grief, even shed tears.
-      </p>
-      <p>
-        An opportunity for the communities of this island to share their stories at last, in
-        search of a more united, hopeful future.
+        Over a period of up to two weeks, the Council will hear testimony from experts on
+        immigration as well as personal stories of those whose lives have been affected by the
+        issue.
       </p>
 
-      <Scene src={stage} alt="A man up on a friend's shoulders taking a photo, in a crowd on The Mall with a Union Jack behind" heading="A Moment of National Cultural Impact" focus="50% 25%" />
+      <Scene src={councilTalk} alt="A small group of men of different ages talking over drinks, one of them speaking with his hands" focus="50% 35%" />
       <p>
-        In that way, the national Council of the People aims to have a positive impact
-        across our society.
+        Clearly, this subject is incredibly volatile. But we believe the National Council of the
+        People must allow all perspectives to be aired, even those that either side might find
+        extreme, to make sure that it truly represents our country as a whole.
       </p>
       <p>
-        To that end, we will aim to engage as many people as possible by making the Council
-        exciting, emotional — even entertaining.
+        So the Council will hear the case for a more open approach to immigration. That could
+        include the legacy of immigration in shaping modern Britain and the contribution
+        migrants make today.
       </p>
       <p>
-        We will involve high profile cultural figures from across the arts, music, film &amp;
-        TV both to drive public awareness and of course share their perspectives too.
+        And they will hear the case for more immigration control, including those who want to
+        reverse it. That could include concerns about the pace of change in communities, the
+        impact on culture and traditions, or crime and safety.
+      </p>
+      <p>
+        Inevitably this conversation will be about what it means to be British. What does it
+        mean to belong here? What are our core British values and how do they apply to those
+        who want to come here and stay?
+      </p>
+      <p>
+        They will explore how the debate itself has affected us all. For example, concerns that
+        it fuels racism towards ethnic minority communities, including people born and raised
+        here. Or that people feel unable to voice legitimate concerns without suffering social
+        or legal repercussions.
+      </p>
+      <p>
+        Like every conversation and the local Councils of the People before it, this gathering
+        will be a place where all sides can speak without fear of judgment. Where all
+        perspectives will be heard. Where ghosts from the past can be faced. Where we can
+        express anger, grief, even shed tears.
+      </p>
+      <p>
+        The crucial difference is that the National Council of the People will bring
+        representatives from the whole country into one room. Voices from every region and every
+        walk of life, across the full spectrum of opinion finally coming together face to face.
+      </p>
+      <p>This is how we, as a people, can finally find our way through this issue together.</p>
+
+      <Scene src={impact} alt="A packed stadium at night, a green stage of hills and chimneys lit up in the middle" heading="A Moment of National Cultural Impact" />
+      <p>
+        Even though most of us will not take part directly, there will be loads of ways to
+        follow along and get involved in the National Council of the People, whoever and
+        wherever you are.
+      </p>
+      <p>
+        Just as the Jubilee sparked street parties across the country, we hope the National
+        Council will spark conversation about immigration across the country, one rooted in
+        honesty and respect.
+      </p>
+      <p>
+        There will be an app where you can follow what’s happening in the Council, post comments
+        and vote on the ideas that resonate most with you personally.
+      </p>
+      <p>
+        There will also be a portal where you can submit your own stories or perspective. We’ll
+        all have a chance to speak without fear of judgment and to contribute.
+      </p>
+      <p>
+        And we’ll encourage everyone from everyday people to public figures across the arts,
+        music, film and TV to share their points of view. Some may be submitted for
+        consideration in the Council. Together, our stories will stand as a collection of
+        national memory on immigration.
+      </p>
+
+      <Scene src={policy} alt="Children holding up a Union flag together outdoors" heading="The People’s Policy" focus="50% 40%" />
+      <p>
+        At the end of this process, we will have the first policy on immigration written by the
+        people ourselves, not politicians.
+      </p>
+      <p>
+        Of course, there will be hard compromises. Undoubtedly everyone will find some part hard
+        to stomach. Yet it will be the first policy ever put forward on this issue that most
+        people can accept. A policy in all our names.
+      </p>
+      <p>
+        This will be a breakthrough in how we do democracy. One that will be impossible to
+        ignore. A prototype for a new political system.
       </p>
     </article>
-
   </main>
 </Layout>
 
@@ -469,6 +643,59 @@ const LEVELS = [
     font-size: var(--type-xl);
     line-height: 1.4;
     text-wrap: balance;
+  }
+
+  .path-n {
+    color: var(--color-wtp-dawn);
+  }
+
+  /* Other Ways opens on a green band, like the paths banner, its heading in
+     the column */
+  .prose h2.band {
+    margin: 4.5rem calc(50% - 50vw) 2.2rem;
+    padding: clamp(3rem, 9vw, 5.5rem) calc(50vw - 50%);
+    background: var(--color-wtp-green);
+    font-size: var(--type-display-xl);
+    line-height: 0.98;
+    scroll-margin-top: 0;
+  }
+  /* small indented heads within a section: Anton caps behind a dawn rule */
+  .prose h3.subhead {
+    margin: 3rem 0 1rem;
+    padding-left: 1.1rem;
+    border-left: 2px solid var(--color-wtp-dawn);
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: var(--type-display-sm);
+    line-height: 1.1;
+    color: #fff;
+  }
+  /* the pledge a group makes, as its own statement */
+  .prose .pledge {
+    margin: 1.4rem 0 1.6rem;
+    padding: 1.2rem 1.4rem 1.2rem 2.6rem;
+    background: var(--color-wtp-green);
+    color: #fff;
+  }
+  .prose .pledge li::before {
+    left: -1.25rem;
+  }
+  .prose .quote {
+    margin: 0 0 1.6rem;
+  }
+  .prose .quote p {
+    margin: 0;
+    font-size: var(--type-xl);
+    font-style: italic;
+    line-height: 1.4;
+    color: #fff;
+  }
+  .prose .quote footer {
+    margin-top: 0.4rem;
+    font-size: var(--type-sm);
+    color: rgba(246, 244, 238, 0.6);
   }
 
   /* Rules of the Game — paper card, ink type, like the back of a board game */

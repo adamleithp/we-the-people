@@ -16,13 +16,7 @@ wide; Astro resizes them to WebP at build.
 | problem-02-greenwich-flag | Gloomy, foreboding, dark Houses of Parliament. **Replaced:** Unsplash, Lawrence Chismorie (`0QY4O2FSK60`) |
 | problem-03-march | Protests, flags, antifascists vs patriots, riot police. **Replaced:** Unsplash, Alex Radelich (`Evo4wmtRaPI`) |
 | problem-04-arms-linked | Peace across the divide: hugs, handshakes across lines. **Replaced:** Unsplash, Nathan Dumlao (`5frNXb3acHU`) |
-| you-01-tea-mugs | Anonymous pair of hands holding tea together. **Replaced:** Unsplash, Sam Hojati (`KxKbXRfrO3I`) |
-| you-02-spread-the-word | Two people talking. **Replaced:** Unsplash, Valentin (`tJlV-Yu_Ps4`) |
-| you-03-the-plan | The road ahead. **Replaced:** Unsplash, Georgii Eletskikh (`WQZouZ6jTj4`) |
-| level-community, level-country | The Your Community / Our Country panels on /be-part-of-it. **Royalty-free:** Unsplash, Random Institute (`5v_rsYMuxek`) and Freddie Collins (`yzvSdga4Lgs`) |
 | community-06-we-the-people-of | Opens Your Community. **Replaced:** Unsplash, MD Duran (`kBr-A4K67z4`) |
-| country-01-chamber | Circular chamber, national in scale. **Replaced:** Unsplash, Neon Wang (`UpE4KQSZ1dA`), Parliament House, Canberra |
-| country-02-the-mall | Iconic British cultural moment (doc used Stormzy). **Replaced:** Unsplash, Jonny Gios (`csTgUUaSdqI`), The Mall, London |
 
 ## 26 Oct 2026 photo pack (client-supplied iStock, licensed by WTP)
 
@@ -54,3 +48,11 @@ Chosen by the client in the Linear tickets and downloaded from their Google Driv
 | `foundations-04-global-impact.jpg` | `1TE83cR…` | Foundations: Global impact |
 | `foundations-05-how-we-fit-in.jpg` | `1RrmXQ0…` (the homepage banner, as the ticket asked) | Foundations: How "We The People" fits in |
 | `foundations-06-spark.jpg` | `1aCB9TD…` | Foundations: the photo partway through How "We The People" fits in |
+| `level-v2-community.jpg` | `1nBI8E2…` | Be Part of It: Your Community panel (ADA-56) |
+| `level-v2-country.jpg` | `15CI1V2…` | Be Part of It: Our Country panel (ADA-56) |
+| `country-v2-01-council.jpg` | `1L2OeUV…` (1920px, the largest supplied) | Our Country: A National Council of the People (ADA-64) |
+| `country-v2-02-council-talk.jpg` | `11OpNDG…` | Our Country: the photo partway through the National Council (ADA-64) |
+| `country-v2-03-cultural-impact.jpg` | `1_PHZ1m…` | Our Country: A Moment of National Cultural Impact (ADA-65) |
+| `country-v2-04-peoples-policy.jpg` | `1KUIN28…` | Our Country: The People's Policy (ADA-67) |
+
+The You panel and #AgreeOnTea use `home-part-tea.jpg` (iStock-2221195931, from the licensed pack): the ticket's copy of the same photo was a watermarked iStock preview. ADA-59's Other Ways photo (iStock-1202072057) and ADA-61's Your Community photo (iStock-2159254002) also came as watermarked previews, so they wait for licensed copies: Other Ways opens on a green band, and Your Community keeps `community-06-we-the-people-of.jpg`.

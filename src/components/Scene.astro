@@ -16,6 +16,8 @@ interface Props {
   alt: string;
   /** the section heading, set over the photo */
   heading?: string;
+  /** more of the heading, in its type on the lines below (Your Community's places) */
+  headingMore?: string;
   kicker?: string;
   /** object-position for the crop, e.g. "50% 30%" */
   focus?: string;
@@ -30,6 +32,7 @@ const {
   src,
   alt,
   heading,
+  headingMore,
   kicker,
   focus = '50% 50%',
   first = false,
@@ -72,7 +75,10 @@ const {
     heading && (
       <figcaption class="scene__caption">
         {kicker && <p class="scene__kicker">{kicker}</p>}
-        <h2 class="scene__heading">{heading}</h2>
+        <h2 class="scene__heading">
+          {heading}
+          {headingMore && <span class="scene__more">{headingMore}</span>}
+        </h2>
       </figcaption>
     )
   }
@@ -155,6 +161,11 @@ const {
     letter-spacing: 0.01em;
     text-wrap: balance;
     color: #fff;
+  }
+
+  .scene__more {
+    display: block;
+    margin-top: 0.15em;
   }
 
   @media (prefers-reduced-motion: no-preference) {
